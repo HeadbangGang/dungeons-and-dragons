@@ -4,6 +4,7 @@ import { Form, Button } from 'react-bootstrap'
 import { auth } from '../../database/firebase'
 import { useHistory } from 'react-router-dom'
 import { AUTHENTICATION, ERRORS } from '../../language-map'
+import './authentication.css'
 
 export default function PasswordReset ({ setError }) {
     const history = useHistory()
@@ -41,7 +42,7 @@ export default function PasswordReset ({ setError }) {
                     </Form.Group>
                     <div className="authentication-submit">
                         <Button
-                            variant="outline-danger"
+                            variant="outline-dark"
                             type="submit"
                             onClick={ (e) => passwordResetHandler(e) }
                         >

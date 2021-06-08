@@ -4,12 +4,13 @@ import { useHistory } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { auth, generateUserDocument } from '../../database/firebase'
 import { AUTHENTICATION, ERRORS, GENERAL } from '../../language-map'
+import './authentication.css'
 
 export default function SignUp ({ setError }) {
     const history = useHistory()
 
     const [email, setEmail] = useState(null)
-    const [username, setUsername] = useState(null)
+    const [characterName, setCharacterName] = useState(null)
     const [password, setPassword] = useState(null)
 
     return (
@@ -24,18 +25,17 @@ export default function SignUp ({ setError }) {
                 >
                     <Form.Group controlId="formUsername">
                         <Form.Label>
-                            { AUTHENTICATION.userName }
+                            { AUTHENTICATION.characterName }
                         </Form.Label>
                         <Form.Control
                             autoComplete="off"
                             data-lpignore="true"
                             onChange={ (e) => {
-                                setUsername(e.target.value)
+                                setCharacterName(e.target.value)
                             } }
-                            placeholder="ILovePokemon1234"
+                            placeholder='Samwise Gamgee'
                         />
                         <Form.Text className="text-muted">
-                            { GENERAL.beCreative }
                         </Form.Text>
                     </Form.Group>
                     <Form.Group controlId="formBasicEmail">
@@ -69,7 +69,7 @@ export default function SignUp ({ setError }) {
                     </Form.Group>
                     <div className="authentication-submit">
                         <Button
-                            variant="outline-danger"
+                            variant="outline-dark"
                             type="submit"
                             onClick={ (e) => {
                                 createAccountHandler(e)
@@ -99,10 +99,10 @@ export default function SignUp ({ setError }) {
     async function createAccountHandler (e) {
         e.preventDefault()
 
-        if (email && password && username) {
+        if (email && password && characterName) {
             try{
                 const { user } = await auth.createUserWithEmailAndPassword(email, password)
-                generateUserDocument(user, { username })
+                generateUserDocument(user, { characterName })
             }
             catch(e){
                 if (e.code === 'auth/email-already-in-use') {
@@ -112,8 +112,8 @@ export default function SignUp ({ setError }) {
                 }
             }
         } else {
-            if (!username) {
-                setError(ERRORS.enterUsername)
+            if (!characterName) {
+                setError(ERRORS.enterCharacter)
             } else if (!email) {
                 setError(ERRORS.enterEmail)
             } else if (!password) {

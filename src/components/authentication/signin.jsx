@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import { useHistory, Link } from 'react-router-dom'
 import { auth } from '../../database/firebase'
 import { AUTHENTICATION, ERRORS } from '../../language-map'
+import './authentication.css'
 
 export default function SignIn ({ setError }) {
     const history = useHistory()
@@ -60,7 +61,7 @@ export default function SignIn ({ setError }) {
                                 signInToAccountHandler(e)
                             } }
                             type="null"
-                            variant="outline-danger"
+                            variant="outline-dark"
                         >
                             { AUTHENTICATION.signIn }
                         </Button>

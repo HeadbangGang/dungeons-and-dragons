@@ -9,6 +9,8 @@ import SignIn from './authentication/signin'
 import SignUp from './authentication/signup'
 import PasswordReset from './authentication/passwordreset'
 import UserProvider from '../providers/userprovider'
+import DndFooter from '../components/footer/dnd-footer'
+import ProfilePage from './authentication/profilepage'
 
 export const DndContainer = () => {
     return (
@@ -23,7 +25,9 @@ export const DndContainer = () => {
                         <Route exact path='/account/sign-in' component={ SignIn } />
                         <Route exact path='/account/sign-up' component={ SignUp } />
                         <Route exact path='/account/password-reset' component={ PasswordReset } />
+                        <Route exact path='/account/profile' component={ ProfilePage } />
                     </Switch>
+                    <DndFooter />
                 </Router>
             </PlayersProvider>
         </UserProvider>

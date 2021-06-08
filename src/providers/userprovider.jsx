@@ -1,7 +1,7 @@
 import React, { createContext, useEffect, useState } from 'react'
 import { auth, generateUserDocument } from '../database/firebase'
 
-export const UserContext = createContext({ user: null })
+export const UserContext = createContext(null)
 
 export default function UserProvider (props) {
     const [userAccount, setUserAccount] = useState([])

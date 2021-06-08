@@ -43,36 +43,41 @@ export const DndNavbar = ({ error, setError }) => {
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
             <Navbar.Collapse id="basic-navbar-nav">
                 <Nav className="mr-auto">
-                    <div className='mr-auto navbar-nav'>
-                        <a
-                            className='nav-link'
-                            onClick={ () => history.push('/initiative-order') }
-                        >
+                    {userContext &&
+                    <>
+                        <div className='mr-auto navbar-nav'>
+                            <a
+                                className='nav-link'
+                                onClick={ () => history.push('/initiative-order') }
+                            >
                             Initiative Order
-                        </a>
-                    </div>
-                    <NavDropdown title="Characters" id="basic-nav-dropdown">
-                        { players.map((player, index) => {
-                            return (
-                                <a
-                                    className='dropdown-item'
-                                    // href=''
-                                    key={ index }
-                                    onClick={ () => console.log(player) }
-                                >
-                                    { player }
-                                </a>
-                            )
-                        })}
-                    </NavDropdown>
+                            </a>
+                        </div>
+                        <NavDropdown title="Characters" id="basic-nav-dropdown" menuVariant='light'>
+                            { players.map((player, index) => {
+                                return (
+                                    <a
+                                        className='dropdown-item'
+                                        // href=''
+                                        key={ index }
+                                        onClick={ () => console.log(player) }
+                                    >
+                                        { player }
+                                    </a>
+                                )
+                            })}
+                        </NavDropdown>
+                    </>}
                 </Nav>
                 { userContext?.email || userContext?.username
-                    ? <input
-                        className="navbar-user-icon"
-                        onClick={ () => history.push('/account/profile') }
-                        src={ userContext?.photoURL || userIcon }
-                        type="image"
-                    />
+                    ? <div className='navbar-user-wrapper'>
+                        <input
+                            className="navbar-user-icon"
+                            onClick={ () => history.push('/account/profile') }
+                            src={ userContext?.photoURL || userIcon }
+                            type="image"
+                        />
+                    </div>
                     : <Button variant="outline-dark"
                         className="navbar-sign-in-button"
                         onClick={ () => {

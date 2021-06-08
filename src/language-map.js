@@ -9,14 +9,14 @@ export const AUTHENTICATION = {
     sendResetEmail: 'Send Password Reset Email',
     signIn: 'Sign In',
     signOut: 'Sign Out',
-    userName: 'User Name'
+    characterName: 'Character Name'
 }
 
 export const ERRORS = {
     emailNotRegistered: 'This email address is not registered. Please try another or proceed to Create an Account.',
     enterEmail: 'Please enter a valid email address.',
     enterPassword: 'Please enter a valid password.',
-    enterUsername: 'Please enter a User Name.',
+    enterCharacter: 'Please enter your characterʼs name.',
     error: 'ERROR',
     errorSendingEmail: 'There was an error sending the password reset email. Please try again.',
     noUserFound: 'No user was found with this email. Try another email address or proceed to Create an Account.',

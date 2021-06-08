@@ -1,5 +1,5 @@
 import React, { useContext } from 'react'
-import { auth } from '../../database/firebase'
+import { auth, administrator } from '../../database/firebase'
 import { UserContext } from '../../providers/userprovider'
 import { useHistory } from 'react-router-dom'
 import { AUTHENTICATION, GENERAL } from '../../language-map'
@@ -11,14 +11,14 @@ export default function ProfilePage () {
 
     return (
         <>
-            { userContext?.email && userContext?.username
+            { userContext?.email && userContext?.characterName
                 ? <div>
-                    <h2>{ userContext.username }</h2>
+                    <h2>{ userContext.characterName }</h2>
                     <h3>{ userContext.email }</h3>
                     <button onClick={ async () => {
                         try {
                             await auth.signOut()
-                                .then(history.push('/pokedex'))
+                                .then(history.push('/'))
                         } catch (e) {
                             console.log(e)
                         }
