@@ -1,3 +1,12 @@
 .profile-character-img {
     height: 200px;
 }
+
+.react-pdf__Page__annotations {
+    position: fixed;
+    opacity: 0;
+}
+
+.modal-content {
+    min-height: 1170px;
+}

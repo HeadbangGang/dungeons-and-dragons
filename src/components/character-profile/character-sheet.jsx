@@ -1,8 +1,6 @@
 import React, { useState } from 'react'
 import { Modal, Button } from 'react-bootstrap'
-import { pdfjs, Document, Page } from 'react-pdf'
-import { PDFDownloadLink } from '@react-pdf/renderer'
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${ pdfjs.version }/pdf.worker.min.js`
+import { Document, Page } from 'react-pdf'
 import monk from '../../test-data/monk.pdf'
 
 
@@ -11,23 +9,11 @@ export const CharacterSheet = () => {
     const [showModal, setShowModal] = useState(false)
     const [numPages, setNumPages] = useState(null)
 
-
-    const characterSheetPDF = () => (
+    const CharacterSheetPDF = () => (
         <Document file={ monk } onLoadSuccess={ ({ numPages }) => setNumPages(numPages) } options={{ workerSrc: '/pdf.worker.js' }}>
-            <Page pageNumber={ pageNumber } width={ 750 } />
+            <Page pageNumber={ pageNumber } width={ 750 } height={ 800 } />
         </Document>
     )
-
-    // const downloadCharacterSheet = () => (
-    //     <div>
-    //         <PDFDownloadLink document={ characterSheetPDF() } fileName="somename.pdf">
-    //             {({ blob, url, loading, error }) =>
-    //             { loading ? 'Loading document...' : 'Download now!'
-    //                 error ? 'Error Loading Document' : '' }
-    //             }
-    //         </PDFDownloadLink>
-    //     </div>
-    // )
 
     return (
         <>
@@ -41,17 +27,16 @@ export const CharacterSheet = () => {
             >
                 <Modal.Header closeButton>
                     <Modal.Title id="contained-modal-title-vcenter">
-          Character Sheet
+                        Character Sheet
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    { characterSheetPDF() }
+                    <CharacterSheetPDF />
                 </Modal.Body>
                 <Modal.Footer>
-                    {/* {downloadCharacterSheet()} */}
-                    { pageNumber > 1 && <Button onClick={ () => setPageNumber(pageNumber-1) }>Page Down</Button> }
+                    { pageNumber > 1 && <Button onClick={ () => setPageNumber(pageNumber-1) }>Previous Page</Button> }
                     <span>{pageNumber} of {numPages}</span>
-                    { pageNumber < numPages && <Button onClick={ () => setPageNumber(pageNumber+1) }>Page Up</Button> }
+                    { pageNumber < numPages && <Button onClick={ () => setPageNumber(pageNumber+1) }>Next Page</Button> }
                     <Button onClick={ () => setShowModal(false) }>Close</Button>
                 </Modal.Footer>
             </Modal>

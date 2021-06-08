@@ -1,16 +1,34 @@
 import React, { useContext } from 'react'
-import { Navbar, NavDropdown, Nav } from 'react-bootstrap'
+import { Navbar, NavDropdown, Nav, Button, Toast } from 'react-bootstrap'
 import { useHistory } from 'react-router-dom'
 import d20 from '../../media/d20.png'
 import { PlayersContext } from '../../providers/players-provider'
+import { UserContext } from '../../providers/userprovider'
+import { AUTHENTICATION, ERRORS } from '../../language-map'
+import userIcon from '../../media/d20.png'
 import './dnd-navbar.css'
 
-export const DndNavbar = () => {
+export const DndNavbar = ({ error, setError }) => {
     const history = useHistory()
     const players = useContext(PlayersContext)
+    const userContext = useContext(UserContext)
 
     return (
         <Navbar bg="light" expand="lg">
+            <Toast
+                autohide
+                className="navbar-toast-container"
+                delay={ 5000 }
+                onClose={ () => setError(null) }
+                show={ !!error }
+            >
+                <Toast.Header>
+                    <strong className="mr-auto">
+                        { ERRORS.error }
+                    </strong>
+                </Toast.Header>
+                <Toast.Body>{ error }</Toast.Body>
+            </Toast>
             <a
                 href=''
                 onClick={ () => history.push('/') }
@@ -19,6 +37,7 @@ export const DndNavbar = () => {
                     alt='dnd-logo'
                     className='navbar-icon'
                     src={ d20 }
+                    draggable={ false }
                 />
             </a>
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -47,6 +66,22 @@ export const DndNavbar = () => {
                         })}
                     </NavDropdown>
                 </Nav>
+                { userContext?.email || userContext?.username
+                    ? <input
+                        className="navbar-user-icon"
+                        onClick={ () => history.push('/account/profile') }
+                        src={ userContext?.photoURL || userIcon }
+                        type="image"
+                    />
+                    : <Button variant="outline-dark"
+                        className="navbar-sign-in-button"
+                        onClick={ () => {
+                            history.push('/account/sign-in')
+                        } }
+                    >
+                        { AUTHENTICATION.signIn }
+                    </Button>
+                }
             </Navbar.Collapse>
         </Navbar>
     )

@@ -5,18 +5,27 @@ import { CharacterProfile } from './character-profile/character-profile'
 import { DndHome } from './homepage/dnd-home'
 import { DndNavbar } from './navbar/dnd-navbar'
 import { InitiativeOrder } from './initiative-order/initiative-order'
+import SignIn from './authentication/signin'
+import SignUp from './authentication/signup'
+import PasswordReset from './authentication/passwordreset'
+import UserProvider from '../providers/userprovider'
 
 export const DndContainer = () => {
     return (
-        <PlayersProvider>
-            <Router basename='/'>
-                <DndNavbar />
-                <Switch>
-                    <Route exact path='/' component={ DndHome } />
-                    <Route exact path='/profile' component={ CharacterProfile } />
-                    <Route exact path='/initiative-order' component={ InitiativeOrder } />
-                </Switch>
-            </Router>
-        </PlayersProvider>
+        <UserProvider>
+            <PlayersProvider>
+                <Router basename='/'>
+                    <DndNavbar />
+                    <Switch>
+                        <Route exact path='/' component={ DndHome } />
+                        <Route exact path='/profile' component={ CharacterProfile } />
+                        <Route exact path='/initiative-order' component={ InitiativeOrder } />
+                        <Route exact path='/account/sign-in' component={ SignIn } />
+                        <Route exact path='/account/sign-up' component={ SignUp } />
+                        <Route exact path='/account/password-reset' component={ PasswordReset } />
+                    </Switch>
+                </Router>
+            </PlayersProvider>
+        </UserProvider>
     )
 }

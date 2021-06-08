@@ -1,3 +1,51 @@
+.navbar-container {
+    background-color: red;
+    border: 1px solid black;
+    margin: 10px;
+    border-radius: 50px;
+}
+
+.navbar-brand-name {
+    color: #ffcb05 !important;
+    text-shadow:  2px 1px 3px #2a75bb, 0 0 1em #2a75bb, 0 0 0.2em #2a75bb;
+    font-size: 30px !important;
+}
+
 .navbar-icon {
     height: 40px;
+    width: 40px;
+    margin: 0 10px 0 0;
+}
+
+.navbar-icon:hover {
+    transform: scale(1.1);
+}
+
+.navbar-toast-container {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+.navbar-user-icon {
+    height: 35px;
+    width: 35px;
+    border: 1px solid black;
+    border-radius: 50%;
+}
+
+.navbar-sign-in-button {
+    border-radius: 20px !important;
+    border-width: 2px !important;
+    font-weight: 600 !important;
+    height: auto;
+    line-height: normal !important;
+}
+
+.nav-link {
+    cursor: pointer;
+}
+
+.dropdown-item {
+    cursor: pointer;
 }
