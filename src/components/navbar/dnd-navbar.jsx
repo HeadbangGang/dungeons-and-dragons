@@ -24,7 +24,14 @@ export const DndNavbar = () => {
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
             <Navbar.Collapse id="basic-navbar-nav">
                 <Nav className="mr-auto">
-                    <Nav.Link href="#link">Link</Nav.Link>
+                    <div className='mr-auto navbar-nav'>
+                        <a
+                            className='nav-link'
+                            onClick={ () => history.push('/initiative-order') }
+                        >
+                            Initiative Order
+                        </a>
+                    </div>
                     <NavDropdown title="Characters" id="basic-nav-dropdown">
                         { players.map((player, index) => {
                             return (
