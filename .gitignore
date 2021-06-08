@@ -50,5 +50,5 @@ Thumbs.db
 
 build/*
 
-.firebase*
-firebase*
+.firebase/*
+firebase/*
