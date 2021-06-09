@@ -43,7 +43,7 @@ export const DndNavbar = ({ error, setError }) => {
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
             <Navbar.Collapse id="basic-navbar-nav">
                 <Nav className="mr-auto">
-                    {userContext &&
+                    { userContext?.activeGameId && players.length > 0 &&
                     <>
                         <div className='mr-auto navbar-nav'>
                             <a
@@ -53,7 +53,7 @@ export const DndNavbar = ({ error, setError }) => {
                             Initiative Order
                             </a>
                         </div>
-                        <NavDropdown title="Characters" id="basic-nav-dropdown" menuVariant='light'>
+                        <NavDropdown title="Characters" id="basic-nav-dropdown">
                             { players.map((player, index) => {
                                 return (
                                     <a

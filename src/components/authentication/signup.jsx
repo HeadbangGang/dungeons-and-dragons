@@ -10,7 +10,7 @@ export default function SignUp ({ setError }) {
     const history = useHistory()
 
     const [email, setEmail] = useState(null)
-    const [characterName, setCharacterName] = useState(null)
+    const [fullName, setFullName] = useState(null)
     const [password, setPassword] = useState(null)
 
     return (
@@ -23,15 +23,15 @@ export default function SignUp ({ setError }) {
                     className="authentication-form-container"
                     onSubmit={ (e) => createAccountHandler(e) }
                 >
-                    <Form.Group controlId="formUsername">
+                    <Form.Group controlId="formFullName">
                         <Form.Label>
-                            { AUTHENTICATION.characterName }
+                            { AUTHENTICATION.fullName }
                         </Form.Label>
                         <Form.Control
                             autoComplete="off"
                             data-lpignore="true"
                             onChange={ (e) => {
-                                setCharacterName(e.target.value)
+                                setFullName(e.target.value)
                             } }
                             placeholder='Samwise Gamgee'
                         />
@@ -99,12 +99,11 @@ export default function SignUp ({ setError }) {
     async function createAccountHandler (e) {
         e.preventDefault()
 
-        if (email && password && characterName) {
-            try{
+        if (email && password && fullName) {
+            try {
                 const { user } = await auth.createUserWithEmailAndPassword(email, password)
-                generateUserDocument(user, { characterName })
-            }
-            catch(e){
+                generateUserDocument(user, { fullName })
+            } catch(e){
                 if (e.code === 'auth/email-already-in-use') {
                     setError(ERRORS.emailAlreadyExists)
                 } else {
@@ -112,8 +111,8 @@ export default function SignUp ({ setError }) {
                 }
             }
         } else {
-            if (!characterName) {
-                setError(ERRORS.enterCharacter)
+            if (!fullName) {
+                setError(ERRORS.enterFullName)
             } else if (!email) {
                 setError(ERRORS.enterEmail)
             } else if (!password) {

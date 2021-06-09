@@ -21,12 +21,13 @@ export const generateUserDocument = async (user, additionalData) => {
     const userRef = db.doc(`users/${ user.uid }`)
     const snapshot = await userRef.get()
     if (!snapshot.exists) {
-        const { email, characterName, photoURL } = user
+        const { email, fullName, photoURL } = user
         try {
             await userRef.set({
-                characterName,
+                fullName,
                 email,
                 photoURL,
+                games: {},
                 ...additionalData
             })
         } catch (e) {
