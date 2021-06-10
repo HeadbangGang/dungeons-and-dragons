@@ -1,6 +1,7 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { useMediaQuery } from 'react-responsive'
 import PlayersProvider from '../providers/players-provider'
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
+import { Route, Switch } from 'react-router-dom'
 import { CharacterProfile } from './character-profile/character-profile'
 import { DndHome } from './homepage/dnd-home'
 import { DndNavbar } from './navbar/dnd-navbar'
@@ -14,23 +15,41 @@ import ProfilePage from './authentication/profilepage'
 import './dnd-container.css'
 
 export const DndContainer = () => {
+    const [error, setError] = useState(null)
+
+    const isSmallView = useMediaQuery({
+        query: '(max-device-width: 991px)'
+    })
+
     return (
         <div className='dnd-container'>
-            <UserProvider>
+            <UserProvider location={ location }>
                 <PlayersProvider>
-                    <Router basename='/'>
-                        <DndNavbar />
-                        <Switch>
-                            <Route exact path='/' component={ DndHome } />
-                            <Route exact path='/profile' component={ CharacterProfile } />
-                            <Route exact path='/initiative-order' component={ InitiativeOrder } />
-                            <Route exact path='/account/sign-in' component={ SignIn } />
-                            <Route exact path='/account/sign-up' component={ SignUp } />
-                            <Route exact path='/account/password-reset' component={ PasswordReset } />
-                            <Route exact path='/account/profile' component={ ProfilePage } />
-                        </Switch>
-                        <DndFooter />
-                    </Router>
+                    <DndNavbar error={ error } isSmallView={ isSmallView } setError={ setError } />
+                    <Switch>
+                        <Route exact path='/'>
+                            <DndHome />
+                        </Route>
+                        <Route exact path='/profile'>
+                            <CharacterProfile />
+                        </Route>
+                        <Route exact path='/initiative-order'>
+                            <InitiativeOrder />
+                        </Route>
+                        <Route exact path='/account/sign-in'>
+                            <SignIn setError={ setError } />
+                        </Route>
+                        <Route exact path='/account/sign-up'>
+                            <SignUp setError={ setError } />
+                        </Route>
+                        <Route exact path='/account/password-reset'>
+                            <PasswordReset setError={ setError } />
+                        </Route>
+                        <Route exact path='/account/profile'>
+                            <ProfilePage setError={ setError } />
+                        </Route>
+                    </Switch>
+                    <DndFooter />
                 </PlayersProvider>
             </UserProvider>
         </div>

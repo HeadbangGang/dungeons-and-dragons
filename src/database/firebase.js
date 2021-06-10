@@ -21,14 +21,15 @@ export const generateUserDocument = async (user, additionalData) => {
     const userRef = db.doc(`users/${ user.uid }`)
     const snapshot = await userRef.get()
     if (!snapshot.exists) {
-        const { email, fullName, photoURL } = user
+        const { email, photoURL } = user
         try {
             await userRef.set({
-                fullName,
                 email,
                 photoURL,
                 games: {},
                 ...additionalData
+            }).then(() => {
+                window.location.replace('/account/profile')
             })
         } catch (e) {
             console.error('Error creating user document', e)

@@ -3,7 +3,7 @@ import { Form, Button } from 'react-bootstrap'
 import { useHistory } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { auth, generateUserDocument } from '../../database/firebase'
-import { AUTHENTICATION, ERRORS, GENERAL } from '../../language-map'
+import { AUTHENTICATION, ERRORS } from '../../language-map'
 import './authentication.css'
 
 export default function SignUp ({ setError }) {
@@ -103,10 +103,12 @@ export default function SignUp ({ setError }) {
             try {
                 const { user } = await auth.createUserWithEmailAndPassword(email, password)
                 generateUserDocument(user, { fullName })
-            } catch(e){
-                if (e.code === 'auth/email-already-in-use') {
+            } catch(e) {
+                switch(e){
+                case e.code === 'auth/email-already-in-use':
                     setError(ERRORS.emailAlreadyExists)
-                } else {
+                    break
+                default:
                     setError(e.message)
                 }
             }

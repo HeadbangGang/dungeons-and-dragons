@@ -21,7 +21,7 @@ export default function PlayersProvider (props) {
             setPlayers(characterNames)
         }
 
-        if (userContext.activeGameId) {
+        if (userContext?.activeGameId) {
             getPlayers()
         }
     }, [userContext])

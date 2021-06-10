@@ -25,6 +25,7 @@
     position: absolute;
     top: 20px;
     right: 20px;
+    z-index: 2000;
 }
 
 .navbar-user-icon {
@@ -38,7 +39,7 @@
     border-radius: 50px;
     width: 45px;
     height: 45px;
-    margin: 10px 0;
+    margin: 0 0 0 auto;
 }
 
 .navbar-sign-in-button {
@@ -47,6 +48,7 @@
     font-weight: 600 !important;
     height: auto;
     line-height: normal !important;
+    margin-left: auto
 }
 
 .nav-link {

@@ -75,11 +75,14 @@ export default function PasswordReset ({ setError }) {
                     setEmailHasBeenSent(true)
                 })
                 .catch((e) => {
-                    if (e.code === 'auth/user-not-found') {
+                    switch(e){
+                    case e.code === 'auth/user-not-found':
                         setError(ERRORS.emailNotRegistered)
-                    } else if (e.code === 'auth/invalid-email') {
+                        break
+                    case e.code === 'auth/invalid-email':
                         setError(ERRORS.enterEmail)
-                    } else {
+                        break
+                    default:
                         setError(ERRORS.errorSendingEmail)
                     }
                 })
