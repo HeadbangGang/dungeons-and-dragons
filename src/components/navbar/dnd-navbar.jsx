@@ -1,27 +1,32 @@
-import React, { useContext } from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
+import { useSelector } from 'react-redux'
 import { Navbar, NavDropdown, Nav, Button, Toast } from 'react-bootstrap'
 import { useHistory } from 'react-router-dom'
 import d20 from '../../media/d20.png'
-import { PlayersContext } from '../../providers/players-provider'
-import { UserContext } from '../../providers/userprovider'
 import { AUTHENTICATION, ERRORS } from '../../language-map'
 import userIcon from '../../media/d20.png'
 import './dnd-navbar.css'
+import { getCurrentUser, getActiveGamePlayers } from '../../store/store'
 
 export const DndNavbar = ({ error, isSmallView, setError }) => {
     const history = useHistory()
-    const players = useContext(PlayersContext)
-    const userContext = useContext(UserContext)
+
+    const userData = useSelector(getCurrentUser)
+    const players = useSelector(getActiveGamePlayers)
+    const [navbarExpanded, setNavbarExpanded] = useState(false)
 
     const signInButton = () => {
-        if(userContext?.email || userContext?.username) {
+        if(userData?.get('email') && userData?.get('uid') && userData?.get('fullName')) {
             return (
                 <div className='navbar-user-wrapper'>
                     <input
                         className="navbar-user-icon"
-                        onClick={ () => history.push('/account/profile') }
-                        src={ userContext?.photoURL || userIcon }
+                        onClick={ () => {
+                            setNavbarExpanded(false)
+                            history.push('/account/profile')
+                        } }
+                        src={ userData?.get('photoURL') || userIcon }
                         type="image"
                     />
                 </div>
@@ -31,6 +36,7 @@ export const DndNavbar = ({ error, isSmallView, setError }) => {
                 <Button variant="outline-dark"
                     className="navbar-sign-in-button"
                     onClick={ () => {
+                        setNavbarExpanded(false)
                         history.push('/account/sign-in')
                     } }
                 >
@@ -41,21 +47,24 @@ export const DndNavbar = ({ error, isSmallView, setError }) => {
     }
 
     return (
-        <>
-            <Navbar bg="light" expand="lg">
-                <a
-                    href=''
-                    onClick={ () => history.push('/') }
-                >
-                    <img
-                        alt='dnd-logo'
-                        className='navbar-icon'
-                        src={ d20 }
-                        draggable={ false }
-                    />
-                </a>
-                { isSmallView && signInButton()}
-                { userContext?.activeGameId && players.length > 0 &&
+        <Navbar bg="light" expand="lg" fixed='top' expanded={ navbarExpanded } onToggle={ () => setNavbarExpanded(!navbarExpanded) }>
+            <a
+                href='#'
+                onClick={ (e) => {
+                    e.preventDefault()
+                    setNavbarExpanded(false)
+                    history.push('/') }
+                }
+            >
+                <img
+                    alt='dnd-logo'
+                    className='navbar-icon'
+                    src={ d20 }
+                    draggable={ false }
+                />
+            </a>
+            { isSmallView && signInButton()}
+            { userData?.get('activeGameId') && players.size > 0 &&
                     <>
                         <Navbar.Toggle aria-controls="basic-navbar-nav" />
                         <Navbar.Collapse id="basic-navbar-nav">
@@ -63,7 +72,10 @@ export const DndNavbar = ({ error, isSmallView, setError }) => {
                                 <div className='mr-auto navbar-nav'>
                                     <a
                                         className='nav-link'
-                                        onClick={ () => history.push('/initiative-order') }
+                                        onClick={ () => {
+                                            setNavbarExpanded(false)
+                                            history.push('/initiative-order')
+                                        } }
                                     >
                             Initiative Order
                                     </a>
@@ -74,7 +86,10 @@ export const DndNavbar = ({ error, isSmallView, setError }) => {
                                             <a
                                                 className='dropdown-item'
                                                 key={ index }
-                                                onClick={ () => setError(player) }
+                                                onClick={ () => {
+                                                    setNavbarExpanded(false)
+                                                    setError(player)
+                                                } }
                                             >
                                                 { player }
                                             </a>
@@ -84,8 +99,7 @@ export const DndNavbar = ({ error, isSmallView, setError }) => {
                             </Nav>
                         </Navbar.Collapse>
                     </>}
-                { !isSmallView && signInButton() }
-            </Navbar>
+            { !isSmallView && signInButton() }
             <Toast
                 autohide
                 className="navbar-toast-container"
@@ -100,7 +114,7 @@ export const DndNavbar = ({ error, isSmallView, setError }) => {
                 </Toast.Header>
                 <Toast.Body>{ error }</Toast.Body>
             </Toast>
-        </>
+        </Navbar>
     )
 }
 

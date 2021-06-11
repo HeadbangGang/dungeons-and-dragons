@@ -3,10 +3,18 @@
 }
 
 .react-pdf__Page__annotations {
-    position: fixed;
-    opacity: 0;
+    display: none !important;
 }
 
-.modal-content {
-    min-height: 1170px;
+canvas {
+    width: 100% !important;
+    height: 100% !important;
 }
+
+.modal-footer {
+    margin: 0 auto;
+}
+
+.modal-open .character-sheet-modal {
+    overflow: hidden
+  }

@@ -34,7 +34,7 @@ export const DndHome = () => {
                 </Row>
                 <Row>
                     <div className='dnd-home-title'><strong>Dungeons and Dragons</strong></div>
-                    {/* <button onClick={ () => history.push('/profile') }>Click Me</button> */}
+                    <button onClick={ () => history.push('/profile') }>Click Me</button>
                 </Row>
             </Col>
         </Container>

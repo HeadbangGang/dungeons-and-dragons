@@ -1,3 +1,23 @@
 .navbar-container-footer {
     color: white;
 }
+
+.footer-active-game-id {
+  margin-left: auto;
+}
+
+@media only screen and (max-device-width: 576px) {
+  .footer-copyright {
+    display: none;
+  }
+}
+
+@media only screen and (max-device-width: 992px) {
+  .footer-copyright {
+    font-size: 14px;
+  }
+
+  .footer-active-game-id {
+    font-size: 14px;
+  }
+}

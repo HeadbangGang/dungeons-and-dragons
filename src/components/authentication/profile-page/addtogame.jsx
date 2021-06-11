@@ -1,22 +1,24 @@
-import React, { useContext, useState } from 'react'
+import React, { useState } from 'react'
 import { useHistory } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import PropTypes from 'prop-types'
-import { db } from '../../database/firebase'
+import { db } from '../../../database/firebase'
 import { InputGroup, FormControl, Button } from 'react-bootstrap'
-import { UserContext } from '../../providers/userprovider'
 import './profile-page.css'
+import { getCurrentUser } from '../../../store/store'
 
 
 export default function AddToGame ({ setError }) {
-    const userContext = useContext(UserContext ?? '')
     const history = useHistory()
+
+    const userData = useSelector(getCurrentUser)
 
     const [gameId, setGameId] = useState()
     const [characterName, setCharacterName] = useState()
 
     const createGame = async () => {
         const gameIds = []
-        const userAccount = db.collection('users').doc(userContext.uid)
+        const userAccount = db.collection('users').doc(userData.get('uid'))
         const accountDataCall = await userAccount.get()
         const userAccountData = accountDataCall.data()
         const games = db.collection('games')
@@ -39,7 +41,7 @@ export default function AddToGame ({ setError }) {
                 })
                 await games.doc(gameId).set({
                     players: {
-                        [userContext.fullName]: {
+                        [userData.get('fullName')]: {
                             characterName: characterName
                         }
                     }
@@ -55,7 +57,7 @@ export default function AddToGame ({ setError }) {
 
     const joinGame = async () => {
         const gameIds = []
-        const userAccount = db.collection('users').doc(userContext.uid)
+        const userAccount = db.collection('users').doc(userData.get('uid'))
         const accountDataCall = await userAccount.get()
         const userAccountData = accountDataCall.data()
         const games = db.collection('games')
@@ -82,7 +84,7 @@ export default function AddToGame ({ setError }) {
                 })
                 await games.doc(gameId).update({
                     players: { ...existingGlobalGameData,
-                        [userContext.fullName]: {
+                        [userData.get('fullName')]: {
                             characterName: characterName
                         }
                     }
@@ -93,7 +95,7 @@ export default function AddToGame ({ setError }) {
                 setError(e)
             }
         } else {
-            const userGames = Object.keys(userContext.games)
+            const userGames = Object.keys(userData.get('games'))
             switch(userGames){
             case userGames.includes(gameId):
                 setError('You are already a player in this game.')
@@ -119,12 +121,13 @@ export default function AddToGame ({ setError }) {
                     <InputGroup.Text id="inputGroup-sizing-sm">Character Name</InputGroup.Text>
                 </InputGroup.Prepend>
                 <FormControl
+                    type='tel'
                     onChange={ (e) => setCharacterName(e.target.value) }
                 />
             </InputGroup>
             <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
-                <Button onClick={ () => joinGame() }>Join Game</Button>
-                <Button onClick={ () => createGame() }>Create Game</Button>
+                <Button variant='dark' onClick={ () => joinGame() }>Join Game</Button>
+                <Button variant='dark' onClick={ () => createGame() }>Create Game</Button>
             </div>
         </div>
     )

@@ -21,7 +21,10 @@ export default function SignUp ({ setError }) {
                 </div>
                 <Form
                     className="authentication-form-container"
-                    onSubmit={ (e) => createAccountHandler(e) }
+                    onSubmit={ (e) => {
+                        e.preventDefault()
+                        createAccountHandler(e)
+                    } }
                 >
                     <Form.Group controlId="formFullName">
                         <Form.Label>
@@ -98,7 +101,6 @@ export default function SignUp ({ setError }) {
 
     async function createAccountHandler (e) {
         e.preventDefault()
-
         if (email && password && fullName) {
             try {
                 const { user } = await auth.createUserWithEmailAndPassword(email, password)

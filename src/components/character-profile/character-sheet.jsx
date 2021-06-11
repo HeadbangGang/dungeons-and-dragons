@@ -10,8 +10,8 @@ export const CharacterSheet = () => {
     const [numPages, setNumPages] = useState(null)
 
     const CharacterSheetPDF = () => (
-        <Document file={ monk } onLoadSuccess={ ({ numPages }) => setNumPages(numPages) } options={{ workerSrc: '/pdf.worker.js' }}>
-            <Page pageNumber={ pageNumber } width={ 750 } height={ 800 } />
+        <Document className='character-profile-pdf-document' file={ monk } onLoadSuccess={ ({ numPages }) => setNumPages(numPages) } options={{ workerSrc: '/pdf.worker.js' }}>
+            <Page className='character-profile-pdf-page' pageNumber={ pageNumber } width={ 750 } height={ 800 } />
         </Document>
     )
 
@@ -19,6 +19,7 @@ export const CharacterSheet = () => {
         <>
             <button onClick={ () => setShowModal(true) }>Show</button>
             <Modal
+                className='character-sheet-modal'
                 size="lg"
                 aria-labelledby="contained-modal-title-vcenter"
                 centered
@@ -34,10 +35,9 @@ export const CharacterSheet = () => {
                     <CharacterSheetPDF />
                 </Modal.Body>
                 <Modal.Footer>
-                    { pageNumber > 1 && <Button onClick={ () => setPageNumber(pageNumber-1) }>Previous Page</Button> }
+                    <Button disabled={ pageNumber < 2 } onClick={ () => setPageNumber(pageNumber-1) }>Previous Page</Button>
                     <span>{pageNumber} of {numPages}</span>
-                    { pageNumber < numPages && <Button onClick={ () => setPageNumber(pageNumber+1) }>Next Page</Button> }
-                    <Button onClick={ () => setShowModal(false) }>Close</Button>
+                    <Button disabled={ pageNumber === numPages } onClick={ () => setPageNumber(pageNumber+1) }>Next Page</Button>
                 </Modal.Footer>
             </Modal>
         </>

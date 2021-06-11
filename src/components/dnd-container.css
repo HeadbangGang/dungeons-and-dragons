@@ -1,3 +1,20 @@
 .dnd-container {
-    overflow-x: hidden;
+    overflow: hidden;
+}
+
+.dnd-main-content {
+    padding: 50px 0 75px;
+    min-height: 100vh;
+}
+
+@media all and (orientation:landscape) {
+    .dnd-container {
+        display: none;
+    }
+}
+
+@media all and (orientation:portrait) {
+    .landscape-page-container {
+        display: none;
+    }
 }

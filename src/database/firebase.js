@@ -1,6 +1,7 @@
 import firebase from 'firebase/app'
 import 'firebase/auth'
 import 'firebase/firestore'
+import 'firebase/storage'
 
 const firebaseConfig = {
     apiKey: 'AIzaSyAbUqiIPzGOTk20rWjuy7vBa4Cpvst_zJQ',
@@ -15,6 +16,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig)
 export const auth = firebase.auth()
 export const db = firebase.firestore()
+export const storage = firebase.storage()
 
 export const generateUserDocument = async (user, additionalData) => {
     if (!user) return

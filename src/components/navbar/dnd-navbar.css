@@ -19,6 +19,7 @@
 
 .navbar-icon:hover {
     transform: scale(1.1);
+    cursor: pointer;
 }
 
 .navbar-toast-container {
@@ -32,6 +33,7 @@
     height: 35px;
     width: 35px;
     margin: 4px;
+    border-radius: 8px;
 }
 
 .navbar-user-wrapper {
@@ -61,4 +63,8 @@
 
 .dropdown-item.active, .dropdown-item:active {
     background-color: lightgrey;
+}
+
+.navbar-toggler {
+    margin-left: 10px;
 }
