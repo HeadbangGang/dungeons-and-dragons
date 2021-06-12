@@ -7,14 +7,16 @@
     min-height: 100vh;
 }
 
-@media all and (orientation:landscape) {
+.landscape-page-container {
+    display: none;
+}
+
+@media all and (orientation:landscape) and (max-device-width: 1200px) {
     .dnd-container {
         display: none;
     }
-}
 
-@media all and (orientation:portrait) {
     .landscape-page-container {
-        display: none;
+        display: unset;
     }
 }

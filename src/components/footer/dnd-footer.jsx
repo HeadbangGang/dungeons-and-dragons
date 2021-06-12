@@ -1,14 +1,17 @@
 import React from 'react'
 import { useHistory } from 'react-router-dom'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { Navbar } from 'react-bootstrap'
 import d20 from '../../media/d20.png'
 import { GENERAL } from '../../language-map'
 import './dnd-footer.css'
-import { getCurrentUser } from '../../store/store'
+import { getCurrentUser, setSelectedCharacter, getSelectedCharacter } from '../../store/store'
 
 export default function DndFooter () {
     const history = useHistory()
+    const dispatch = useDispatch()
+
+    const hasSelectedCharacter = useSelector(getSelectedCharacter)
     const userData = useSelector(getCurrentUser)
     const date = new Date
 
@@ -19,6 +22,7 @@ export default function DndFooter () {
                 href='#'
                 onClick={ (e) => {
                     e.preventDefault()
+                    { hasSelectedCharacter && dispatch(setSelectedCharacter(null)) }
                     history.push('/') }
                 }
             >

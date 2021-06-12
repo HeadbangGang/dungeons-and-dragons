@@ -1,20 +1,30 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { Navbar, NavDropdown, Nav, Button, Toast } from 'react-bootstrap'
 import { useHistory } from 'react-router-dom'
 import d20 from '../../media/d20.png'
 import { AUTHENTICATION, ERRORS } from '../../language-map'
 import userIcon from '../../media/d20.png'
 import './dnd-navbar.css'
-import { getCurrentUser, getActiveGamePlayers } from '../../store/store'
+import { getCurrentUser, getActiveGameData, getProfilePicture, setSelectedCharacter, getSelectedCharacter } from '../../store/store'
 
 export const DndNavbar = ({ error, isSmallView, setError }) => {
     const history = useHistory()
+    const dispatch = useDispatch()
 
     const userData = useSelector(getCurrentUser)
-    const players = useSelector(getActiveGamePlayers)
+    const activeGameData = useSelector(getActiveGameData)
+    const profilePicture = useSelector(getProfilePicture)
+    const hasSelectedCharacter = useSelector(getSelectedCharacter)
+
     const [navbarExpanded, setNavbarExpanded] = useState(false)
+    let players = []
+
+    activeGameData?.get('players')?.forEach(player => {
+        const name = player.get('characterName')
+        players.push(name)
+    })
 
     const signInButton = () => {
         if(userData?.get('email') && userData?.get('uid') && userData?.get('fullName')) {
@@ -24,9 +34,10 @@ export const DndNavbar = ({ error, isSmallView, setError }) => {
                         className="navbar-user-icon"
                         onClick={ () => {
                             setNavbarExpanded(false)
+                            { hasSelectedCharacter && dispatch(setSelectedCharacter(null)) }
                             history.push('/account/profile')
                         } }
-                        src={ userData?.get('photoURL') || userIcon }
+                        src={ profilePicture || userIcon }
                         type="image"
                     />
                 </div>
@@ -37,6 +48,7 @@ export const DndNavbar = ({ error, isSmallView, setError }) => {
                     className="navbar-sign-in-button"
                     onClick={ () => {
                         setNavbarExpanded(false)
+                        { hasSelectedCharacter && dispatch(setSelectedCharacter(null)) }
                         history.push('/account/sign-in')
                     } }
                 >
@@ -53,6 +65,7 @@ export const DndNavbar = ({ error, isSmallView, setError }) => {
                 onClick={ (e) => {
                     e.preventDefault()
                     setNavbarExpanded(false)
+                    { hasSelectedCharacter && dispatch(setSelectedCharacter(null)) }
                     history.push('/') }
                 }
             >
@@ -64,7 +77,7 @@ export const DndNavbar = ({ error, isSmallView, setError }) => {
                 />
             </a>
             { isSmallView && signInButton()}
-            { userData?.get('activeGameId') && players.size > 0 &&
+            { userData?.get('activeGameId') && players.length > 0 &&
                     <>
                         <Navbar.Toggle aria-controls="basic-navbar-nav" />
                         <Navbar.Collapse id="basic-navbar-nav">
@@ -74,6 +87,7 @@ export const DndNavbar = ({ error, isSmallView, setError }) => {
                                         className='nav-link'
                                         onClick={ () => {
                                             setNavbarExpanded(false)
+                                            { hasSelectedCharacter && dispatch(setSelectedCharacter(null)) }
                                             history.push('/initiative-order')
                                         } }
                                     >
@@ -88,7 +102,7 @@ export const DndNavbar = ({ error, isSmallView, setError }) => {
                                                 key={ index }
                                                 onClick={ () => {
                                                     setNavbarExpanded(false)
-                                                    setError(player)
+                                                    dispatch(setSelectedCharacter(player))
                                                 } }
                                             >
                                                 { player }

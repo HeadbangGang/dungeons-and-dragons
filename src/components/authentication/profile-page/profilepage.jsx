@@ -8,7 +8,8 @@ import { AUTHENTICATION, GENERAL } from '../../../language-map'
 import AddToGame from './addtogame'
 import './profile-page.css'
 import userIcon from '../../../media/d20.png'
-import { getCurrentUser, updatePhotoUrl } from '../../../store/store'
+import editIcon from '../../../media/edit.png'
+import { getCurrentUser, updatePhotoUrl, getProfilePicture } from '../../../store/store'
 
 
 export default function ProfilePage ({ setError }) {
@@ -19,6 +20,7 @@ export default function ProfilePage ({ setError }) {
     const [profilePicturePath, setProfilePicturePath] = useState(null)
 
     const userData = useSelector(getCurrentUser)
+    const profilePicture = useSelector(getProfilePicture)
 
     useEffect(() => {
         if (profilePictureBlob && profilePicturePath) {
@@ -49,18 +51,18 @@ export default function ProfilePage ({ setError }) {
         }
     }
 
-
     return (
         <>
             { userData?.get('email') && userData?.get('fullName')
                 ? <Col xl={ 12 } lg={ 12 } md={ 12 } sm={ 12 } xs={ 12 }>
                     <Row style={{ placeContent: 'center' }}>
+                        <img className='profile-edit-img' src={ editIcon } alt='' />
                         <div className='profile-img-wrapper'>
                             <input
                                 alt='profile-img'
                                 className='profile-page-img'
                                 onClick={ () => inputFile.current.click() }
-                                src={ userData.get('photoURL') || userIcon }
+                                src={ profilePicture || userIcon }
                                 type='image'
                             />
                             <input type='file' id='file' ref={ inputFile } style={{ display: 'none' }} onChange={ () => { setProfilePictureBlob(inputFile.current.files[0]) } } />

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { useMediaQuery } from 'react-responsive'
+import { useHistory } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { getCurrentUser, setUserAccount, setActiveGamePlayers } from '../store/store'
+import { getCurrentUser, setUserAccount, setActiveGameData, getSelectedCharacter } from '../store/store'
 import { auth, db, generateUserDocument } from '../database/firebase'
 import { Route, Switch } from 'react-router-dom'
 import { CharacterProfile } from './character-profile/character-profile'
@@ -17,10 +18,12 @@ import LandscapePage from './landscape-page/landscape-page'
 import './dnd-container.css'
 
 export const DndContainer = () => {
+    const history = useHistory()
     const dispatch = useDispatch()
     const [error, setError] = useState(null)
 
     const userData = useSelector(getCurrentUser)
+    const selectedCharacter = useSelector(getSelectedCharacter)
 
     const isSmallView = useMediaQuery({
         query: '(max-device-width: 991px)'
@@ -34,16 +37,18 @@ export const DndContainer = () => {
     }, [])
 
     useEffect(() => {
+        if (selectedCharacter) {
+            history.push(`/profile/${ selectedCharacter }`)
+        }
+    }, [selectedCharacter])
+
+    useEffect(() => {
         async function getPlayers () {
-            const characterNames = []
             const activeGameId = userData.get('activeGameId')
             const gameDataByActiveGameId = db.collection('games').doc(activeGameId)
             const gameDataCall = await gameDataByActiveGameId.get()
-            const gameData = gameDataCall.data().players
-            for (const [key, value] of Object.entries(gameData)) {
-                characterNames.push(value.characterName)
-            }
-            dispatch(setActiveGamePlayers(characterNames))
+            const gameData = gameDataCall.data()
+            dispatch(setActiveGameData(gameData))
         }
 
         if (userData?.get('activeGameId')) {
@@ -60,7 +65,7 @@ export const DndContainer = () => {
                         <Route exact path='/'>
                             <DndHome />
                         </Route>
-                        <Route exact path='/profile'>
+                        <Route exact path={ `/profile/${ selectedCharacter }` }>
                             <CharacterProfile />
                         </Route>
                         <Route exact path='/initiative-order'>

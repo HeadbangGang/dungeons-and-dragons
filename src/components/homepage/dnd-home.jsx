@@ -1,13 +1,11 @@
 import React, { useState } from 'react'
-import { useHistory } from 'react-router-dom'
 import { Container, Col, Row } from 'react-bootstrap'
 import d20Vector from '../../media/d20-vector-good.png'
 import spinner from '../../media/spinner.webp'
-import { db } from '../../database/firebase'
+import { GENERAL } from '../../language-map'
 import './dnd-home.css'
 
 export const DndHome = () => {
-    const history = useHistory()
     const [isImageLoaded, setIsImageLoaded] = useState(false)
 
     return (
@@ -33,8 +31,11 @@ export const DndHome = () => {
                     </div>
                 </Row>
                 <Row>
-                    <div className='dnd-home-title'><strong>Dungeons and Dragons</strong></div>
-                    <button onClick={ () => history.push('/profile') }>Click Me</button>
+                    <div className='dnd-home-title'>
+                        <strong>
+                            { GENERAL.dungeonsAndDragons }
+                        </strong>
+                    </div>
                 </Row>
             </Col>
         </Container>

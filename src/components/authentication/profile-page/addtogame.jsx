@@ -1,15 +1,17 @@
 import React, { useState } from 'react'
 import { useHistory } from 'react-router-dom'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
 import { db } from '../../../database/firebase'
 import { InputGroup, FormControl, Button } from 'react-bootstrap'
+import { ERRORS, AUTHENTICATION } from '../../../language-map'
 import './profile-page.css'
-import { getCurrentUser } from '../../../store/store'
+import { getCurrentUser, updateUserAccount, updateActiveGameData } from '../../../store/store'
 
 
 export default function AddToGame ({ setError }) {
     const history = useHistory()
+    const dispatch = useDispatch()
 
     const userData = useSelector(getCurrentUser)
 
@@ -30,28 +32,11 @@ export default function AddToGame ({ setError }) {
         const existingGameDataUserAccount = userAccountData.games
 
         if (gameId && !gameIds.includes(gameId)) {
-            try {
-                await userAccount.update({
-                    activeGameId: gameId,
-                    games: { ...existingGameDataUserAccount,
-                        [gameId]: {
-                            characterName: characterName
-                        }
-                    }
-                })
-                await games.doc(gameId).set({
-                    players: {
-                        [userData.get('fullName')]: {
-                            characterName: characterName
-                        }
-                    }
-                })
-                history.push('/')
-            } catch (e) {
-                setError(e)
-            }
+            dispatch(updateUserAccount(gameId, characterName, existingGameDataUserAccount))
+            dispatch(updateActiveGameData(gameId, characterName, true))
+            history.push('/')
         } else {
-            setError('Game ID already exists, please proceed to Join Game')
+            setError(ERRORS.gameAlreadyExists)
         }
     }
 
@@ -78,14 +63,18 @@ export default function AddToGame ({ setError }) {
                     activeGameId: gameId,
                     games: { ...existingGameDataUserAccount,
                         [gameId]: {
-                            characterName: characterName
+                            characterName: characterName,
+                            player: userData.get('fullName'),
+                            playerProfileImg: userData.get('photoURL', null)
                         }
                     }
                 })
                 await games.doc(gameId).update({
                     players: { ...existingGlobalGameData,
-                        [userData.get('fullName')]: {
-                            characterName: characterName
+                        [userData.get('uid')]: {
+                            characterName: characterName,
+                            owner: userData.get('fullName'),
+                            ownerProfileImg: userData.get('photoURL', null)
                         }
                     }
                 }).then(() => {
@@ -98,10 +87,10 @@ export default function AddToGame ({ setError }) {
             const userGames = Object.keys(userData.get('games'))
             switch(userGames){
             case userGames.includes(gameId):
-                setError('You are already a player in this game.')
+                setError(ERRORS.playerExists)
                 break
             default:
-                setError('The entered Game ID does not exist, please proceed to Create Game')
+                setError(ERRORS.gameDoesNotExist)
             }
         }
     }
@@ -110,7 +99,9 @@ export default function AddToGame ({ setError }) {
         <div style={{ marginTop: '25px', border: '1px solid black', padding: '10px' }}>
             <InputGroup size="sm" className="mb-3">
                 <InputGroup.Prepend>
-                    <InputGroup.Text id="inputGroup-sizing-sm">Game ID</InputGroup.Text>
+                    <InputGroup.Text id="inputGroup-sizing-sm">
+                        { AUTHENTICATION.gameId }
+                    </InputGroup.Text>
                 </InputGroup.Prepend>
                 <FormControl
                     onChange={ (e) => setGameId(e.target.value) }
@@ -118,7 +109,9 @@ export default function AddToGame ({ setError }) {
             </InputGroup>
             <InputGroup size="sm" className="mb-3">
                 <InputGroup.Prepend>
-                    <InputGroup.Text id="inputGroup-sizing-sm">Character Name</InputGroup.Text>
+                    <InputGroup.Text id="inputGroup-sizing-sm">
+                        { AUTHENTICATION.characterName }
+                    </InputGroup.Text>
                 </InputGroup.Prepend>
                 <FormControl
                     type='tel'
@@ -126,8 +119,12 @@ export default function AddToGame ({ setError }) {
                 />
             </InputGroup>
             <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
-                <Button variant='dark' onClick={ () => joinGame() }>Join Game</Button>
-                <Button variant='dark' onClick={ () => createGame() }>Create Game</Button>
+                <Button variant='dark' onClick={ () => joinGame() }>
+                    { AUTHENTICATION.joinGame }
+                </Button>
+                <Button variant='dark' onClick={ () => createGame() }>
+                    { AUTHENTICATION.createGame }
+                </Button>
             </div>
         </div>
     )

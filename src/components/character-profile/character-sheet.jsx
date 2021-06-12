@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
 import { Modal, Button } from 'react-bootstrap'
-import { Document, Page } from 'react-pdf'
+import { Document, Page, pdfjs } from 'react-pdf'
 import monk from '../../test-data/monk.pdf'
-
+import { GENERAL } from '../../language-map'
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${ pdfjs.version }/pdf.worker.min.js`
 
 export const CharacterSheet = () => {
     const [pageNumber, setPageNumber] = useState(1)
@@ -10,7 +11,7 @@ export const CharacterSheet = () => {
     const [numPages, setNumPages] = useState(null)
 
     const CharacterSheetPDF = () => (
-        <Document className='character-profile-pdf-document' file={ monk } onLoadSuccess={ ({ numPages }) => setNumPages(numPages) } options={{ workerSrc: '/pdf.worker.js' }}>
+        <Document className='character-profile-pdf-document' file={ monk } onLoadSuccess={ ({ numPages }) => setNumPages(numPages) }>
             <Page className='character-profile-pdf-page' pageNumber={ pageNumber } width={ 750 } height={ 800 } />
         </Document>
     )
@@ -28,16 +29,22 @@ export const CharacterSheet = () => {
             >
                 <Modal.Header closeButton>
                     <Modal.Title id="contained-modal-title-vcenter">
-                        Character Sheet
+                        { GENERAL.characterSheet }
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <CharacterSheetPDF />
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button disabled={ pageNumber < 2 } onClick={ () => setPageNumber(pageNumber-1) }>Previous Page</Button>
-                    <span>{pageNumber} of {numPages}</span>
-                    <Button disabled={ pageNumber === numPages } onClick={ () => setPageNumber(pageNumber+1) }>Next Page</Button>
+                    <div className='dnd-modal-buttons'>
+                        <Button className='dnd-modal-nav-button' disabled={ pageNumber < 2 } onClick={ () => setPageNumber(pageNumber-1) }>
+                            { GENERAL.prevPage }
+                        </Button>
+                        <span>{pageNumber} of {numPages}</span>
+                        <Button className='dnd-modal-nav-button' disabled={ pageNumber === numPages } onClick={ () => setPageNumber(pageNumber+1) }>
+                            { GENERAL.nextPage }
+                        </Button>
+                    </div>
                 </Modal.Footer>
             </Modal>
         </>

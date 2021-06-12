@@ -11,10 +11,61 @@ canvas {
     height: 100% !important;
 }
 
-.modal-footer {
+.dnd-modal-buttons {
     margin: 0 auto;
 }
 
 .modal-open .character-sheet-modal {
     overflow: hidden
   }
+
+.dnd-modal-nav-button {
+    margin: 0 10px;
+}
+
+.modal-content {
+    width: 75%;
+    margin: 0 auto;
+}
+
+@media all and (max-device-height: 775px) {
+    .modal-content {
+        height: 45%;
+        width: 45%;
+    }
+}
+
+@media all and (min-device-height: 775px) and (max-device-height: 880px) {
+    .modal-content {
+        height: 50%;
+        width: 50%;
+    }
+}
+
+@media all and (min-device-height: 880px) and (max-device-height: 992px) {
+    .modal-content {
+        height: 60%;
+        width: 60%;
+    }
+}
+
+@media all and (min-device-height: 992px) and (max-device-height: 1100px) {
+    .modal-content {
+        height: 70%;
+        width: 70%;
+    }
+}
+
+@media all and (max-device-width: 993px) and (min-device-height: 1101px) and (max-device-height: 1200px) {
+    .modal-content {
+        height: 80%;
+        width: 80%;
+    }
+}
+
+@media all and (min-device-height: 1200px) {
+    .modal-content {
+        height: 90% !important;
+        width: 90% !important;
+    }
+}
