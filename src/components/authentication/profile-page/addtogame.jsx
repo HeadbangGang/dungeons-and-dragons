@@ -57,7 +57,6 @@ export default function AddToGame ({ setError }) {
             }
         }
         history.push('/')
-        location.reload()
     }
 
     return (
@@ -69,6 +68,7 @@ export default function AddToGame ({ setError }) {
                     </InputGroup.Text>
                 </InputGroup.Prepend>
                 <FormControl
+                    type='tel'
                     onChange={ (e) => setGameId(e.target.value) }
                 />
             </InputGroup>
@@ -79,7 +79,6 @@ export default function AddToGame ({ setError }) {
                     </InputGroup.Text>
                 </InputGroup.Prepend>
                 <FormControl
-                    type='tel'
                     onChange={ (e) => setCharacterName(e.target.value) }
                 />
             </InputGroup>
