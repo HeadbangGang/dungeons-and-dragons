@@ -18,7 +18,7 @@ export default function AddToGame ({ setError }) {
     const [gameId, setGameId] = useState()
     const [characterName, setCharacterName] = useState()
 
-    const createGame = async () => {
+    const gameQueryHandler = async (isNewGame) => {
         const gameIds = []
         const userAccount = db.collection('users').doc(userData.get('uid'))
         const accountDataCall = await userAccount.get()
@@ -31,68 +31,33 @@ export default function AddToGame ({ setError }) {
 
         const existingGameDataUserAccount = userAccountData.games
 
-        if (gameId && !gameIds.includes(gameId)) {
-            dispatch(updateUserAccount(gameId, characterName, existingGameDataUserAccount))
-            dispatch(updateActiveGameData(gameId, characterName, true))
-            history.push('/')
-        } else {
-            setError(ERRORS.gameAlreadyExists)
-        }
-    }
-
-    const joinGame = async () => {
-        const gameIds = []
-        const userAccount = db.collection('users').doc(userData.get('uid'))
-        const accountDataCall = await userAccount.get()
-        const userAccountData = accountDataCall.data()
-        const games = db.collection('games')
-        const gamesSnapshot = await games.get()
-        gamesSnapshot.forEach(game => {
-            gameIds.push(game.id)
-        })
-
-        const existingGameDataUserAccount = userAccountData.games
-
-        if (gameId && gameIds.includes(gameId) && !Object.keys(userAccountData.games).includes(gameId)) {
-            const globalGameData = games.doc(gameId)
-            const globalGameDataCall = await globalGameData.get()
-            const existingGlobalGameData = globalGameDataCall.data().players
-
-            try {
-                await userAccount.update({
-                    activeGameId: gameId,
-                    games: { ...existingGameDataUserAccount,
-                        [gameId]: {
-                            characterName: characterName,
-                            player: userData.get('fullName'),
-                            playerProfileImg: userData.get('photoURL', null)
-                        }
-                    }
-                })
-                await games.doc(gameId).update({
-                    players: { ...existingGlobalGameData,
-                        [userData.get('uid')]: {
-                            characterName: characterName,
-                            owner: userData.get('fullName'),
-                            ownerProfileImg: userData.get('photoURL', null)
-                        }
-                    }
-                }).then(() => {
-                    history.push('/')
-                })
-            } catch (e) {
-                setError(e)
+        if (isNewGame) {
+            if (gameId && !gameIds.includes(gameId)) {
+                dispatch(updateUserAccount(gameId, characterName, existingGameDataUserAccount))
+                dispatch(updateActiveGameData(gameId, characterName, isNewGame))
+            } else {
+                setError(ERRORS.gameAlreadyExists)
             }
         } else {
-            const userGames = Object.keys(userData.get('games'))
-            switch(userGames){
-            case userGames.includes(gameId):
-                setError(ERRORS.playerExists)
-                break
-            default:
-                setError(ERRORS.gameDoesNotExist)
+            if (gameId && gameIds.includes(gameId) && !Object.keys(userAccountData.games).includes(gameId)) {
+                const globalGameData = games.doc(gameId)
+                const globalGameDataCall = await globalGameData.get()
+                const existingGlobalGameData = globalGameDataCall.data().players
+                dispatch(updateUserAccount(gameId, characterName, existingGameDataUserAccount))
+                dispatch(updateActiveGameData(gameId, characterName, isNewGame, existingGlobalGameData))
+            } else {
+                const userGames = Object.keys(userData.get('games'))
+                switch(userGames) {
+                case userGames.includes(gameId):
+                    setError(ERRORS.playerExists)
+                    break
+                default:
+                    setError(ERRORS.gameDoesNotExist)
+                }
             }
         }
+        history.push('/')
+        location.reload()
     }
 
     return (
@@ -119,10 +84,10 @@ export default function AddToGame ({ setError }) {
                 />
             </InputGroup>
             <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
-                <Button variant='dark' onClick={ () => joinGame() }>
+                <Button variant='dark' onClick={ () => gameQueryHandler(false) }>
                     { AUTHENTICATION.joinGame }
                 </Button>
-                <Button variant='dark' onClick={ () => createGame() }>
+                <Button variant='dark' onClick={ () => gameQueryHandler(true) }>
                     { AUTHENTICATION.createGame }
                 </Button>
             </div>

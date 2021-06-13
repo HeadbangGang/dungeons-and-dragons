@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { useSelector, useDispatch } from 'react-redux'
 import { Navbar, NavDropdown, Nav, Button, Toast } from 'react-bootstrap'
@@ -7,7 +7,7 @@ import d20 from '../../media/d20.png'
 import { AUTHENTICATION, ERRORS } from '../../language-map'
 import userIcon from '../../media/d20.png'
 import './dnd-navbar.css'
-import { getCurrentUser, getActiveGameData, getProfilePicture, setSelectedCharacter, getSelectedCharacter } from '../../store/store'
+import { getCurrentUser, getActiveGameData, getActiveGameId, getProfilePicture, setSelectedCharacter, getSelectedCharacter } from '../../store/store'
 
 export const DndNavbar = ({ error, isSmallView, setError }) => {
     const history = useHistory()
@@ -15,16 +15,22 @@ export const DndNavbar = ({ error, isSmallView, setError }) => {
 
     const userData = useSelector(getCurrentUser)
     const activeGameData = useSelector(getActiveGameData)
+    const activeGameId = useSelector(getActiveGameId)
     const profilePicture = useSelector(getProfilePicture)
     const hasSelectedCharacter = useSelector(getSelectedCharacter)
 
+    const [players, setPlayers] = useState([])
     const [navbarExpanded, setNavbarExpanded] = useState(false)
-    let players = []
 
-    activeGameData?.get('players')?.forEach(player => {
-        const name = player.get('characterName')
-        players.push(name)
+    useEffect(() => {
+        if (activeGameId && activeGameData.size > 0) {
+            activeGameData.get('players').forEach(player => {
+                const name = player.get('characterName')
+                !players.includes(name) && setPlayers([...players, name])
+            })
+        }
     })
+
 
     const signInButton = () => {
         if(userData?.get('email') && userData?.get('uid') && userData?.get('fullName')) {
@@ -34,7 +40,7 @@ export const DndNavbar = ({ error, isSmallView, setError }) => {
                         className="navbar-user-icon"
                         onClick={ () => {
                             setNavbarExpanded(false)
-                            { hasSelectedCharacter && dispatch(setSelectedCharacter(null)) }
+                            { hasSelectedCharacter && dispatch(setSelectedCharacter(undefined)) }
                             history.push('/account/profile')
                         } }
                         src={ profilePicture || userIcon }
@@ -48,7 +54,7 @@ export const DndNavbar = ({ error, isSmallView, setError }) => {
                     className="navbar-sign-in-button"
                     onClick={ () => {
                         setNavbarExpanded(false)
-                        { hasSelectedCharacter && dispatch(setSelectedCharacter(null)) }
+                        { hasSelectedCharacter && dispatch(setSelectedCharacter(undefined)) }
                         history.push('/account/sign-in')
                     } }
                 >
@@ -65,7 +71,7 @@ export const DndNavbar = ({ error, isSmallView, setError }) => {
                 onClick={ (e) => {
                     e.preventDefault()
                     setNavbarExpanded(false)
-                    { hasSelectedCharacter && dispatch(setSelectedCharacter(null)) }
+                    { hasSelectedCharacter && dispatch(setSelectedCharacter(undefined)) }
                     history.push('/') }
                 }
             >
@@ -77,7 +83,7 @@ export const DndNavbar = ({ error, isSmallView, setError }) => {
                 />
             </a>
             { isSmallView && signInButton()}
-            { userData?.get('activeGameId') && players.length > 0 &&
+            { activeGameId && players.length > 0 &&
                     <>
                         <Navbar.Toggle aria-controls="basic-navbar-nav" />
                         <Navbar.Collapse id="basic-navbar-nav">
@@ -87,7 +93,7 @@ export const DndNavbar = ({ error, isSmallView, setError }) => {
                                         className='nav-link'
                                         onClick={ () => {
                                             setNavbarExpanded(false)
-                                            { hasSelectedCharacter && dispatch(setSelectedCharacter(null)) }
+                                            { hasSelectedCharacter && dispatch(setSelectedCharacter(undefined)) }
                                             history.push('/initiative-order')
                                         } }
                                     >

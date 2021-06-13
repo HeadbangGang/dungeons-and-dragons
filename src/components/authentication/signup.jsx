@@ -106,11 +106,9 @@ export default function SignUp ({ setError }) {
                 const { user } = await auth.createUserWithEmailAndPassword(email, password)
                 generateUserDocument(user, { fullName })
             } catch(e) {
-                switch(e){
-                case e.code === 'auth/email-already-in-use':
+                if (e.code === 'auth/email-already-in-use') {
                     setError(ERRORS.emailAlreadyExists)
-                    break
-                default:
+                } else {
                     setError(e.message)
                 }
             }

@@ -2,8 +2,6 @@ import { createStore, applyMiddleware, compose } from 'redux'
 import { db } from '../database/firebase'
 import { logger } from 'redux-logger'
 import Immutable from 'immutable'
-import { composeWithDevTools } from 'redux-devtools-extension'
-
 
 const initialState = Immutable.fromJS({})
 
@@ -21,7 +19,7 @@ const dndState = (currentState = initialState, action) => {
         return currentState.set('activeGameData', Immutable.fromJS(action.gameData))
     }
     case UPDATE_ACTIVE_GAME_DATA: {
-        const updatedGameData = updateCurrentActiveGameData(action.gameId, action.characterName, action.createNewGame, currentState)
+        const updatedGameData = updateCurrentActiveGameData(action.gameId, action.characterName, action.isNewGame, action.existingGameData, currentState)
         return currentState.set('activeGameData', updatedGameData)
     }
     case UPDATE_PHOTO_URL: {
@@ -45,7 +43,7 @@ export const UPDATE_USER_ACCOUNT = 'updateData'
 export const setActiveGameData = gameData => ({ type: SET_ACTIVE_GAME_DATA, gameData })
 export const SET_ACTIVE_GAME_DATA = 'activeGameData'
 
-export const updateActiveGameData = (gameId, characterName, createNewGame) => ({ type: UPDATE_ACTIVE_GAME_DATA, gameId, characterName, createNewGame })
+export const updateActiveGameData = (gameId, characterName, isNewGame, existingGameData) => ({ type: UPDATE_ACTIVE_GAME_DATA, gameId, characterName, isNewGame, existingGameData })
 export const UPDATE_ACTIVE_GAME_DATA = 'updateActiveGameData'
 
 export const updatePhotoUrl = url => ({ type: UPDATE_PHOTO_URL, url })
@@ -59,14 +57,19 @@ export const getCurrentUser = state => state.get('user', Immutable.Map())
 export const getActiveGameData = state => state.get('activeGameData', Immutable.Map())
 export const getSelectedCharacter = state => state.get('selectedCharacter', null)
 export const getProfilePicture = state => getCurrentUser(state)?.get('photoURL', null)
+export const getActiveGameId = state => getCurrentUser(state)?.get('activeGameId', undefined)
 
 const updateCurrentUserAccount = (gameId, characterName, currentGameData, state) => {
     const uid = getCurrentUser(state).get('uid')
+    const playerName = getCurrentUser(state).get('fullName')
+    const profileImg = getCurrentUser(state).get('photoURL', null)
     const newData = {
         activeGameId: gameId,
         games: { ...currentGameData,
             [gameId]: {
-                characterName: characterName
+                characterName: characterName,
+                player: playerName,
+                playerProfileImg: profileImg
             }
         }
     }
@@ -76,30 +79,33 @@ const updateCurrentUserAccount = (gameId, characterName, currentGameData, state)
     return userAccountState
 }
 
-const updateCurrentActiveGameData = (gameId, characterName, createNewGame, state) => {
+const updateCurrentActiveGameData = (gameId, characterName, isNewGame, existingGameData, state) => {
     const uid = getCurrentUser(state).get('uid')
     const playerName = getCurrentUser(state).get('fullName')
     const profileImg = getCurrentUser(state).get('photoURL', null)
     let newData = {}
-    if (createNewGame) {
-        newData = {
-            players: {
-                [uid]: {
-                    characterName: characterName,
-                    player: playerName,
-                    playerProfileImg: profileImg
-                }
+    newData = {
+        players: { ...existingGameData ?? undefined,
+            [uid]: {
+                characterName: characterName,
+                player: playerName,
+                playerProfileImg: profileImg
             }
         }
-        createNewGameDB(newData, gameId)
-        return Immutable.fromJS(newData)
+    }
+    updateExistingGameDB(newData, gameId, isNewGame)
+    return Immutable.fromJS(newData)
+}
+
+const updateExistingGameDB = async (data, gameId, isNewGame) => {
+    const games = db.collection('games')
+    if (isNewGame) {
+        await games.doc(gameId).set(data)
+    } else {
+        await games.doc(gameId).update(data)
     }
 }
 
-const createNewGameDB = async (data, gameId) => {
-    const games = db.collection('games')
-    await games.doc(gameId).set(data)
-}
 const updateDBUserAccount = async (uid, data) => {
     const userAccount = db.collection('users').doc(uid)
     try {
@@ -109,7 +115,16 @@ const updateDBUserAccount = async (uid, data) => {
     }
 }
 
+const composeEnhancers =
+  window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ ?
+      window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({
+      }) : compose
+const enhancer = composeEnhancers(
+    applyMiddleware(logger),
+)
 // Initialize
-const enhancers = compose(applyMiddleware(logger), composeWithDevTools())
-const store = createStore(dndState, initialState, enhancers)
+const store = createStore(
+    dndState,
+    enhancer
+)
 export default store

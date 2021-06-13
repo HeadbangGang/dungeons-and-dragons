@@ -5,14 +5,14 @@ import { Navbar } from 'react-bootstrap'
 import d20 from '../../media/d20.png'
 import { GENERAL } from '../../language-map'
 import './dnd-footer.css'
-import { getCurrentUser, setSelectedCharacter, getSelectedCharacter } from '../../store/store'
+import { setSelectedCharacter, getActiveGameId, getSelectedCharacter } from '../../store/store'
 
 export default function DndFooter () {
     const history = useHistory()
     const dispatch = useDispatch()
 
     const hasSelectedCharacter = useSelector(getSelectedCharacter)
-    const userData = useSelector(getCurrentUser)
+    const activeGameId = useSelector(getActiveGameId)
     const date = new Date
 
     return (
@@ -22,7 +22,7 @@ export default function DndFooter () {
                 href='#'
                 onClick={ (e) => {
                     e.preventDefault()
-                    { hasSelectedCharacter && dispatch(setSelectedCharacter(null)) }
+                    { hasSelectedCharacter && dispatch(setSelectedCharacter(undefined)) }
                     history.push('/') }
                 }
             >
@@ -36,7 +36,7 @@ export default function DndFooter () {
                 />
             </a>
             <span className='footer-copyright'>{ GENERAL.copyright + ' ' + date.getFullYear() + ' ' + GENERAL.name }</span>
-            { userData?.get('activeGameId') && <span className='footer-active-game-id'>{ `Game ID: ${ userData.get('activeGameId') }`}</span> }
+            { activeGameId && <span className='footer-active-game-id'>{ `Game ID: ${ activeGameId }`}</span> }
         </Navbar>
     )
 }

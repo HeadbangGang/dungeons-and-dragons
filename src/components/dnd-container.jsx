@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import Immutable from 'immutable'
 import { useMediaQuery } from 'react-responsive'
 import { useHistory } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
@@ -32,7 +33,7 @@ export const DndContainer = () => {
     useEffect(() => {
         auth.onAuthStateChanged(async userAuth => {
             const user = await generateUserDocument(userAuth)
-            dispatch(setUserAccount(user))
+            dispatch(setUserAccount(user || Immutable.Map()))
         })
     }, [])
 
@@ -46,11 +47,11 @@ export const DndContainer = () => {
         async function getPlayers () {
             const activeGameId = userData.get('activeGameId')
             const gameDataByActiveGameId = db.collection('games').doc(activeGameId)
-            const gameDataCall = await gameDataByActiveGameId.get()
-            const gameData = gameDataCall.data()
-            dispatch(setActiveGameData(gameData))
+            await gameDataByActiveGameId.get()
+                .then((res) => {
+                    dispatch(setActiveGameData(res.data()))
+                })
         }
-
         if (userData?.get('activeGameId')) {
             getPlayers()
         }
@@ -69,7 +70,7 @@ export const DndContainer = () => {
                             <CharacterProfile />
                         </Route>
                         <Route exact path='/initiative-order'>
-                            <InitiativeOrder />
+                            <InitiativeOrder setError={ setError } />
                         </Route>
                         <Route exact path='/account/sign-in'>
                             <SignIn setError={ setError } />
@@ -87,9 +88,7 @@ export const DndContainer = () => {
                 </div>
                 <DndFooter isSmallView={ isSmallView } />
             </div>
-            <div>
-                <LandscapePage />
-            </div>
+            <LandscapePage />
         </div>
     )
 }

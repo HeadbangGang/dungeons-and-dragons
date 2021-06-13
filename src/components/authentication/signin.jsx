@@ -93,14 +93,11 @@ export default function SignIn ({ setError }) {
                     history.push('/account/profile')
                 }
             } catch(e) {
-                switch(e){
-                case e.code === 'auth/wrong-password':
-                    setError(ERRORS.wrongPassword)
-                    break
-                case e.code === 'auth/user-not-found':
+                if (e.code === 'auth/user-not-found') {
                     setError(ERRORS.noUserFound)
-                    break
-                default:
+                } else if (e.code === 'auth/wrong-password'){
+                    setError(ERRORS.wrongPassword)
+                } else {
                     setError(ERRORS.signingIn)
                 }
             }
