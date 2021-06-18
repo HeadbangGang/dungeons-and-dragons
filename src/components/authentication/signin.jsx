@@ -1,12 +1,14 @@
 import React, { useState } from 'react'
+import { useDispatch } from 'react-redux'
 import { Form, Button } from 'react-bootstrap'
-import PropTypes from 'prop-types'
 import { useHistory, Link } from 'react-router-dom'
+import { setError } from '../../store/store'
 import { auth } from '../../database/firebase'
 import { AUTHENTICATION, ERRORS } from '../../language-map'
 import './authentication.css'
 
-export default function SignIn ({ setError }) {
+export default function SignIn () {
+    const dispatch = useDispatch()
     const history = useHistory()
 
     const [email, setEmail] = useState(null)
@@ -94,25 +96,20 @@ export default function SignIn ({ setError }) {
                 }
             } catch(e) {
                 if (e.code === 'auth/user-not-found') {
-                    setError(ERRORS.noUserFound)
+                    dispatch(setError(ERRORS.noUserFound))
                 } else if (e.code === 'auth/wrong-password'){
-                    setError(ERRORS.wrongPassword)
+                    dispatch(setError(ERRORS.wrongPassword))
                 } else {
-                    setError(ERRORS.signingIn)
+                    dispatch(setError(ERRORS.signingIn))
                 }
             }
         } else {
             if (!email) {
-                setError(ERRORS.enterEmail)
+                dispatch(setError(ERRORS.enterEmail))
             } else if (!password) {
-                setError(ERRORS.enterPassword)
+                dispatch(setError(ERRORS.enterPassword))
             }
         }
 
     }
-}
-
-SignIn.propTypes={
-    getUserDocument: PropTypes.func,
-    setError: PropTypes.func
 }

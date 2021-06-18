@@ -1,9 +1,9 @@
 import React, { useRef, useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import PropTypes from 'prop-types'
 import { auth, db, storage } from '../../../database/firebase'
 import { Col, Row, Button } from 'react-bootstrap'
 import { useHistory } from 'react-router-dom'
+import { setError } from '../../../store/store'
 import { AUTHENTICATION, GENERAL } from '../../../language-map'
 import AddToGame from './addtogame'
 import './profile-page.css'
@@ -12,7 +12,7 @@ import editIcon from '../../../media/edit.png'
 import { getCurrentUser, updatePhotoUrl, getProfilePicture } from '../../../store/store'
 
 
-export default function ProfilePage ({ setError }) {
+export default function ProfilePage () {
     const history = useHistory()
     const inputFile = useRef(null)
     const dispatch = useDispatch()
@@ -47,7 +47,7 @@ export default function ProfilePage ({ setError }) {
             })
             dispatch(updatePhotoUrl(profilePicturePath))
         } catch (e) {
-            setError(e.message)
+            dispatch(setError(e.message))
         }
     }
 
@@ -65,7 +65,14 @@ export default function ProfilePage ({ setError }) {
                                 src={ profilePicture || userIcon }
                                 type='image'
                             />
-                            <input type='file' id='file' ref={ inputFile } style={{ display: 'none' }} onChange={ () => { setProfilePictureBlob(inputFile.current.files[0]) } } />
+                            <input
+                                accept="image/png, image/jpeg"
+                                type='file'
+                                id='file'
+                                ref={ inputFile }
+                                style={{ display: 'none' }}
+                                onChange={ () => { setProfilePictureBlob(inputFile.current.files[0]) } }
+                            />
                         </div>
                     </Row>
                     <Row style={{ placeContent: 'center' }}>
@@ -78,7 +85,7 @@ export default function ProfilePage ({ setError }) {
                                         await auth.signOut()
                                             .then(history.push('/'))
                                     } catch (e) {
-                                        setError(e)
+                                        dispatch(setError(e))
                                     }
                                 } }
                                 variant='danger'
@@ -88,15 +95,11 @@ export default function ProfilePage ({ setError }) {
                         </div>
                     </Row>
                     <Row style={{ placeContent: 'center', minHeight: '150px' }}>
-                        <AddToGame setError={ setError } />
+                        <AddToGame />
                     </Row>
                 </Col>
                 : <div>{ GENERAL.loading }</div>
             }
         </>
     )
-}
-
-ProfilePage.propTypes={
-    setError: PropTypes.func
 }

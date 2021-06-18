@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
-import PropTypes from 'prop-types'
+import { setError } from '../../../store/store'
 import { db } from '../../../database/firebase'
 import { InputGroup, FormControl, Button } from 'react-bootstrap'
 import { ERRORS, AUTHENTICATION } from '../../../language-map'
@@ -9,7 +9,7 @@ import './profile-page.css'
 import { getCurrentUser, updateUserAccount, updateActiveGameData } from '../../../store/store'
 
 
-export default function AddToGame ({ setError }) {
+export default function AddToGame () {
     const history = useHistory()
     const dispatch = useDispatch()
 
@@ -30,33 +30,34 @@ export default function AddToGame ({ setError }) {
         })
 
         const existingGameDataUserAccount = userAccountData.games
-
+        const cleanGameId = gameId.replaceAll(' ', '')
         if (isNewGame) {
-            if (gameId && !gameIds.includes(gameId)) {
-                dispatch(updateUserAccount(gameId, characterName, existingGameDataUserAccount))
-                dispatch(updateActiveGameData(gameId, characterName, isNewGame))
+            if (cleanGameId && !gameIds.includes(cleanGameId)) {
+                dispatch(updateUserAccount(cleanGameId, characterName, existingGameDataUserAccount))
+                dispatch(updateActiveGameData(cleanGameId, characterName, isNewGame))
+                history.push('/')
             } else {
-                setError(ERRORS.gameAlreadyExists)
+                dispatch(setError(ERRORS.gameAlreadyExists))
             }
         } else {
-            if (gameId && gameIds.includes(gameId) && !Object.keys(userAccountData.games).includes(gameId)) {
-                const globalGameData = games.doc(gameId)
+            if (cleanGameId && gameIds.includes(cleanGameId) && !Object.keys(userAccountData.games).includes(cleanGameId)) {
+                const globalGameData = games.doc(cleanGameId)
                 const globalGameDataCall = await globalGameData.get()
                 const existingGlobalGameData = globalGameDataCall.data().players
-                dispatch(updateUserAccount(gameId, characterName, existingGameDataUserAccount))
-                dispatch(updateActiveGameData(gameId, characterName, isNewGame, existingGlobalGameData))
+                dispatch(updateUserAccount(cleanGameId, characterName, existingGameDataUserAccount))
+                dispatch(updateActiveGameData(cleanGameId, characterName, isNewGame, existingGlobalGameData))
+                history.push('/')
             } else {
                 const userGames = Object.keys(userData.get('games'))
                 switch(userGames) {
-                case userGames.includes(gameId):
-                    setError(ERRORS.playerExists)
+                case userGames.includes(cleanGameId):
+                    dispatch(setError(ERRORS.playerExists))
                     break
                 default:
-                    setError(ERRORS.gameDoesNotExist)
+                    dispatch(setError(ERRORS.gameDoesNotExist))
                 }
             }
         }
-        history.push('/')
     }
 
     return (
@@ -69,6 +70,7 @@ export default function AddToGame ({ setError }) {
                 </InputGroup.Prepend>
                 <FormControl
                     type='tel'
+                    maxLength='10'
                     onChange={ (e) => setGameId(e.target.value) }
                 />
             </InputGroup>
@@ -79,6 +81,7 @@ export default function AddToGame ({ setError }) {
                     </InputGroup.Text>
                 </InputGroup.Prepend>
                 <FormControl
+                    maxLength='15'
                     onChange={ (e) => setCharacterName(e.target.value) }
                 />
             </InputGroup>
@@ -92,8 +95,4 @@ export default function AddToGame ({ setError }) {
             </div>
         </div>
     )
-}
-
-AddToGame.propTypes={
-    setError: PropTypes.func
 }

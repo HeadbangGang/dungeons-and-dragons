@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
+import { setError, getError } from '../../store/store'
 import { useSelector, useDispatch } from 'react-redux'
 import { Navbar, NavDropdown, Nav, Button, Toast } from 'react-bootstrap'
 import { useHistory } from 'react-router-dom'
@@ -9,7 +10,7 @@ import userIcon from '../../media/d20.png'
 import './dnd-navbar.css'
 import { getCurrentUser, getActiveGameData, getActiveGameId, getProfilePicture, setSelectedCharacter, getSelectedCharacter } from '../../store/store'
 
-export const DndNavbar = ({ error, isSmallView, setError }) => {
+export const DndNavbar = ({ isSmallView }) => {
     const history = useHistory()
     const dispatch = useDispatch()
 
@@ -18,6 +19,7 @@ export const DndNavbar = ({ error, isSmallView, setError }) => {
     const activeGameId = useSelector(getActiveGameId)
     const profilePicture = useSelector(getProfilePicture)
     const hasSelectedCharacter = useSelector(getSelectedCharacter)
+    const error = useSelector(getError)
 
     const [players, setPlayers] = useState([])
     const [navbarExpanded, setNavbarExpanded] = useState(false)
@@ -124,7 +126,7 @@ export const DndNavbar = ({ error, isSmallView, setError }) => {
                 autohide
                 className="navbar-toast-container"
                 delay={ 5000 }
-                onClose={ () => setError(null) }
+                onClose={ () => dispatch(setError(null)) }
                 show={ !!error }
             >
                 <Toast.Header>
@@ -139,7 +141,5 @@ export const DndNavbar = ({ error, isSmallView, setError }) => {
 }
 
 DndNavbar.propTypes={
-    error: PropTypes.string,
-    isSmallView: PropTypes.bool,
-    setError: PropTypes.func
+    isSmallView: PropTypes.bool
 }

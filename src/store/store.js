@@ -1,13 +1,22 @@
 import { createStore, applyMiddleware, compose } from 'redux'
 import { db } from '../database/firebase'
-import { logger } from 'redux-logger'
+import { createLogger } from 'redux-logger'
 import Immutable from 'immutable'
 
 const initialState = Immutable.fromJS({})
 
+const logger = createLogger({
+    collapsed: true,
+    stateTransformer: state => state.toJS(),
+    diff: true
+})
+
 // Reducer
 const dndState = (currentState = initialState, action) => {
     switch(action.type) {
+    case SET_ERROR: {
+        return currentState.set('error', action.errorData)
+    }
     case SET_USER_ACCOUNT: {
         return currentState.set('user', Immutable.fromJS(action.userData))
     }
@@ -28,17 +37,28 @@ const dndState = (currentState = initialState, action) => {
     case SET_SELECTED_CHARACTER: {
         return currentState.set('selectedCharacter', action.character)
     }
+    case UPDATE_PLAYER_INITIATIVE: {
+        const updatedPlayerGameData = updateCurrentPlayerInitiative(action.initiative, action.id, currentState)
+        return currentState.setIn(['activeGameData', action.playerType, action.id], updatedPlayerGameData)
+    }
+    case SET_NPC: {
+        const addedNPC = setNewNPC(action.name, action.initiative, currentState)
+        return currentState.setIn(['activeGameData', 'NPCs'], addedNPC)
+    }
     default:
         return currentState
     }
 }
 
 // Content Creators
+export const setError = errorData => ({ type: SET_ERROR, errorData })
+export const SET_ERROR = 'setError'
+
 export const setUserAccount = userData => ({ type: SET_USER_ACCOUNT, userData })
 export const SET_USER_ACCOUNT = 'user'
 
 export const updateUserAccount = (gameId, characterName, currentGameData) => ({ type: UPDATE_USER_ACCOUNT, gameId, characterName, currentGameData })
-export const UPDATE_USER_ACCOUNT = 'updateData'
+export const UPDATE_USER_ACCOUNT = 'updateUserData'
 
 export const setActiveGameData = gameData => ({ type: SET_ACTIVE_GAME_DATA, gameData })
 export const SET_ACTIVE_GAME_DATA = 'activeGameData'
@@ -46,19 +66,27 @@ export const SET_ACTIVE_GAME_DATA = 'activeGameData'
 export const updateActiveGameData = (gameId, characterName, isNewGame, existingGameData) => ({ type: UPDATE_ACTIVE_GAME_DATA, gameId, characterName, isNewGame, existingGameData })
 export const UPDATE_ACTIVE_GAME_DATA = 'updateActiveGameData'
 
+export const updatePlayerInitiative = (initiative, playerType, id) => ({ type: UPDATE_PLAYER_INITIATIVE, initiative, playerType, id })
+export const UPDATE_PLAYER_INITIATIVE = 'updatePlayerInitiative'
+
 export const updatePhotoUrl = url => ({ type: UPDATE_PHOTO_URL, url })
 export const UPDATE_PHOTO_URL = 'user/photoURL'
 
 export const setSelectedCharacter = character => ({ type: SET_SELECTED_CHARACTER, character })
 export const SET_SELECTED_CHARACTER = 'selectedCharacter'
 
+export const setNPC = (name, initiative) => ({ type: SET_NPC, name, initiative })
+export const SET_NPC = 'setNPC'
+
 // Selectors
+export const getError = state => state.get('error', null)
 export const getCurrentUser = state => state.get('user', Immutable.Map())
 export const getActiveGameData = state => state.get('activeGameData', Immutable.Map())
 export const getSelectedCharacter = state => state.get('selectedCharacter', null)
 export const getProfilePicture = state => getCurrentUser(state)?.get('photoURL', null)
 export const getActiveGameId = state => getCurrentUser(state)?.get('activeGameId', undefined)
 
+// Redux Functions
 const updateCurrentUserAccount = (gameId, characterName, currentGameData, state) => {
     const uid = getCurrentUser(state).get('uid')
     const playerName = getCurrentUser(state).get('fullName')
@@ -89,7 +117,7 @@ const updateCurrentActiveGameData = (gameId, characterName, isNewGame, existingG
             [uid]: {
                 characterName: characterName,
                 player: playerName,
-                playerProfileImg: profileImg
+                playerProfileImg: profileImg,
             }
         }
     }
@@ -97,12 +125,48 @@ const updateCurrentActiveGameData = (gameId, characterName, isNewGame, existingG
     return Immutable.fromJS(newData)
 }
 
+const updateCurrentPlayerInitiative = (value, id, state) => {
+    const gameId = getCurrentUser(state).get('activeGameId')
+    let currentValue = getActiveGameData(state).getIn(['players', id])
+    currentValue = currentValue.merge(Immutable.fromJS({ initiativeValue: value }))
+    const dbPath = `players.${ id }.initiativeValue`
+    const dbData = { [dbPath]: value }
+    updateExistingGameDB(dbData, gameId)
+    return currentValue
+}
+
+const setNewNPC = (name, initiative, state) => {
+    let dbData
+    const npcData = getActiveGameData(state).get('NPCs', undefined)
+    const gameId = getCurrentUser(state).get('activeGameId')
+    let currentState = getActiveGameData(state)
+    const path = Immutable.fromJS({ [name]: { name: name, initiative: initiative, NPC: true } })
+    if (currentState.keySeq().includes('NPCs')) {
+        currentState = currentState.get('NPCs').merge(path)
+    } else {
+        currentState = path
+    }
+
+    if (npcData && npcData.size > 0 && npcData.keySeq().includes(name)) {
+        dbData = { NPCs: { [name]: { name: name, initiative: initiative, NPC: true } } }
+    } else {
+        dbData = { NPCs: { ...npcData.toJS(), [name]: { name: name, initiative: initiative, NPC: true } } }
+    }
+    updateExistingGameDB(dbData, gameId)
+    return currentState
+}
+
+// Firebase Functions
 const updateExistingGameDB = async (data, gameId, isNewGame) => {
     const games = db.collection('games')
-    if (isNewGame) {
-        await games.doc(gameId).set(data)
-    } else {
-        await games.doc(gameId).update(data)
+    try {
+        if (isNewGame) {
+            await games.doc(gameId).set(data)
+        } else {
+            await games.doc(gameId).update(data)
+        }
+    } catch (e) {
+        store.dispatch(setError(e.message))
     }
 }
 
@@ -111,10 +175,11 @@ const updateDBUserAccount = async (uid, data) => {
     try {
         await userAccount.update(data)
     } catch (e) {
-        console.log(e)
+        store.dispatch(setError(e.message))
     }
 }
 
+// Create Store
 const composeEnhancers =
   window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ ?
       window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({

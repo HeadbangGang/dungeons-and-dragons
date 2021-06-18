@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import Immutable from 'immutable'
 import { useMediaQuery } from 'react-responsive'
 import { useHistory } from 'react-router-dom'
@@ -21,7 +21,6 @@ import './dnd-container.css'
 export const DndContainer = () => {
     const history = useHistory()
     const dispatch = useDispatch()
-    const [error, setError] = useState(null)
 
     const userData = useSelector(getCurrentUser)
     const selectedCharacter = useSelector(getSelectedCharacter)
@@ -60,7 +59,7 @@ export const DndContainer = () => {
     return (
         <div>
             <div className='dnd-container'>
-                <DndNavbar error={ error } isSmallView={ isSmallView } setError={ setError } />
+                <DndNavbar isSmallView={ isSmallView } />
                 <div className='dnd-main-content'>
                     <Switch>
                         <Route exact path='/'>
@@ -70,19 +69,19 @@ export const DndContainer = () => {
                             <CharacterProfile />
                         </Route>
                         <Route exact path='/initiative-order'>
-                            <InitiativeOrder setError={ setError } />
+                            <InitiativeOrder />
                         </Route>
                         <Route exact path='/account/sign-in'>
-                            <SignIn setError={ setError } />
+                            <SignIn />
                         </Route>
                         <Route exact path='/account/sign-up'>
-                            <SignUp setError={ setError } />
+                            <SignUp />
                         </Route>
                         <Route exact path='/account/password-reset'>
-                            <PasswordReset setError={ setError } />
+                            <PasswordReset />
                         </Route>
                         <Route exact path='/account/profile'>
-                            <ProfilePage setError={ setError } />
+                            <ProfilePage />
                         </Route>
                     </Switch>
                 </div>

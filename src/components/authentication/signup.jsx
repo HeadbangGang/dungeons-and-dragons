@@ -1,12 +1,14 @@
 import React, { useState } from 'react'
+import { useDispatch } from 'react-redux'
 import { Form, Button } from 'react-bootstrap'
 import { useHistory } from 'react-router-dom'
-import PropTypes from 'prop-types'
 import { auth, generateUserDocument } from '../../database/firebase'
+import { setError } from '../../store/store'
 import { AUTHENTICATION, ERRORS } from '../../language-map'
 import './authentication.css'
 
-export default function SignUp ({ setError }) {
+export default function SignUp () {
+    const dispatch = useDispatch()
     const history = useHistory()
 
     const [email, setEmail] = useState(null)
@@ -37,6 +39,7 @@ export default function SignUp ({ setError }) {
                                 setFullName(e.target.value)
                             } }
                             placeholder='Samwise Gamgee'
+                            maxLength='20'
                         />
                         <Form.Text className="text-muted">
                         </Form.Text>
@@ -52,6 +55,7 @@ export default function SignUp ({ setError }) {
                                 setEmail(e.target.value)
                             } }
                             placeholder="example@gmail.com"
+                            maxLength='30'
                             type="email"
                         />
                         <Form.Text className="text-muted">
@@ -67,6 +71,7 @@ export default function SignUp ({ setError }) {
                                 setPassword(e.target.value)
                             } }
                             placeholder="Password"
+                            maxLength='15'
                             type="password"
                         />
                     </Form.Group>
@@ -107,23 +112,19 @@ export default function SignUp ({ setError }) {
                 generateUserDocument(user, { fullName })
             } catch(e) {
                 if (e.code === 'auth/email-already-in-use') {
-                    setError(ERRORS.emailAlreadyExists)
+                    dispatch(setError(ERRORS.emailAlreadyExists))
                 } else {
-                    setError(e.message)
+                    dispatch(setError(e.message))
                 }
             }
         } else {
             if (!fullName) {
-                setError(ERRORS.enterFullName)
+                dispatch(setError(ERRORS.enterFullName))
             } else if (!email) {
-                setError(ERRORS.enterEmail)
+                dispatch(setError(ERRORS.enterEmail))
             } else if (!password) {
-                setError(ERRORS.enterPassword)
+                dispatch(setError(ERRORS.enterPassword))
             }
         }
     }
-}
-
-SignUp.propTypes = {
-    setError: PropTypes.func
 }

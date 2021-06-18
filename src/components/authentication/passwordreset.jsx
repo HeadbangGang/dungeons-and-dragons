@@ -1,13 +1,16 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
+import { useDispatch } from 'react-redux'
+import { setError } from '../../store/store'
 import { Form, Button } from 'react-bootstrap'
 import { auth } from '../../database/firebase'
 import { useHistory } from 'react-router-dom'
 import { AUTHENTICATION, ERRORS } from '../../language-map'
 import './authentication.css'
 
-export default function PasswordReset ({ setError }) {
+export default function PasswordReset () {
     const history = useHistory()
+    const dispatch = useDispatch()
 
     const [email, setEmail] = useState(null)
     const [emailHasBeenSent, setEmailHasBeenSent] = useState()
@@ -77,17 +80,17 @@ export default function PasswordReset ({ setError }) {
                 .catch((e) => {
                     switch(e){
                     case e.code === 'auth/user-not-found':
-                        setError(ERRORS.emailNotRegistered)
+                        dispatch(setError(ERRORS.emailNotRegistered))
                         break
                     case e.code === 'auth/invalid-email':
-                        setError(ERRORS.enterEmail)
+                        dispatch(setError(ERRORS.enterEmail))
                         break
                     default:
-                        setError(ERRORS.errorSendingEmail)
+                        dispatch(setError(ERRORS.errorSendingEmail))
                     }
                 })
         } else {
-            setError(ERRORS.enterEmail)
+            dispatch(setError(ERRORS.enterEmail))
         }
     }
 }
