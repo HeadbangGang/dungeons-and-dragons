@@ -50,7 +50,7 @@ export const InitiativeOrder = () => {
             const sortedPlayers = allPlayers.toOrderedMap().sortBy(x => -x.get('initiativeValue'))
             dispatch(setConsolidatedPlayers(sortedPlayers))
         }
-        setTimeout(getData, 10000)
+        setTimeout(getData, 1000)
     }
 
     const updatePlayersInitiative = (e) => {
