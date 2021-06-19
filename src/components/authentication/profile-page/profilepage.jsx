@@ -4,9 +4,10 @@ import { auth, db, storage } from '../../../database/firebase'
 import { Col, Row, Button } from 'react-bootstrap'
 import { useHistory } from 'react-router-dom'
 import { setError } from '../../../store/store'
-import { AUTHENTICATION, GENERAL } from '../../../language-map'
+import { AUTHENTICATION } from '../../../language-map'
 import AddToGame from './addtogame'
 import './profile-page.css'
+import spinner from '../../../media/spinner.webp'
 import userIcon from '../../../media/d20.png'
 import editIcon from '../../../media/edit.png'
 import { getCurrentUser, updatePhotoUrl, getProfilePicture } from '../../../store/store'
@@ -98,7 +99,11 @@ export default function ProfilePage () {
                         <AddToGame />
                     </Row>
                 </Col>
-                : <div>{ GENERAL.loading }</div>
+                : <div>
+                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                        <img src={ spinner } alt='loading' style={{ marginTop: '50px' }} />
+                    </div>
+                </div>
             }
         </>
     )

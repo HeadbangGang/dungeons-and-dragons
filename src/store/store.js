@@ -28,7 +28,7 @@ const dndState = (currentState = initialState, action) => {
         return currentState.set('activeGameData', Immutable.fromJS(action.gameData))
     }
     case UPDATE_ACTIVE_GAME_DATA: {
-        const updatedGameData = updateCurrentActiveGameData(action.gameId, action.characterName, action.isNewGame, action.existingGameData, currentState)
+        const updatedGameData = updateCurrentActiveGameData(action.gameId, action.characterName, action.isNewGame, action.isDM, action.existingGameData, currentState)
         return currentState.set('activeGameData', updatedGameData)
     }
     case UPDATE_PHOTO_URL: {
@@ -56,6 +56,10 @@ const dndState = (currentState = initialState, action) => {
     case SET_CONSOLIDATED_PLAYERS: {
         return currentState.set('allPlayers', action.players)
     }
+    case REMOVE_NPC: {
+        const removedNPC = removeCurrentNPC(action.npc, currentState)
+        return currentState.setIn(['activeGameData', 'NPCs'], removedNPC)
+    }
     default:
         return currentState
     }
@@ -74,7 +78,8 @@ export const UPDATE_USER_ACCOUNT = 'updateUserData'
 export const setActiveGameData = gameData => ({ type: SET_ACTIVE_GAME_DATA, gameData })
 export const SET_ACTIVE_GAME_DATA = 'activeGameData'
 
-export const updateActiveGameData = (gameId, characterName, isNewGame, existingGameData) => ({ type: UPDATE_ACTIVE_GAME_DATA, gameId, characterName, isNewGame, existingGameData })
+export const updateActiveGameData = (gameId, characterName, isNewGame, isDM, existingGameData) =>
+    ({ type: UPDATE_ACTIVE_GAME_DATA, gameId, characterName, isNewGame, isDM, existingGameData })
 export const UPDATE_ACTIVE_GAME_DATA = 'updateActiveGameData'
 
 export const updatePlayerInitiative = (initiative, playerType, id) => ({ type: UPDATE_PLAYER_INITIATIVE, initiative, playerType, id })
@@ -95,8 +100,11 @@ export const SET_NPC = 'setNPC'
 export const resetInitiative = () => ({ type: RESET_INITIATIVE })
 export const RESET_INITIATIVE = 'resetInitiative'
 
-export const setConsolidatedPlayers = (players) => ({ type: SET_CONSOLIDATED_PLAYERS, players })
+export const setConsolidatedPlayers = players => ({ type: SET_CONSOLIDATED_PLAYERS, players })
 export const SET_CONSOLIDATED_PLAYERS = 'setConsolidatedPlayers'
+
+export const removeNPC = npc => ({ type: REMOVE_NPC, npc })
+export const REMOVE_NPC = 'removeNPC'
 
 // Selectors
 export const getError = state => state.get('error', null)
@@ -128,7 +136,7 @@ const updateCurrentUserAccount = (gameId, characterName, currentGameData, state)
     return userAccountState
 }
 
-const updateCurrentActiveGameData = (gameId, characterName, isNewGame, existingGameData, state) => {
+const updateCurrentActiveGameData = (gameId, characterName, isNewGame, isDM, existingGameData, state) => {
     const uid = getCurrentUser(state).get('uid')
     const playerName = getCurrentUser(state).get('fullName')
     const profileImg = getCurrentUser(state).get('photoURL', null)
@@ -137,8 +145,9 @@ const updateCurrentActiveGameData = (gameId, characterName, isNewGame, existingG
         players: { ...existingGameData ?? undefined,
             [uid]: {
                 characterName: characterName,
+                gameMaster: isDM,
                 player: playerName,
-                playerProfileImg: profileImg,
+                playerProfileImg: profileImg
             }
         }
     }
@@ -201,6 +210,15 @@ const resetCurrentInitiative = (state) => {
     return newData
 }
 
+const removeCurrentNPC = (npc, state) => {
+    const gameId = getCurrentUser(state).get('activeGameId')
+    let currentState = getActiveGameData(state).get('NPCs')
+    currentState = currentState.delete(npc)
+    const path = { NPCs: currentState.toJS() }
+    updateExistingGameDB(path, gameId)
+    return currentState
+}
+
 // Firebase Functions
 const updateExistingGameDB = async (data, gameId, isNewGame) => {
     const games = db.collection('games')
@@ -211,7 +229,7 @@ const updateExistingGameDB = async (data, gameId, isNewGame) => {
             await games.doc(gameId).update(data)
         }
     } catch (e) {
-        store.dispatch(setError(e.message))
+        setError(e.message)
     }
 }
 
@@ -220,7 +238,7 @@ const updateDBUserAccount = async (uid, data) => {
     try {
         await userAccount.update(data)
     } catch (e) {
-        store.dispatch(setError(e.message))
+        setError(e.message)
     }
 }
 

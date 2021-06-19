@@ -17,6 +17,7 @@ export default function AddToGame () {
 
     const [gameId, setGameId] = useState()
     const [characterName, setCharacterName] = useState()
+    const [isDM, setIsDM] = useState(false)
 
     const gameQueryHandler = async (isNewGame) => {
         const gameIds = []
@@ -28,36 +29,46 @@ export default function AddToGame () {
         gamesSnapshot.forEach(game => {
             gameIds.push(game.id)
         })
-
         const existingGameDataUserAccount = userAccountData.games
         const cleanGameId = gameId.replaceAll(' ', '')
         if (isNewGame) {
             if (cleanGameId && !gameIds.includes(cleanGameId)) {
                 dispatch(updateUserAccount(cleanGameId, characterName, existingGameDataUserAccount))
-                dispatch(updateActiveGameData(cleanGameId, characterName, isNewGame))
+                dispatch(updateActiveGameData(cleanGameId, characterName, isNewGame, isDM))
                 history.push('/')
             } else {
                 dispatch(setError(ERRORS.gameAlreadyExists))
             }
         } else {
-            if (cleanGameId && gameIds.includes(cleanGameId) && !Object.keys(userAccountData.games).includes(cleanGameId)) {
-                const globalGameData = games.doc(cleanGameId)
-                const globalGameDataCall = await globalGameData.get()
-                const existingGlobalGameData = globalGameDataCall.data().players
-                dispatch(updateUserAccount(cleanGameId, characterName, existingGameDataUserAccount))
-                dispatch(updateActiveGameData(cleanGameId, characterName, isNewGame, existingGlobalGameData))
-                history.push('/')
+            const globalGameData = games.doc(cleanGameId)
+            const globalGameDataCall = await globalGameData.get()
+            const existingGlobalGameData = globalGameDataCall.data().players
+            const playersList = Object.keys(existingGlobalGameData)
+            let gameHasDM
+            playersList.forEach(player => {
+                if (existingGlobalGameData[player].gameMaster) {
+                    gameHasDM = true
+                }
+            })
+            if (gameHasDM && isDM) {
+                dispatch(setError('This game already has a Game Master'))
+                setIsDM(false)
             } else {
-                const userGames = Object.keys(userData.get('games'))
-                switch(userGames) {
-                case userGames.includes(cleanGameId):
-                    dispatch(setError(ERRORS.playerExists))
-                    break
-                default:
-                    dispatch(setError(ERRORS.gameDoesNotExist))
+                if (cleanGameId && gameIds.includes(cleanGameId) && !Object.keys(userAccountData.games).includes(cleanGameId)) {
+                    dispatch(updateUserAccount(cleanGameId, characterName, existingGameDataUserAccount))
+                    dispatch(updateActiveGameData(cleanGameId, characterName, isNewGame, isDM, existingGlobalGameData))
+                    history.push('/')
+                } else {
+                    const userGames = Object.keys(userData.get('games'))
+                    if (userGames.includes(cleanGameId)) {
+                        dispatch(setError(ERRORS.playerExists))
+                    } else {
+                        dispatch(setError(ERRORS.gameDoesNotExist))
+                    }
                 }
             }
         }
+
     }
 
     return (
@@ -74,6 +85,7 @@ export default function AddToGame () {
                     onChange={ (e) => setGameId(e.target.value) }
                 />
             </InputGroup>
+            {!isDM &&
             <InputGroup size="sm" className="mb-3">
                 <InputGroup.Prepend>
                     <InputGroup.Text id="inputGroup-sizing-sm">
@@ -84,7 +96,28 @@ export default function AddToGame () {
                     maxLength='15'
                     onChange={ (e) => setCharacterName(e.target.value) }
                 />
-            </InputGroup>
+            </InputGroup> }
+            <div style={{ textAlign: 'center', marginBottom: '5px' }}>
+                <input
+                    checked={ isDM }
+                    id='dm-query'
+                    onChange={ () => {
+                        setIsDM(!isDM)
+                        if (!isDM) {
+                            setCharacterName('Game Master')
+                        } else {
+                            setCharacterName('')
+                        }
+                    } }
+                    type='checkbox'
+                />
+                <label
+                    className='ml-3'
+                    htmlFor='dm-query'
+                >
+                    Are you the Game Master?
+                </label>
+            </div>
             <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
                 <Button variant='dark' onClick={ () => gameQueryHandler(false) }>
                     { AUTHENTICATION.joinGame }

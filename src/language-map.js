@@ -42,6 +42,7 @@ export const GENERAL = {
     name: 'Name',
     nextPage: 'Next Page',
     prevPage: 'Previous Page',
+    remove: 'Remove',
     submit: 'Submit'
 }
 

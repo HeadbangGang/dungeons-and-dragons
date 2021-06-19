@@ -8,7 +8,14 @@ import d20 from '../../media/d20.png'
 import { AUTHENTICATION, ERRORS } from '../../language-map'
 import userIcon from '../../media/d20.png'
 import './dnd-navbar.css'
-import { getCurrentUser, getActiveGameData, getActiveGameId, getProfilePicture, setSelectedCharacter, getSelectedCharacter } from '../../store/store'
+import {
+    getActiveGameData,
+    getActiveGameId,
+    getCurrentUser,
+    getProfilePicture,
+    getSelectedCharacter,
+    setSelectedCharacter
+} from '../../store/store'
 
 export const DndNavbar = ({ isSmallView }) => {
     const history = useHistory()
@@ -28,7 +35,10 @@ export const DndNavbar = ({ isSmallView }) => {
         if (activeGameId && activeGameData.size > 0) {
             activeGameData.get('players').forEach(player => {
                 const name = player.get('characterName')
-                !players.includes(name) && setPlayers([...players, name])
+                const isDM = player.get('gameMaster')
+                if (!players.includes(name) && !isDM) {
+                    setPlayers([...players, name])
+                }
             })
         }
     })
