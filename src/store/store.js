@@ -178,10 +178,10 @@ const setNewNPC = (name, initiative, state) => {
         currentState = path
     }
 
-    if (npcData && npcData.size > 0 && npcData.keySeq().includes(name)) {
+    if (npcData?.size > 0 && npcData?.keySeq().includes(name)) {
         dbData = { NPCs: { [name]: { characterName: name, initiativeValue: initiative, NPC: true } } }
     } else {
-        dbData = { NPCs: { ...npcData.toJS(), [name]: { characterName: name, initiativeValue: initiative, NPC: true } } }
+        dbData = { NPCs: { ...npcData?.toJS(), [name]: { characterName: name, initiativeValue: initiative, NPC: true } } }
     }
     updateExistingGameDB(dbData, gameId)
     return currentState

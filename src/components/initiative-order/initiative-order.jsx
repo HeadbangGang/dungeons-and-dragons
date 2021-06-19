@@ -82,7 +82,7 @@ export const InitiativeOrder = () => {
     const addNPC = (e) => {
         e.preventDefault()
         const initiativeToNum = parseInt(npcInitiative)
-        if (!isNaN(initiativeToNum) && npcName.trim() !== '' && !gameData.get('NPCs').keySeq().includes(npcName.trim())) {
+        if (!isNaN(initiativeToNum) && npcName.trim() !== '' && !gameData.get('NPCs')?.keySeq().includes(npcName.trim())) {
             dispatch(setNPC(npcName, initiativeToNum))
             setNpcName('')
             setNpcInitiative('')
@@ -129,7 +129,7 @@ export const InitiativeOrder = () => {
                                             <td>{ name }</td>
                                             <td>{ initiative === null ? 'Not Set' : initiative }</td>
                                             {/* <td>{ isSelected ? 'X' : '' }</td> */}
-                                            { gameData.get('NPCs').size > 0 && isAdmin &&
+                                            { gameData.get('NPCs')?.size > 0 && isAdmin &&
                                             <td>
                                                 { isNPC &&
                                                 <a
