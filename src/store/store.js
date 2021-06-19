@@ -41,6 +41,10 @@ const dndState = (currentState = initialState, action) => {
         const updatedPlayerGameData = updateCurrentPlayerInitiative(action.initiative, action.id, currentState)
         return currentState.setIn(['activeGameData', action.playerType, action.id], updatedPlayerGameData)
     }
+    case UPDATE_NPC_INITIATIVE: {
+        const updatedNPCInitiative = updateChosenNPCInitiative(action.initiative, action.name, currentState)
+        return currentState.setIn(['activeGameData', 'NPCs', action.name], updatedNPCInitiative)
+    }
     case SET_NPC: {
         const addedNPC = setNewNPC(action.name, action.initiative, currentState)
         return currentState.setIn(['activeGameData', 'NPCs'], addedNPC)
@@ -75,6 +79,9 @@ export const UPDATE_ACTIVE_GAME_DATA = 'updateActiveGameData'
 
 export const updatePlayerInitiative = (initiative, playerType, id) => ({ type: UPDATE_PLAYER_INITIATIVE, initiative, playerType, id })
 export const UPDATE_PLAYER_INITIATIVE = 'updatePlayerInitiative'
+
+export const updateNPCInitiative = (initiative, name) => ({ type: UPDATE_NPC_INITIATIVE, initiative, name })
+export const UPDATE_NPC_INITIATIVE = 'updateNPCInitiative'
 
 export const updatePhotoUrl = url => ({ type: UPDATE_PHOTO_URL, url })
 export const UPDATE_PHOTO_URL = 'user/photoURL'
@@ -144,6 +151,16 @@ const updateCurrentPlayerInitiative = (value, id, state) => {
     let currentValue = getActiveGameData(state).getIn(['players', id])
     currentValue = currentValue.merge(Immutable.fromJS({ initiativeValue: value }))
     const dbPath = `players.${ id }.initiativeValue`
+    const dbData = { [dbPath]: value }
+    updateExistingGameDB(dbData, gameId)
+    return currentValue
+}
+
+const updateChosenNPCInitiative = (value, name, state) => {
+    const gameId = getCurrentUser(state).get('activeGameId')
+    let currentValue = getActiveGameData(state).getIn(['NPCs', name])
+    currentValue = currentValue.merge(Immutable.fromJS({ initiativeValue: value }))
+    const dbPath = `NPCs.${ name }.initiativeValue`
     const dbData = { [dbPath]: value }
     updateExistingGameDB(dbData, gameId)
     return currentValue

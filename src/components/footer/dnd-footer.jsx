@@ -35,7 +35,7 @@ export default function DndFooter () {
                     draggable={ false }
                 />
             </a>
-            <span className='footer-copyright'>{ GENERAL.copyright + ' ' + date.getFullYear() + ' ' + GENERAL.name }</span>
+            <span className='footer-copyright'>{ GENERAL.copyright + ' ' + date.getFullYear() + ' ' + GENERAL.myName }</span>
             { activeGameId && <span className='footer-active-game-id'>{ `Game ID: ${ activeGameId }`}</span> }
         </Navbar>
     )

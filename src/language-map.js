@@ -34,15 +34,29 @@ export const ERRORS = {
 
 export const GENERAL = {
     characterSheet: 'Character Sheet',
+    close: 'Close',
     copyright: '©',
     dungeonsAndDragons: 'Dungeons and Dragons',
     loading: 'Loading...',
-    name: 'Tayden Flitcroft',
+    myName: 'Tayden Flitcroft',
+    name: 'Name',
     nextPage: 'Next Page',
-    prevPage: 'Previous Page'
+    prevPage: 'Previous Page',
+    submit: 'Submit'
 }
 
 export const LANDSCAPE_PAGE = {
     header: 'Landscape Detected',
     description: 'This content is best experienced with your device in portrait mode. Please rotate your device for the optimal experience.'
+}
+
+export const INITIATIVE_PAGE = {
+    character: 'Character',
+    disclaimer: '**Please have patience when you submit a change. There is a delay, but it is working.**',
+    edit: 'Edit',
+    editInitiativeFor: 'Edit Initiative for',
+    initiative: 'Initiative',
+    npcCreator: 'NPC Creator',
+    resetInitiative: 'Reset Initiative',
+    setInitiative: 'Set Your Initiative'
 }

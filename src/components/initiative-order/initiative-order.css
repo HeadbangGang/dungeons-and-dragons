@@ -3,3 +3,51 @@ table, th, td {
     width: 25%;
     border: 1px solid black;
 }
+
+th {
+    padding: 10px;
+}
+
+.initiative-order-container {
+    margin: 25px;
+}
+
+.initiative-order-table-wrapper {
+    margin: 0 auto;
+}
+
+.initiative-order-edit-button {
+    color: blue !important;
+}
+
+.initiative-order-edit-button:hover {
+    color: red !important;
+    cursor: pointer;
+}
+
+.initiative-order-disclaimer-row {
+    margin-top: 15px;
+}
+
+.initiative-order-disclaimer {
+    font-size: 11px;
+    font-weight: lighter;
+}
+
+.initiative-order-initiative-wrapper {
+    margin-top: 25px;
+    border: 1px solid black;
+    padding: 10px;
+}
+
+.initiative-order-initiative-header {
+    text-align: center;
+}
+
+.initiative-order-initiative-input {
+    width: 50px !important;
+}
+
+.row {
+    place-content: center;
+}
