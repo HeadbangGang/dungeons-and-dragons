@@ -13,6 +13,17 @@
     font-size: 50px;
 }
 
+.dnd-home-card {
+  width: 15rem;
+  background-color: moccasin;
+}
+
+.dnd-home-card:hover {
+cursor: pointer;
+transform: scale(1.1);
+border: 2px solid black
+}
+
 @keyframes rotation {
   from {
     transform: rotate(0deg);

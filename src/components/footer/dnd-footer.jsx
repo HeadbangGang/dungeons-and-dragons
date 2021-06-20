@@ -1,7 +1,7 @@
-import React from 'react'
+import React, { useRef, useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
-import { Navbar } from 'react-bootstrap'
+import { Navbar, Tooltip, Overlay } from 'react-bootstrap'
 import d20 from '../../media/d20.png'
 import { GENERAL } from '../../language-map'
 import './dnd-footer.css'
@@ -11,8 +11,13 @@ export default function DndFooter () {
     const history = useHistory()
     const dispatch = useDispatch()
 
+    const triggerRef = useRef(null)
+
     const hasSelectedCharacter = useSelector(getSelectedCharacter)
     const activeGameId = useSelector(getActiveGameId)
+
+    const [showCopiedOverlay, setShowCopiedOverlay] = useState(false)
+
     const date = new Date
 
     return (
@@ -36,7 +41,31 @@ export default function DndFooter () {
                 />
             </a>
             <span className='footer-copyright'>{ GENERAL.copyright + ' ' + date.getFullYear() + ' ' + GENERAL.myName }</span>
-            { activeGameId && <span className='footer-active-game-id'>{ `Game ID: ${ activeGameId }`}</span> }
+            { activeGameId &&
+            <span className='footer-active-game-id'>
+                <a
+                    onClick={ () => {
+                        navigator.clipboard.writeText(activeGameId)
+                        setShowCopiedOverlay(true)
+                    } }
+                    ref={ triggerRef }
+                >
+                    { `Game ID: ${ activeGameId }`}
+                </a>
+                <Overlay
+                    onHide={ () => {
+                        setShowCopiedOverlay(false)
+                    } }
+                    placement="top"
+                    rootClose
+                    show={ showCopiedOverlay }
+                    target={ triggerRef }
+                >
+                    <Tooltip id="overlay-example">
+                        Copied Game ID!
+                    </Tooltip>
+                </Overlay>
+            </span> }
         </Navbar>
     )
 }

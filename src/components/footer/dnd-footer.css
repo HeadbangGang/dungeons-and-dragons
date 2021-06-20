@@ -6,6 +6,10 @@
   margin-left: auto;
 }
 
+.footer-active-game-id:hover {
+  cursor: pointer;
+}
+
 @media only screen and (max-device-width: 576px) {
   .footer-copyright {
     display: none;

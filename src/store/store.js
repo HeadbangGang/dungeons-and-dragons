@@ -60,6 +60,10 @@ const dndState = (currentState = initialState, action) => {
         const removedNPC = removeCurrentNPC(action.npc, currentState)
         return currentState.setIn(['activeGameData', 'NPCs'], removedNPC)
     }
+    case UPDATE_ACTIVE_GAME_ID: {
+        const updatedActiveGameId = updateCurrentActiveGameID(action.id, currentState)
+        return currentState.set('user', updatedActiveGameId)
+    }
     default:
         return currentState
     }
@@ -106,6 +110,9 @@ export const SET_CONSOLIDATED_PLAYERS = 'setConsolidatedPlayers'
 export const removeNPC = npc => ({ type: REMOVE_NPC, npc })
 export const REMOVE_NPC = 'removeNPC'
 
+export const updateActiveGameID = id => ({ type: UPDATE_ACTIVE_GAME_ID, id })
+export const UPDATE_ACTIVE_GAME_ID = 'updateActiveGameID'
+
 // Selectors
 export const getError = state => state.get('error', null)
 export const getCurrentUser = state => state.get('user', Immutable.Map())
@@ -114,6 +121,7 @@ export const getSelectedCharacter = state => state.get('selectedCharacter', null
 export const getProfilePicture = state => getCurrentUser(state)?.get('photoURL', null)
 export const getActiveGameId = state => getCurrentUser(state)?.get('activeGameId', undefined)
 export const getConsolidatedPlayers = state => state.get('allPlayers', Immutable.Map())
+export const getAllUserGames = state => getCurrentUser(state).get('games')
 
 // Redux Functions
 const updateCurrentUserAccount = (gameId, characterName, currentGameData, state) => {
@@ -216,6 +224,14 @@ const removeCurrentNPC = (npc, state) => {
     currentState = currentState.delete(npc)
     const path = { NPCs: currentState.toJS() }
     updateExistingGameDB(path, gameId)
+    return currentState
+}
+
+const updateCurrentActiveGameID = (gameId, state) => {
+    let currentState = getCurrentUser(state)
+    const uid = currentState.get('uid')
+    currentState = currentState.merge(Immutable.fromJS({ activeGameId: gameId }))
+    updateDBUserAccount(uid, currentState.toJS())
     return currentState
 }
 

@@ -36,12 +36,17 @@ export const InitiativeOrder = () => {
 
     const isAdmin = userData.get('admin', false)
     const currentUid = userData.get('uid')
-    const isDM = gameData.getIn(['players', currentUid, 'gameMaster'])
+    const isUserDM = gameData.getIn(['players', currentUid, 'gameMaster'])
     const doc = db.collection('games').doc(activeGameId)
 
     useEffect(() => {
+        const timeout = setTimeout(getData, 1000)
+        return () => clearTimeout(timeout)
+    })
+
+    useEffect(() => {
         getData()
-    }, [activeGameId])
+    }, [])
 
     const getData = async () => {
         const fetchDoc = await doc.get()
@@ -51,13 +56,12 @@ export const InitiativeOrder = () => {
             const npcs = data.get('NPCs')
             const allPlayers = players.merge(npcs)
             const sortedPlayers = allPlayers.toOrderedMap().sortBy(x => {
-                if (x.get('initiativeValue') > -100){
+                if (x.get('initiativeValue') > -100 && !x.get('gameMaster')){
                     return -x.get('initiativeValue')
                 }
             })
             dispatch(setConsolidatedPlayers(sortedPlayers))
         }
-        setTimeout(getData, 1000)
     }
 
     const updatePlayersInitiative = (e) => {
@@ -121,7 +125,7 @@ export const InitiativeOrder = () => {
                                         <strong>{ INITIATIVE_PAGE.initiative }</strong>
                                     </th>
                                     {/* <th><strong>Whoʼs Turn?</strong></th> */}
-                                    {isAdmin &&
+                                    {(isAdmin || isUserDM) &&
                                     <th>
                                         <strong>{ INITIATIVE_PAGE.edit }</strong>
                                     </th> }
@@ -138,7 +142,7 @@ export const InitiativeOrder = () => {
                                                 <td>{ name }</td>
                                                 <td>{ initiative === null ? 'Not Set' : initiative }</td>
                                                 {/* <td>{ isSelected ? 'X' : '' }</td> */}
-                                                {isAdmin &&
+                                                { (isAdmin || isUserDM) &&
                                             <td>
                                                 { isNPC &&
                                                 <a
@@ -163,7 +167,7 @@ export const InitiativeOrder = () => {
                     <Button onClick={ () => {console.log('last player')} }>Last Player</Button>
                     <Button className='ml-3 mr-3' onClick={ () => {console.log('next player')} }>Next Player</Button>
                 </Row> */}
-                {!isDM &&
+                {!isUserDM &&
                 <Row>
                     <div className='initiative-order-initiative-wrapper'>
                         <Form onSubmit={ (e) => updatePlayersInitiative(e) }>
@@ -191,7 +195,7 @@ export const InitiativeOrder = () => {
                     </div>
                 </Row>
                 }
-                {(isAdmin || isDM) &&
+                {(isAdmin || isUserDM) &&
                 <>
                     <Row>
                         <div className='initiative-order-initiative-wrapper'>
