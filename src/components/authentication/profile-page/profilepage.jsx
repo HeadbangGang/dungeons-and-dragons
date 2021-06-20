@@ -32,7 +32,7 @@ export default function ProfilePage () {
     }, [profilePictureBlob, profilePicturePath])
 
     const changeProfilePicture = async () => {
-        const storageRef = storage.ref(`${ userData.get('uid') }/profilePicture/${ profilePictureBlob.name }`)
+        const storageRef = storage.ref(`${ userData.get('uid') }/profilePicture/image`)
         storageRef.put(profilePictureBlob).then(() => {
             storageRef.getDownloadURL().then((url) => {
                 setProfilePicturePath(url)
@@ -47,8 +47,20 @@ export default function ProfilePage () {
                 photoURL: profilePicturePath
             })
             dispatch(updatePhotoUrl(profilePicturePath))
+            setProfilePictureBlob(null)
+            setProfilePicturePath(null)
         } catch (e) {
             dispatch(setError(e.message))
+        }
+    }
+
+    const fileValidation = (fileBlob) => {
+        const fsize = fileBlob.size
+        const fileSize = Math.round((fsize / 1024))
+        if (fileSize >= 10240) {
+            dispatch(setError('File too Big, please select a file less than 10MB'))
+        } else {
+            setProfilePictureBlob(fileBlob)
         }
     }
 
@@ -72,7 +84,9 @@ export default function ProfilePage () {
                                 id='file'
                                 ref={ inputFile }
                                 style={{ display: 'none' }}
-                                onChange={ () => { setProfilePictureBlob(inputFile.current.files[0]) } }
+                                onChange={ () => {
+                                    fileValidation(inputFile.current.files[0])
+                                } }
                             />
                         </div>
                     </Row>

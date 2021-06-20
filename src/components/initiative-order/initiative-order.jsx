@@ -40,7 +40,7 @@ export const InitiativeOrder = () => {
     const doc = db.collection('games').doc(activeGameId)
 
     useEffect(() => {
-        const timeout = setTimeout(getData, 1000)
+        const timeout = setTimeout(getData, 3000)
         return () => clearTimeout(timeout)
     })
 
