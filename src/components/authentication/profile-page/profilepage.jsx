@@ -3,14 +3,13 @@ import { useSelector, useDispatch } from 'react-redux'
 import { auth, db, storage } from '../../../database/firebase'
 import { Col, Row, Button } from 'react-bootstrap'
 import { useHistory } from 'react-router-dom'
-import { setError } from '../../../store/store'
 import { AUTHENTICATION } from '../../../language-map'
 import AddToGame from './addtogame'
 import './profile-page.css'
 import spinner from '../../../media/spinner.webp'
 import userIcon from '../../../media/d20.png'
 import editIcon from '../../../media/edit.png'
-import { getCurrentUser, updatePhotoUrl, getProfilePicture } from '../../../store/store'
+import { getCurrentUser, updatePhotoUrl, getProfilePicture, setError } from '../../../store/store'
 
 
 export default function ProfilePage () {
@@ -68,7 +67,7 @@ export default function ProfilePage () {
         <>
             { userData?.get('email') && userData?.get('fullName')
                 ? <Col xl={ 12 } lg={ 12 } md={ 12 } sm={ 12 } xs={ 12 }>
-                    <Row style={{ placeContent: 'center' }}>
+                    <Row>
                         <img className='profile-edit-img' src={ editIcon } alt='' />
                         <div className='profile-img-wrapper'>
                             <input
@@ -90,7 +89,7 @@ export default function ProfilePage () {
                             />
                         </div>
                     </Row>
-                    <Row style={{ placeContent: 'center' }}>
+                    <Row>
                         <div style={{ margin: '25px', textAlign: 'center' }}>
                             <h2>{ userData.get('fullName') }</h2>
                             <h3>{ userData.get('email') }</h3>
@@ -109,15 +108,13 @@ export default function ProfilePage () {
                             </Button>
                         </div>
                     </Row>
-                    <Row style={{ placeContent: 'center', minHeight: '150px' }}>
+                    <Row className='profile-page-add-to-game-wrapper'>
                         <AddToGame />
                     </Row>
                 </Col>
-                : <div>
-                    <div style={{ display: 'flex', justifyContent: 'center' }}>
-                        <img src={ spinner } alt='loading' style={{ marginTop: '50px' }} />
-                    </div>
-                </div>
+                : <Row>
+                    <img src={ spinner } alt='loading' className='profile-page-spinner' />
+                </Row>
             }
         </>
     )

@@ -263,9 +263,17 @@ const composeEnhancers =
   window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ ?
       window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({
       }) : compose
-const enhancer = composeEnhancers(
-    applyMiddleware(logger),
-)
+let enhancer
+if (process.env.NODE_ENV === 'production') {
+    enhancer = composeEnhancers(
+        applyMiddleware(),
+    )
+} else {
+    enhancer = composeEnhancers(
+        applyMiddleware(logger),
+    )
+}
+
 // Initialize
 const store = createStore(
     dndState,

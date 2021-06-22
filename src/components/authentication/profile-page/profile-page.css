@@ -16,3 +16,15 @@
     top: 40px;
     left: 215px;
 }
+
+Row {
+    place-content: center;
+}
+
+.profile-page-add-to-game-wrapper {
+    min-height: 150px;
+}
+
+.profile-page-spinner {
+margin-top: 50px;
+}

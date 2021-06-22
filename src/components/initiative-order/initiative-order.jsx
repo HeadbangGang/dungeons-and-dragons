@@ -17,6 +17,7 @@ import {
     updateNPCInitiative,
     updatePlayerInitiative
 } from '../../store/store'
+import spinner from '../../media/spinner.webp'
 import { GENERAL, INITIATIVE_PAGE } from '../../language-map'
 
 export const InitiativeOrder = () => {
@@ -40,7 +41,7 @@ export const InitiativeOrder = () => {
     const doc = db.collection('games').doc(activeGameId)
 
     useEffect(() => {
-        const timeout = setTimeout(getData, 3000)
+        const timeout = setTimeout(getData, 5000)
         return () => clearTimeout(timeout)
     })
 
@@ -69,6 +70,7 @@ export const InitiativeOrder = () => {
         const initiativeToNum = parseInt(initiativeValue || selectedNPCInitiative)
         if (!isNaN(initiativeToNum)) {
             dispatch(updatePlayerInitiative(initiativeToNum, 'players', userData.get('uid')))
+            getData()
             setInitiativeValue('')
         } else {
             dispatch(setError('Please enter a valid initiative value in numeric format.'))
@@ -82,6 +84,7 @@ export const InitiativeOrder = () => {
         if (!isNaN(initiativeToNum)) {
             setShowModal(false)
             dispatch(updateNPCInitiative(initiativeToNum, selectedNPCName))
+            getData()
             setSelectedNPCInitiative('')
             setSelectedNPCName('')
         } else {
@@ -95,6 +98,7 @@ export const InitiativeOrder = () => {
         const initiativeToNum = parseInt(npcInitiative)
         if (!isNaN(initiativeToNum) && npcName.trim() !== '' && !gameData.get('NPCs')?.keySeq().includes(npcName.trim())) {
             dispatch(setNPC(npcName, initiativeToNum))
+            getData()
             setNpcName('')
             setNpcInitiative('')
         } else {
@@ -130,7 +134,7 @@ export const InitiativeOrder = () => {
                                         <strong>{ INITIATIVE_PAGE.edit }</strong>
                                     </th> }
                                 </tr>
-                                {allPlayersConsolidated?.keySeq().map((player, index) => {
+                                { allPlayersConsolidated?.keySeq().map((player, index) => {
                                     const name = allPlayersConsolidated.getIn([player, 'characterName'])
                                     const initiative = allPlayersConsolidated.getIn([player, 'initiativeValue'], 'Not Set')
                                     const isNPC = allPlayersConsolidated.getIn([player, 'NPC'], false)
@@ -158,9 +162,14 @@ export const InitiativeOrder = () => {
                                             </tr>
                                         )
                                     }
-                                })}
+                                })
+                                }
                             </tbody>
                         </table>
+                        { allPlayersConsolidated.size < 1 &&
+                        <div style={{ textAlign: 'center' }}>
+                            <img src={ spinner } alt='loading' style={{ width: '75%' }} />
+                        </div>}
                     </div>
                 </Row>
                 {/* <Row style={{ placeContent: 'center', margin: '10px' }}>
@@ -220,7 +229,14 @@ export const InitiativeOrder = () => {
                         </div>
                     </Row>
                     <Row>
-                        <Button className='ml-3 mr-3 mt-3' onClick={ () => dispatch(resetInitiative()) } variant='danger'>
+                        <Button
+                            className='ml-3 mr-3 mt-3'
+                            onClick={ () => {
+                                dispatch(resetInitiative())
+                                getData()
+                            } }
+                            variant='danger'
+                        >
                             { INITIATIVE_PAGE.resetInitiative }
                         </Button>
                     </Row>
@@ -265,6 +281,7 @@ export const InitiativeOrder = () => {
                         <Button
                             onClick={ () => {
                                 dispatch(removeNPC(selectedNPCName))
+                                getData()
                                 setShowModal(false)
                             } }
                             variant='danger'
