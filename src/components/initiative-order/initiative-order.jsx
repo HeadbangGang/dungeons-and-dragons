@@ -31,7 +31,9 @@ export const InitiativeOrder = () => {
     const [initiativeValue, setInitiativeValue] = useState('')
     const [npcName, setNpcName] = useState('')
     const [npcInitiative, setNpcInitiative] = useState('')
-    const [showModal, setShowModal] = useState(false)
+    const [showInitiativeModal, setShowInitiativeModal] = useState(false)
+    const [showConfirmationModal, setShowConfirmationModal] = useState(false)
+    const [resetInitiativeGroup, setResetInitiativeGroup] = useState(null)
     const [selectedNPCName, setSelectedNPCName] = useState('')
     const [selectedNPCInitiative, setSelectedNPCInitiative] = useState('')
 
@@ -82,7 +84,7 @@ export const InitiativeOrder = () => {
         e.preventDefault()
         const initiativeToNum = parseInt(selectedNPCInitiative)
         if (!isNaN(initiativeToNum)) {
-            setShowModal(false)
+            setShowInitiativeModal(false)
             dispatch(updateNPCInitiative(initiativeToNum, selectedNPCName))
             getData()
             setSelectedNPCInitiative('')
@@ -152,7 +154,7 @@ export const InitiativeOrder = () => {
                                                 <a
                                                     className='initiative-order-edit-button'
                                                     onClick={ () => {
-                                                        setShowModal(true)
+                                                        setShowInitiativeModal(true)
                                                         setSelectedNPCName(name)
                                                     } }
                                                 >
@@ -228,12 +230,34 @@ export const InitiativeOrder = () => {
                             </Form>
                         </div>
                     </Row>
+                    <Row className='mt-3'>
+                        <Button
+                            className='mr-3'
+                            onClick={ () => {
+                                setShowConfirmationModal(true)
+                                setResetInitiativeGroup('npcs')
+                            } }
+                            tabIndex='-1'
+                        >
+                            Remove All NPCs
+                        </Button>
+                        <Button
+                            onClick={ () => {
+                                setShowConfirmationModal(true)
+                                setResetInitiativeGroup('players')
+                            } }
+                            tabIndex='-1'
+                        >
+                            Reset Players Initiatives
+                        </Button>
+                    </Row>
                     <Row>
                         <Button
+                            tabIndex='-1'
                             className='ml-3 mr-3 mt-3'
                             onClick={ () => {
-                                dispatch(resetInitiative())
-                                getData()
+                                setShowConfirmationModal(true)
+                                setResetInitiativeGroup(null)
                             } }
                             variant='danger'
                         >
@@ -243,9 +267,10 @@ export const InitiativeOrder = () => {
                 </>
                 }
             </Col>
+            {/* NPC Initiative Modal */}
             <Modal
-                show={ showModal }
-                onHide={ () => setShowModal(false) }
+                show={ showInitiativeModal }
+                onHide={ () => setShowInitiativeModal(false) }
                 size="md"
                 aria-labelledby="contained-modal-title-vcenter"
                 enforceFocus
@@ -282,18 +307,55 @@ export const InitiativeOrder = () => {
                             onClick={ () => {
                                 dispatch(removeNPC(selectedNPCName))
                                 getData()
-                                setShowModal(false)
+                                setShowInitiativeModal(false)
                             } }
                             variant='danger'
                         >
-                            {`${ GENERAL.remove } ${ selectedNPCName }`}</Button>
+                            {`${ GENERAL.remove } ${ selectedNPCName }`}
+                        </Button>
                     </Row>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button onClick={ () => setShowModal(false) }>
+                    <Button onClick={ () => setShowInitiativeModal(false) }>
                         { GENERAL.close }
                     </Button>
                 </Modal.Footer>
+            </Modal>
+            {/* Confirmation Modal */}
+            <Modal
+                show={ showConfirmationModal }
+                onHide={ () => setShowConfirmationModal(false) }
+                size="md"
+                aria-labelledby="contained-modal-title-vcenter"
+                enforceFocus
+            >
+                <Modal.Header closeButton>
+                    <Modal.Title id="contained-modal-title-vcenter">
+                        {`Reset all ${ resetInitiativeGroup || '' } initiative values?`}
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Row>
+                        <Button
+                            className='mr-3'
+                            onClick={ () => {
+                                dispatch(resetInitiative(resetInitiativeGroup))
+                                getData()
+                                setShowConfirmationModal(false)
+                            } }
+                        >
+                            Yes, I՚m Sure
+                        </Button>
+                        <Button
+                            onClick={ () => {
+                                setResetInitiativeGroup(null)
+                                setShowConfirmationModal(false)
+                            } }
+                        >
+                            Nevermind
+                        </Button>
+                    </Row>
+                </Modal.Body>
             </Modal>
         </div>
     )

@@ -50,7 +50,7 @@ const dndState = (currentState = initialState, action) => {
         return currentState.setIn(['activeGameData', 'NPCs'], addedNPC)
     }
     case RESET_INITIATIVE: {
-        const resetGameInitiative = resetCurrentInitiative(currentState)
+        const resetGameInitiative = resetCurrentInitiative(action.group, currentState)
         return currentState.set('activeGameData', Immutable.fromJS(resetGameInitiative))
     }
     case SET_CONSOLIDATED_PLAYERS: {
@@ -101,7 +101,7 @@ export const SET_SELECTED_CHARACTER = 'selectedCharacter'
 export const setNPC = (name, initiative) => ({ type: SET_NPC, name, initiative })
 export const SET_NPC = 'setNPC'
 
-export const resetInitiative = () => ({ type: RESET_INITIATIVE })
+export const resetInitiative = group => ({ type: RESET_INITIATIVE, group })
 export const RESET_INITIATIVE = 'resetInitiative'
 
 export const setConsolidatedPlayers = players => ({ type: SET_CONSOLIDATED_PLAYERS, players })
@@ -204,16 +204,28 @@ const setNewNPC = (name, initiative, state) => {
     return currentState
 }
 
-const resetCurrentInitiative = (state) => {
+const resetCurrentInitiative = (group, state) => {
     const currentState = getActiveGameData(state)
     const gameId = getCurrentUser(state).get('activeGameId')
     let playerData = currentState.get('players')
+    const npcData = currentState.get('NPCs')
     const players = playerData.keySeq()
-    players.forEach(player => {
-        const currentPlayerData = playerData.setIn([player, 'initiativeValue'], null)
-        playerData = playerData.merge(currentPlayerData)
-    })
-    const newData = { 'NPCs': {}, 'players': playerData.toJS() }
+    let newData
+    if (group === 'npcs'){
+        newData = { 'NPCs': {}, players: playerData.toJS() }
+    } else if (group ==='players') {
+        players.forEach(player => {
+            const currentPlayerData = playerData.setIn([player, 'initiativeValue'], null)
+            playerData = playerData.merge(currentPlayerData)
+        })
+        newData = { 'NPCs': npcData.toJS(), 'players': playerData.toJS() }
+    } else {
+        players.forEach(player => {
+            const currentPlayerData = playerData.setIn([player, 'initiativeValue'], null)
+            playerData = playerData.merge(currentPlayerData)
+        })
+        newData = { 'NPCs': {}, 'players': playerData.toJS() }
+    }
     updateExistingGameDB(newData, gameId)
     return newData
 }

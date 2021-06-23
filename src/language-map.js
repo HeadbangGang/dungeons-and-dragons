@@ -58,6 +58,6 @@ export const INITIATIVE_PAGE = {
     editInitiativeFor: 'Edit Initiative for',
     initiative: 'Initiative',
     npcCreator: 'NPC Creator',
-    resetInitiative: 'Reset Initiative',
+    resetInitiative: 'Reset Initiative Order',
     setInitiative: 'Set Your Initiative'
 }
