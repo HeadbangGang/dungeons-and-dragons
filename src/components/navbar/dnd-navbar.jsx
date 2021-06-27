@@ -114,7 +114,7 @@ export const DndNavbar = ({ isSmallView }) => {
                             Initiative Order
                                     </a>
                                 </div>
-                                { players.length > 0 &&
+                                {/* { players.length > 0 &&
                                 <NavDropdown title="Characters" id="basic-nav-dropdown">
                                     { players.map((player, index) => {
                                         return (
@@ -130,7 +130,7 @@ export const DndNavbar = ({ isSmallView }) => {
                                             </a>
                                         )
                                     })}
-                                </NavDropdown> }
+                                </NavDropdown> } */}
                             </Nav>
                         </Navbar.Collapse>
                     </>}

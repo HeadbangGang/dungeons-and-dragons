@@ -67,11 +67,12 @@ export const InitiativeOrder = () => {
         }
     }
 
-    const updatePlayersInitiative = (e) => {
+    const updatePlayersInitiative = async (e) => {
         e.preventDefault()
         const initiativeToNum = parseInt(initiativeValue || selectedNPCInitiative)
         if (!isNaN(initiativeToNum)) {
-            dispatch(updatePlayerInitiative(initiativeToNum, 'players', userData.get('uid')))
+            await getData()
+            await dispatch(updatePlayerInitiative(initiativeToNum, 'players', userData.get('uid')))
             getData()
             setInitiativeValue('')
         } else {
@@ -80,12 +81,13 @@ export const InitiativeOrder = () => {
         }
     }
 
-    const updateNPCsInitiative = (e) => {
+    const updateNPCsInitiative = async (e) => {
         e.preventDefault()
         const initiativeToNum = parseInt(selectedNPCInitiative)
         if (!isNaN(initiativeToNum)) {
             setShowInitiativeModal(false)
-            dispatch(updateNPCInitiative(initiativeToNum, selectedNPCName))
+            await getData()
+            await dispatch(updateNPCInitiative(initiativeToNum, selectedNPCName))
             getData()
             setSelectedNPCInitiative('')
             setSelectedNPCName('')
@@ -95,11 +97,12 @@ export const InitiativeOrder = () => {
         }
     }
 
-    const addNPC = (e) => {
+    const addNPC = async (e) => {
         e.preventDefault()
         const initiativeToNum = parseInt(npcInitiative)
         if (!isNaN(initiativeToNum) && npcName.trim() !== '' && !gameData.get('NPCs')?.keySeq().includes(npcName.trim())) {
-            dispatch(setNPC(npcName, initiativeToNum))
+            await getData()
+            await dispatch(setNPC(npcName, initiativeToNum))
             getData()
             setNpcName('')
             setNpcInitiative('')
@@ -130,7 +133,6 @@ export const InitiativeOrder = () => {
                                     <th>
                                         <strong>{ INITIATIVE_PAGE.initiative }</strong>
                                     </th>
-                                    {/* <th><strong>Whoʼs Turn?</strong></th> */}
                                     {(isAdmin || isUserDM) &&
                                     <th>
                                         <strong>{ INITIATIVE_PAGE.edit }</strong>
@@ -147,7 +149,6 @@ export const InitiativeOrder = () => {
                                             <tr key={ index }>
                                                 <td>{ name }</td>
                                                 <td>{ initiative === null ? 'Not Set' : initiative }</td>
-                                                {/* <td>{ isSelected ? 'X' : '' }</td> */}
                                                 { (isAdmin || isUserDM) &&
                                             <td>
                                                 { isNPC &&
@@ -174,10 +175,6 @@ export const InitiativeOrder = () => {
                         </div>}
                     </div>
                 </Row>
-                {/* <Row style={{ placeContent: 'center', margin: '10px' }}>
-                    <Button onClick={ () => {console.log('last player')} }>Last Player</Button>
-                    <Button className='ml-3 mr-3' onClick={ () => {console.log('next player')} }>Next Player</Button>
-                </Row> */}
                 {!isUserDM &&
                 <Row>
                     <div className='initiative-order-initiative-wrapper'>
@@ -304,8 +301,9 @@ export const InitiativeOrder = () => {
                     </Row>
                     <Row>
                         <Button
-                            onClick={ () => {
-                                dispatch(removeNPC(selectedNPCName))
+                            onClick={ async () => {
+                                await getData()
+                                await dispatch(removeNPC(selectedNPCName))
                                 getData()
                                 setShowInitiativeModal(false)
                             } }
@@ -344,7 +342,7 @@ export const InitiativeOrder = () => {
                                 setShowConfirmationModal(false)
                             } }
                         >
-                            Yes, I՚m Sure
+                            { INITIATIVE_PAGE.yes }
                         </Button>
                         <Button
                             onClick={ () => {
@@ -352,7 +350,7 @@ export const InitiativeOrder = () => {
                                 setShowConfirmationModal(false)
                             } }
                         >
-                            Nevermind
+                            { INITIATIVE_PAGE.nevermind }
                         </Button>
                     </Row>
                 </Modal.Body>
