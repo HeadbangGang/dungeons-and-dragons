@@ -11,6 +11,7 @@ import {
     getCurrentUser,
     removeNPC,
     resetInitiative,
+    setActiveGameData,
     setConsolidatedPlayers,
     setError,
     setNPC,
@@ -64,6 +65,7 @@ export const InitiativeOrder = () => {
                 }
             })
             dispatch(setConsolidatedPlayers(sortedPlayers))
+            dispatch(setActiveGameData(data))
         }
     }
 
@@ -88,7 +90,6 @@ export const InitiativeOrder = () => {
             setShowInitiativeModal(false)
             await getData()
             await dispatch(updateNPCInitiative(initiativeToNum, selectedNPCName))
-            getData()
             setSelectedNPCInitiative('')
             setSelectedNPCName('')
         } else {
@@ -143,7 +144,6 @@ export const InitiativeOrder = () => {
                                     const initiative = allPlayersConsolidated.getIn([player, 'initiativeValue'], 'Not Set')
                                     const isNPC = allPlayersConsolidated.getIn([player, 'NPC'], false)
                                     const isDM = allPlayersConsolidated.getIn([player, 'gameMaster'], false)
-                                    // const isSelected = gamePlayers.getIn([player, 'selected'])
                                     if (!isDM) {
                                         return (
                                             <tr key={ index }>
@@ -304,7 +304,6 @@ export const InitiativeOrder = () => {
                             onClick={ async () => {
                                 await getData()
                                 await dispatch(removeNPC(selectedNPCName))
-                                getData()
                                 setShowInitiativeModal(false)
                             } }
                             variant='danger'
@@ -336,9 +335,9 @@ export const InitiativeOrder = () => {
                     <Row>
                         <Button
                             className='mr-3'
-                            onClick={ () => {
+                            onClick={ async () => {
+                                await getData()
                                 dispatch(resetInitiative(resetInitiativeGroup))
-                                getData()
                                 setShowConfirmationModal(false)
                             } }
                         >
