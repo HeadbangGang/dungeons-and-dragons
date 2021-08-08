@@ -16,6 +16,7 @@ import PasswordReset from './authentication/passwordreset'
 import DndFooter from '../components/footer/dnd-footer'
 import ProfilePage from './authentication/profile-page/profilepage'
 import LandscapePage from './landscape-page/landscape-page'
+import DiceRoller from './dice-roller/dice-roller'
 import './dnd-container.css'
 
 export const DndContainer = () => {
@@ -82,6 +83,9 @@ export const DndContainer = () => {
                         </Route>
                         <Route exact path='/account/profile'>
                             <ProfilePage />
+                        </Route>
+                        <Route exact path='/dice-roller'>
+                            <DiceRoller />
                         </Route>
                     </Switch>
                 </div>

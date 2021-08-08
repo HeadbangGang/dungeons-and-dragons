@@ -41,6 +41,7 @@ td {
     margin-top: 25px;
     border: 1px solid black;
     padding: 10px;
+    width: 300px;
 }
 
 .initiative-order-initiative-header {
@@ -48,6 +49,10 @@ td {
 }
 
 .initiative-order-initiative-input {
+    width: 50px !important;
+}
+
+.initiative-order-initiative-modifier {
     width: 50px !important;
 }
 

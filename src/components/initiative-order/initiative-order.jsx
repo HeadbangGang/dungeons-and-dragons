@@ -37,6 +37,9 @@ export const InitiativeOrder = () => {
     const [resetInitiativeGroup, setResetInitiativeGroup] = useState(null)
     const [selectedNPCName, setSelectedNPCName] = useState('')
     const [selectedNPCInitiative, setSelectedNPCInitiative] = useState('')
+    const [npcModifier, setNpcModifer] = useState('')
+    const [playerModifier, setPlayerModifier] = useState('')
+    const [newNpcModifier, setNewNpcModifier] = useState('')
 
     const isAdmin = userData.get('admin', false)
     const currentUid = userData.get('uid')
@@ -120,6 +123,38 @@ export const InitiativeOrder = () => {
         }
     }
 
+    const numberValidation = (val) => {
+        let valid
+        if(!/^[0-9]+$/.test(val)){
+            valid = false
+            setNpcModifer('')
+        } else {
+            valid = true
+        }
+        return valid
+    }
+
+    const initiativeModifierHandler = (e, id, role) => {
+        e.preventDefault()
+        if (numberValidation(npcModifier || 0)) {
+            let randomNumber = Math.floor(Math.random() * 20) + 1
+            randomNumber = randomNumber + (parseInt(npcModifier) || parseInt(playerModifier) || parseInt(newNpcModifier) || 0)
+            if (role === 'player') {
+                setInitiativeValue(randomNumber)
+                setPlayerModifier('')
+            } else if (role === 'npc-new') {
+                setNpcInitiative(randomNumber)
+                setNewNpcModifier('')
+            } else if (role === 'npc-edit') {
+                setSelectedNPCInitiative(randomNumber)
+                setNpcModifer('')
+            }
+            document.getElementById(id).focus()
+        } else {
+            dispatch(setError('Please enter a valid modifier value in numeric format.'))
+        }
+    }
+
     return (
         <div className='initiative-order-container'>
             <Col xl={ 12 } lg={ 12 } md={ 12 } sm={ 12 } xs={ 12 }>
@@ -178,10 +213,30 @@ export const InitiativeOrder = () => {
                 {!isUserDM &&
                 <Row>
                     <div className='initiative-order-initiative-wrapper'>
-                        <Form onSubmit={ (e) => updatePlayersInitiative(e) }>
+                        <Form onSubmit={ (e) => initiativeModifierHandler(e, 'player-initiative-submit', 'player') }>
                             <div className='initiative-order-initiative-header'>
                                 { INITIATIVE_PAGE.setInitiative }
                             </div>
+                            <InputGroup className="mb-3 mt-3">
+                                <InputGroup.Prepend>
+                                    <InputGroup.Text>
+                                        Modifier
+                                    </InputGroup.Text>
+                                </InputGroup.Prepend>
+                                <FormControl
+                                    className='initiative-order-initiative-modifier'
+                                    maxLength='2'
+                                    placeholder='0'
+                                    onChange={ (e) => setPlayerModifier(e.target.value) }
+                                    type="tel"
+                                    value={ playerModifier }
+                                />
+                                <Button className="ml-3" onClick={ (e) => initiativeModifierHandler(e, 'player-initiative-submit', 'player') }>
+                            Roll Inititiative
+                                </Button>
+                            </InputGroup>
+                        </Form>
+                        <Form onSubmit={ (e) => updatePlayersInitiative(e) }>
                             <InputGroup className="mb-3 mt-3">
                                 <InputGroup.Prepend>
                                     <InputGroup.Text>
@@ -195,7 +250,7 @@ export const InitiativeOrder = () => {
                                     type="tel"
                                     value={ initiativeValue }
                                 />
-                                <Button className='ml-3' type='submit' onClick={ (e) => updatePlayersInitiative(e) }>
+                                <Button className='ml-3' id='player-initiative-submit' type='submit' onClick={ (e) => updatePlayersInitiative(e) }>
                                     { GENERAL.submit }
                                 </Button>
                             </InputGroup>
@@ -221,19 +276,59 @@ export const InitiativeOrder = () => {
                                     <Form.Label>
                                         { INITIATIVE_PAGE.initiative }
                                     </Form.Label>
-                                    <Form.Control type="tel" maxLength='2' value={ npcInitiative } onChange={ (e) => setNpcInitiative(e.target.value) } />
+                                    <InputGroup>
+                                        <InputGroup.Prepend>
+                                            <InputGroup.Text>
+                                        Modifier
+                                            </InputGroup.Text>
+                                        </InputGroup.Prepend>
+                                        <FormControl
+                                            className='initiative-order-initiative-modifier'
+                                            id='initiative-order-initiative-modifier'
+                                            maxLength='2'
+                                            placeholder='0'
+                                            onChange={ (e) => setNewNpcModifier(e.target.value) }
+                                            type="tel"
+                                            value={ newNpcModifier }
+                                        />
+                                        <Button className="ml-3" onClick={ (e) => initiativeModifierHandler(e, 'npc-creator-submit', 'npc-new') }>
+                            Roll Inititiative
+                                        </Button>
+                                    </InputGroup>
                                 </Form.Group>
-                                <Button onClick={ (e) => addNPC(e) } variant="primary" type="submit">Submit</Button>
+                                <Form.Group>
+                                    <InputGroup>
+                                        <InputGroup.Prepend>
+                                            <InputGroup.Text>
+                                        Initiative
+                                            </InputGroup.Text>
+                                        </InputGroup.Prepend>
+                                        <Form.Control type="tel" maxLength='2' value={ npcInitiative } onChange={ (e) => setNpcInitiative(e.target.value) } />
+                                        <Button className='ml-3' id='npc-creator-submit' onClick={ (e) => addNPC(e) } variant="primary" type="submit">Submit</Button>
+                                    </InputGroup>
+                                </Form.Group>
+                                <Button
+                                    onClick={ () => {
+                                        setNewNpcModifier('')
+                                        setNpcInitiative('')
+                                        setNpcName('')
+                                    } }
+                                    style={{ margin: '0 auto' }}
+                                    tabIndex='-1'
+                                    variant='danger'
+                                >
+                                    Clear
+                                </Button>
                             </Form>
                         </div>
                     </Row>
                     <Row className='mt-3'>
                         <Button
-                            className='mr-3'
                             onClick={ () => {
                                 setShowConfirmationModal(true)
                                 setResetInitiativeGroup('npcs')
                             } }
+                            style={{ margin: '5px' }}
                             tabIndex='-1'
                         >
                             Remove All NPCs
@@ -243,6 +338,7 @@ export const InitiativeOrder = () => {
                                 setShowConfirmationModal(true)
                                 setResetInitiativeGroup('players')
                             } }
+                            style={{ margin: '5px ' }}
                             tabIndex='-1'
                         >
                             Reset Players Initiatives
@@ -271,6 +367,11 @@ export const InitiativeOrder = () => {
                 size="md"
                 aria-labelledby="contained-modal-title-vcenter"
                 enforceFocus
+                onExited={ () => {
+                    setSelectedNPCInitiative('')
+                    setNpcModifer('')
+                } }
+                style={{ textAlign: 'center' }}
             >
                 <Modal.Header closeButton>
                     <Modal.Title id="contained-modal-title-vcenter">
@@ -279,8 +380,30 @@ export const InitiativeOrder = () => {
                 </Modal.Header>
                 <Modal.Body>
                     <Row>
-                        <Form onSubmit={ (e) => updateNPCsInitiative(e) }>
+                        <Form onSubmit={ (e) => initiativeModifierHandler(e, 'npc-initiative-submit', 'npc-edit') }>
                             <InputGroup className="mb-3 mt-3">
+                                <InputGroup.Prepend>
+                                    <InputGroup.Text>
+                                        Modifier
+                                    </InputGroup.Text>
+                                </InputGroup.Prepend>
+                                <FormControl
+                                    className='initiative-order-initiative-modifier'
+                                    maxLength='2'
+                                    placeholder='0'
+                                    onChange={ (e) => setNpcModifer(e.target.value) }
+                                    type="tel"
+                                    value={ npcModifier }
+                                />
+                                <Button className="ml-3" onClick={ (e) => initiativeModifierHandler(e, 'npc-initiative-submit', 'npc-edit') }>
+                            Roll Inititiative
+                                </Button>
+                            </InputGroup>
+                        </Form>
+                    </Row>
+                    <Row>
+                        <Form onSubmit={ (e) => updateNPCsInitiative(e) }>
+                            <InputGroup className="mb-3">
                                 <InputGroup.Prepend>
                                     <InputGroup.Text>
                                         { INITIATIVE_PAGE.initiative }
@@ -293,7 +416,7 @@ export const InitiativeOrder = () => {
                                     type="tel"
                                     value={ selectedNPCInitiative }
                                 />
-                                <Button className='ml-3' type='submit' onClick={ (e) => updateNPCsInitiative(e) }>
+                                <Button className='ml-3' type='submit' id='npc-initiative-submit' onClick={ (e) => updateNPCsInitiative(e) }>
                                     { GENERAL.submit }
                                 </Button>
                             </InputGroup>

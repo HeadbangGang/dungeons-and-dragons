@@ -64,6 +64,13 @@ const dndState = (currentState = initialState, action) => {
         const updatedActiveGameId = updateCurrentActiveGameID(action.id, currentState)
         return currentState.set('user', updatedActiveGameId)
     }
+    case UPDATE_DICE_VALUES: {
+        const updatedDiceValues = updateCurrentDiceValues(action.die, action.values, currentState)
+        return currentState.set('diceValues', updatedDiceValues)
+    }
+    case RESET_DICE_VALUES: {
+        return currentState.set('diceValues', Immutable.fromJS({ '4': [], '6': [], '8': [], '10': [], '12': [], '20': [] }))
+    }
     default:
         return currentState
     }
@@ -113,6 +120,12 @@ export const REMOVE_NPC = 'removeNPC'
 export const updateActiveGameID = id => ({ type: UPDATE_ACTIVE_GAME_ID, id })
 export const UPDATE_ACTIVE_GAME_ID = 'updateActiveGameID'
 
+export const updateDiceValues = (die, values) => ({ type: UPDATE_DICE_VALUES, die, values })
+export const UPDATE_DICE_VALUES = 'updateDiceValues'
+
+export const resetDiceValues = () => ({ type: RESET_DICE_VALUES })
+export const RESET_DICE_VALUES = 'resetDiceValues'
+
 // Selectors
 export const getError = state => state.get('error', null)
 export const getCurrentUser = state => state.get('user', Immutable.Map())
@@ -122,6 +135,7 @@ export const getProfilePicture = state => getCurrentUser(state)?.get('photoURL',
 export const getActiveGameId = state => getCurrentUser(state)?.get('activeGameId', undefined)
 export const getConsolidatedPlayers = state => state.get('allPlayers', Immutable.Map())
 export const getAllUserGames = state => getCurrentUser(state).get('games')
+export const getDiceValues = state => state.get('diceValues', Immutable.fromJS({ '4': [], '6': [], '8': [], '10': [], '12': [], '20': [] }))
 
 // Redux Functions
 const updateCurrentUserAccount = (gameId, characterName, currentGameData, state) => {
@@ -244,6 +258,13 @@ const updateCurrentActiveGameID = (gameId, state) => {
     const uid = currentState.get('uid')
     currentState = currentState.merge(Immutable.fromJS({ activeGameId: gameId }))
     updateDBUserAccount(uid, currentState.toJS())
+    return currentState
+}
+
+const updateCurrentDiceValues = (die, values, state) => {
+    let currentState = getDiceValues(state)
+    const dieValue = die[0]
+    currentState = currentState.mergeDeep(Immutable.fromJS({ [dieValue]: values }))
     return currentState
 }
 

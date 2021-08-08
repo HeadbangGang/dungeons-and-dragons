@@ -97,12 +97,12 @@ export const DndNavbar = ({ isSmallView }) => {
                 />
             </a>
             { isSmallView && signInButton()}
-            { activeGameId && (players.length > 0 || isDM) &&
-                    <>
-                        <Navbar.Toggle aria-controls="basic-navbar-nav" />
-                        <Navbar.Collapse id="basic-navbar-nav">
-                            <Nav className="mr-auto">
-                                <div className='mr-auto navbar-nav'>
+            <>
+                <Navbar.Toggle aria-controls="basic-navbar-nav" />
+                <Navbar.Collapse id="basic-navbar-nav">
+                    <Nav className="mr-auto">
+                        <div className='mr-auto navbar-nav'>
+                            { activeGameId && (players.length > 0 || isDM) &&
                                     <a
                                         className='nav-link'
                                         onClick={ () => {
@@ -112,9 +112,14 @@ export const DndNavbar = ({ isSmallView }) => {
                                         } }
                                     >
                             Initiative Order
-                                    </a>
-                                </div>
-                                {/* { players.length > 0 &&
+                                    </a>}
+                            <a
+                                className='nav-link'
+                                onClick={ () => history.replace('/dice-roller') }
+                            >
+                                Dice Roller
+                            </a>
+                            { players.length > 0 &&
                                 <NavDropdown title="Characters" id="basic-nav-dropdown">
                                     { players.map((player, index) => {
                                         return (
@@ -130,10 +135,11 @@ export const DndNavbar = ({ isSmallView }) => {
                                             </a>
                                         )
                                     })}
-                                </NavDropdown> } */}
-                            </Nav>
-                        </Navbar.Collapse>
-                    </>}
+                                </NavDropdown> }
+                        </div>
+                    </Nav>
+                </Navbar.Collapse>
+            </>
             { !isSmallView && signInButton() }
             <Toast
                 autohide
