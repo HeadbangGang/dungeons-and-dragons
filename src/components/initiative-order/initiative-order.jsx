@@ -40,6 +40,7 @@ export const InitiativeOrder = () => {
     const [npcModifier, setNpcModifer] = useState('')
     const [playerModifier, setPlayerModifier] = useState('')
     const [newNpcModifier, setNewNpcModifier] = useState('')
+    const [showSpinner, setShowSpinner] = useState(false)
 
     const isAdmin = userData.get('admin', false)
     const currentUid = userData.get('uid')
@@ -55,18 +56,21 @@ export const InitiativeOrder = () => {
         getData()
     }, [])
 
+    useEffect(() => {
+        allPlayersConsolidated.size < 1 && !setShowSpinner(true)
+    }, [allPlayersConsolidated])
+
     const getData = async () => {
         const fetchDoc = await doc.get()
         const data = Immutable.fromJS(fetchDoc.data())
         if (data) {
             const players = data.get('players')
             const npcs = data.get('NPCs')
-            const allPlayers = players.merge(npcs)
+            const allPlayers = players.merge(npcs).filter(x => x.get('initiativeValue'))
             const sortedPlayers = allPlayers.toOrderedMap().sortBy(x => {
-                if (x.get('initiativeValue') > -100 && !x.get('gameMaster')){
-                    return -x.get('initiativeValue')
-                }
+                return -x.get('initiativeValue')
             })
+            allPlayers.size === 0 && setShowSpinner(false)
             dispatch(setConsolidatedPlayers(sortedPlayers))
             dispatch(setActiveGameData(data))
         }
@@ -125,7 +129,7 @@ export const InitiativeOrder = () => {
 
     const numberValidation = (val) => {
         let valid
-        if(!/^[0-9]+$/.test(val)){
+        if(!/^[0-9]+$/.test(val) && val !== ''){
             valid = false
             setNpcModifer('')
         } else {
@@ -136,23 +140,19 @@ export const InitiativeOrder = () => {
 
     const initiativeModifierHandler = (e, id, role) => {
         e.preventDefault()
-        if (numberValidation(npcModifier || 0)) {
-            let randomNumber = Math.floor(Math.random() * 20) + 1
-            randomNumber = randomNumber + (parseInt(npcModifier) || parseInt(playerModifier) || parseInt(newNpcModifier) || 0)
-            if (role === 'player') {
-                setInitiativeValue(randomNumber)
-                setPlayerModifier('')
-            } else if (role === 'npc-new') {
-                setNpcInitiative(randomNumber)
-                setNewNpcModifier('')
-            } else if (role === 'npc-edit') {
-                setSelectedNPCInitiative(randomNumber)
-                setNpcModifer('')
-            }
-            document.getElementById(id).focus()
-        } else {
-            dispatch(setError('Please enter a valid modifier value in numeric format.'))
+        let randomNumber = Math.floor(Math.random() * 20) + 1
+        randomNumber = randomNumber + (parseInt(npcModifier) || parseInt(playerModifier) || parseInt(newNpcModifier) || 0)
+        if (role === 'player') {
+            setInitiativeValue(randomNumber)
+            setPlayerModifier('')
+        } else if (role === 'npc-new') {
+            setNpcInitiative(randomNumber)
+            setNewNpcModifier('')
+        } else if (role === 'npc-edit') {
+            setSelectedNPCInitiative(randomNumber)
+            setNpcModifer('')
         }
+        document.getElementById(id).focus()
     }
 
     return (
@@ -160,6 +160,7 @@ export const InitiativeOrder = () => {
             <Col xl={ 12 } lg={ 12 } md={ 12 } sm={ 12 } xs={ 12 }>
                 <Row>
                     <div className='initiative-order-table-wrapper'>
+                        {!showSpinner && allPlayersConsolidated.size > 0 &&
                         <table>
                             <tbody>
                                 <tr>
@@ -176,14 +177,14 @@ export const InitiativeOrder = () => {
                                 </tr>
                                 { allPlayersConsolidated?.keySeq().map((player, index) => {
                                     const name = allPlayersConsolidated.getIn([player, 'characterName'])
-                                    const initiative = allPlayersConsolidated.getIn([player, 'initiativeValue'], 'Not Set')
+                                    const initiative = allPlayersConsolidated.getIn([player, 'initiativeValue'])
                                     const isNPC = allPlayersConsolidated.getIn([player, 'NPC'], false)
                                     const isDM = allPlayersConsolidated.getIn([player, 'gameMaster'], false)
                                     if (!isDM) {
                                         return (
                                             <tr key={ index }>
                                                 <td>{ name }</td>
-                                                <td>{ initiative === null ? 'Not Set' : initiative }</td>
+                                                <td>{ initiative }</td>
                                                 { (isAdmin || isUserDM) &&
                                             <td>
                                                 { isNPC &&
@@ -203,8 +204,8 @@ export const InitiativeOrder = () => {
                                 })
                                 }
                             </tbody>
-                        </table>
-                        { allPlayersConsolidated.size < 1 &&
+                        </table> }
+                        { showSpinner &&
                         <div style={{ textAlign: 'center' }}>
                             <img src={ spinner } alt='loading' style={{ width: '75%' }} />
                         </div>}
@@ -227,7 +228,11 @@ export const InitiativeOrder = () => {
                                     className='initiative-order-initiative-modifier'
                                     maxLength='2'
                                     placeholder='0'
-                                    onChange={ (e) => setPlayerModifier(e.target.value) }
+                                    onChange={ (e) => {
+                                        if (numberValidation(e.target.value)) {
+                                            setPlayerModifier(e.target.value)
+                                        }
+                                    } }
                                     type="tel"
                                     value={ playerModifier }
                                 />
@@ -246,11 +251,15 @@ export const InitiativeOrder = () => {
                                 <FormControl
                                     className='initiative-order-initiative-input'
                                     maxLength='2'
-                                    onChange={ (e) => setInitiativeValue(e.target.value) }
+                                    onChange={ (e) => {
+                                        if (numberValidation(e.target.value)) {
+                                            setInitiativeValue(e.target.value)
+                                        }
+                                    } }
                                     type="tel"
                                     value={ initiativeValue }
                                 />
-                                <Button className='ml-3' id='player-initiative-submit' type='submit' onClick={ (e) => updatePlayersInitiative(e) }>
+                                <Button className='ml-3' disabled={ !initiativeValue } id='player-initiative-submit' type='submit' onClick={ (e) => updatePlayersInitiative(e) }>
                                     { GENERAL.submit }
                                 </Button>
                             </InputGroup>
@@ -287,7 +296,11 @@ export const InitiativeOrder = () => {
                                             id='initiative-order-initiative-modifier'
                                             maxLength='2'
                                             placeholder='0'
-                                            onChange={ (e) => setNewNpcModifier(e.target.value) }
+                                            onChange={ (e) => {
+                                                if (numberValidation(e.target.value)) {
+                                                    setNewNpcModifier(e.target.value)
+                                                }
+                                            } }
                                             type="tel"
                                             value={ newNpcModifier }
                                         />
@@ -303,11 +316,30 @@ export const InitiativeOrder = () => {
                                         Initiative
                                             </InputGroup.Text>
                                         </InputGroup.Prepend>
-                                        <Form.Control type="tel" maxLength='2' value={ npcInitiative } onChange={ (e) => setNpcInitiative(e.target.value) } />
-                                        <Button className='ml-3' id='npc-creator-submit' onClick={ (e) => addNPC(e) } variant="primary" type="submit">Submit</Button>
+                                        <Form.Control
+                                            maxLength='2'
+                                            onChange={ (e) => {
+                                                if (numberValidation(e.target.value)) {
+                                                    setNpcInitiative(e.target.value)
+                                                }
+                                            } }
+                                            type="tel"
+                                            value={ npcInitiative }
+                                        />
+                                        <Button
+                                            className='ml-3'
+                                            disabled={ !npcName || !npcInitiative }
+                                            id='npc-creator-submit'
+                                            onClick={ (e) => addNPC(e) }
+                                            type="submit"
+                                            variant="primary"
+                                        >
+                                            { GENERAL.submit }
+                                        </Button>
                                     </InputGroup>
                                 </Form.Group>
                                 <Button
+                                    disabled={ !newNpcModifier && !npcInitiative && !npcName }
                                     onClick={ () => {
                                         setNewNpcModifier('')
                                         setNpcInitiative('')
@@ -322,41 +354,47 @@ export const InitiativeOrder = () => {
                             </Form>
                         </div>
                     </Row>
-                    <Row className='mt-3'>
-                        <Button
-                            onClick={ () => {
-                                setShowConfirmationModal(true)
-                                setResetInitiativeGroup('npcs')
-                            } }
-                            style={{ margin: '5px' }}
-                            tabIndex='-1'
-                        >
+                    { !showSpinner && allPlayersConsolidated.size > 0 &&
+                    <>
+                        <Row className='mt-3'>
+                            <Button
+                                disabled={ !allPlayersConsolidated.some(k => k.get('NPC')) }
+                                onClick={ () => {
+                                    setShowConfirmationModal(true)
+                                    setResetInitiativeGroup('npcs')
+                                } }
+                                style={{ margin: '5px' }}
+                                tabIndex='-1'
+                            >
                             Remove All NPCs
-                        </Button>
-                        <Button
-                            onClick={ () => {
-                                setShowConfirmationModal(true)
-                                setResetInitiativeGroup('players')
-                            } }
-                            style={{ margin: '5px ' }}
-                            tabIndex='-1'
-                        >
+                            </Button>
+                            <Button
+                                disabled={ !allPlayersConsolidated.some(k => k.get('player')) }
+                                onClick={ () => {
+                                    setShowConfirmationModal(true)
+                                    setResetInitiativeGroup('players')
+                                } }
+                                style={{ margin: '5px ' }}
+                                tabIndex='-1'
+                            >
                             Reset Players Initiatives
-                        </Button>
-                    </Row>
-                    <Row>
-                        <Button
-                            tabIndex='-1'
-                            className='ml-3 mr-3 mt-3'
-                            onClick={ () => {
-                                setShowConfirmationModal(true)
-                                setResetInitiativeGroup(null)
-                            } }
-                            variant='danger'
-                        >
-                            { INITIATIVE_PAGE.resetInitiative }
-                        </Button>
-                    </Row>
+                            </Button>
+                        </Row>
+                        <Row>
+                            <Button
+                                disabled={ allPlayersConsolidated.isEmpty() }
+                                tabIndex='-1'
+                                className='ml-3 mr-3 mt-3'
+                                onClick={ () => {
+                                    setShowConfirmationModal(true)
+                                    setResetInitiativeGroup(null)
+                                } }
+                                variant='danger'
+                            >
+                                { INITIATIVE_PAGE.resetInitiative }
+                            </Button>
+                        </Row>
+                    </>}
                 </>
                 }
             </Col>
@@ -391,7 +429,11 @@ export const InitiativeOrder = () => {
                                     className='initiative-order-initiative-modifier'
                                     maxLength='2'
                                     placeholder='0'
-                                    onChange={ (e) => setNpcModifer(e.target.value) }
+                                    onChange={ (e) => {
+                                        if (numberValidation(e.target.value)) {
+                                            setNpcModifer(e.target.value)
+                                        }
+                                    } }
                                     type="tel"
                                     value={ npcModifier }
                                 />
@@ -412,11 +454,15 @@ export const InitiativeOrder = () => {
                                 <FormControl
                                     className='initiative-order-initiative-input'
                                     maxLength='2'
-                                    onChange={ (e) => setSelectedNPCInitiative(e.target.value) }
+                                    onChange={ (e) => {
+                                        if (numberValidation(e.target.value)) {
+                                            setSelectedNPCInitiative(e.target.value)
+                                        }
+                                    } }
                                     type="tel"
                                     value={ selectedNPCInitiative }
                                 />
-                                <Button className='ml-3' type='submit' id='npc-initiative-submit' onClick={ (e) => updateNPCsInitiative(e) }>
+                                <Button className='ml-3' disabled={ !selectedNPCInitiative } type='submit' id='npc-initiative-submit' onClick={ (e) => updateNPCsInitiative(e) }>
                                     { GENERAL.submit }
                                 </Button>
                             </InputGroup>

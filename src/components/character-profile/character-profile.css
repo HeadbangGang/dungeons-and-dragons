@@ -2,33 +2,15 @@
     height: 200px;
 }
 
-.react-pdf__Page__annotations {
-    display: none !important;
-}
-
-canvas {
-    width: 100% !important;
-    height: 100% !important;
-}
-
 .dnd-modal-buttons {
     margin: 0 auto;
 }
-
-.modal-open .character-sheet-modal {
-    overflow: hidden
-  }
 
 .dnd-modal-nav-button {
     margin: 0 10px;
 }
 
-.modal-content {
-    width: 75%;
-    margin: 0 auto;
-}
-
-@media all and (max-device-height: 775px) {
+/* @media all and (max-device-height: 775px) {
     .modal-content {
         height: 45%;
         width: 45%;
@@ -68,4 +50,4 @@ canvas {
         height: 90% !important;
         width: 90% !important;
     }
-}
+} */

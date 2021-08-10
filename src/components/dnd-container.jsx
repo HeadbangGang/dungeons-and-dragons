@@ -3,7 +3,7 @@ import Immutable from 'immutable'
 import { useMediaQuery } from 'react-responsive'
 import { useHistory } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { getCurrentUser, setUserAccount, setActiveGameData, getSelectedCharacter } from '../store/store'
+import { getCurrentUser, setUserAccount, setActiveGameData, getSelectedCharacter, setIsSmallView } from '../store/store'
 import { auth, db, generateUserDocument } from '../database/firebase'
 import { Route, Switch } from 'react-router-dom'
 import { CharacterProfile } from './character-profile/character-profile'
@@ -26,15 +26,14 @@ export const DndContainer = () => {
     const userData = useSelector(getCurrentUser)
     const selectedCharacter = useSelector(getSelectedCharacter)
 
-    const isSmallView = useMediaQuery({
-        query: '(max-device-width: 991px)'
-    })
+    const isSmallView = useMediaQuery({ query: '(max-width: 1224px)' })
 
     useEffect(() => {
         auth.onAuthStateChanged(async userAuth => {
             const user = await generateUserDocument(userAuth)
             dispatch(setUserAccount(user || Immutable.Map()))
         })
+        dispatch(setIsSmallView(isSmallView))
     }, [])
 
     useEffect(() => {
@@ -60,7 +59,7 @@ export const DndContainer = () => {
     return (
         <div>
             <div className='dnd-container'>
-                <DndNavbar isSmallView={ isSmallView } />
+                <DndNavbar />
                 <div className='dnd-main-content'>
                     <Switch>
                         <Route exact path='/'>
@@ -89,7 +88,7 @@ export const DndContainer = () => {
                         </Route>
                     </Switch>
                 </div>
-                <DndFooter isSmallView={ isSmallView } />
+                <DndFooter />
             </div>
             <LandscapePage />
         </div>

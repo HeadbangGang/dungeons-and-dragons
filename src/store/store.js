@@ -17,6 +17,9 @@ const dndState = (currentState = initialState, action) => {
     case SET_ERROR: {
         return currentState.set('error', action.errorData)
     }
+    case SET_IS_SMALLVIEW: {
+        return currentState.set('smallView', action.isSmallView)
+    }
     case SET_USER_ACCOUNT: {
         return currentState.set('user', Immutable.fromJS(action.userData))
     }
@@ -80,6 +83,9 @@ const dndState = (currentState = initialState, action) => {
 export const setError = errorData => ({ type: SET_ERROR, errorData })
 export const SET_ERROR = 'setError'
 
+export const setIsSmallView = isSmallView => ({ type: SET_IS_SMALLVIEW, isSmallView })
+export const SET_IS_SMALLVIEW = 'setIsSmallView'
+
 export const setUserAccount = userData => ({ type: SET_USER_ACCOUNT, userData })
 export const SET_USER_ACCOUNT = 'user'
 
@@ -128,6 +134,7 @@ export const RESET_DICE_VALUES = 'resetDiceValues'
 
 // Selectors
 export const getError = state => state.get('error', null)
+export const getIsSmallView = state => state.get('smallView', false)
 export const getCurrentUser = state => state.get('user', Immutable.Map())
 export const getActiveGameData = state => state.get('activeGameData', Immutable.Map())
 export const getSelectedCharacter = state => state.get('selectedCharacter', null)

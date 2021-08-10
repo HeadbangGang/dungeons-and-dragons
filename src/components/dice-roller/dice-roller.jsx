@@ -3,7 +3,7 @@
 /* eslint-disable react/jsx-key */
 import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { updateDiceValues, getDiceValues, resetDiceValues } from '../../store/store'
+import { updateDiceValues, getDiceValues, resetDiceValues, getIsSmallView } from '../../store/store'
 import { Row, Button, InputGroup, FormControl } from 'react-bootstrap'
 
 export default function DiceRoller () {
@@ -14,6 +14,7 @@ export default function DiceRoller () {
     const [diceQuantities, setDiceQuantities] = useState([])
 
     const diceValues = useSelector(getDiceValues)
+    const isSmallView = useSelector(getIsSmallView)
 
     useEffect(() => {
         let total = 0
@@ -29,7 +30,7 @@ export default function DiceRoller () {
 
     const numberValidation = (die, val) => {
         let valid
-        if(!/^[0-9]+$/.test(val)){
+        if(!/^[0-9]+$/.test(val) && val !== ''){
             valid = false
             document.getElementById(die).value = ''
         } else {
@@ -102,6 +103,7 @@ export default function DiceRoller () {
                                             handleDiceQuantities(dice, e.target.value)
                                         } }
                                         value={ (diceQuantities.length > 0 && index > -1 && diceQuantities[index] && diceQuantities[index][dice]) || '' }
+                                        type='tel'
                                     />
                                 </InputGroup>
                             </div>
@@ -115,13 +117,8 @@ export default function DiceRoller () {
             </form>
             <Row>
                 { totalRollValue > 0 &&
-                <table style={{ width: '65%', marginTop: '16px' }}>
+                <table style={ isSmallView ? { marginTop: '16px' } : { width: '65%', marginTop: '16px' } }>
                     <tbody>
-                        <tr>
-                            <th colSpan='6' style={{ fontSize: 'x-large' }}>
-                                <strong>Dice Rolls</strong>
-                            </th>
-                        </tr>
                         <tr>
                             { diceSides.map((dice, index) => {
                                 return (

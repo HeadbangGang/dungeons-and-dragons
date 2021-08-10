@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import PropTypes from 'prop-types'
-import { setError, getError } from '../../store/store'
+import { setError, getError, getIsSmallView } from '../../store/store'
 import { useSelector, useDispatch } from 'react-redux'
 import { Navbar, NavDropdown, Nav, Button, Toast } from 'react-bootstrap'
 import { useHistory } from 'react-router-dom'
@@ -17,7 +16,7 @@ import {
     setSelectedCharacter
 } from '../../store/store'
 
-export const DndNavbar = ({ isSmallView }) => {
+export const DndNavbar = () => {
     const history = useHistory()
     const dispatch = useDispatch()
 
@@ -27,6 +26,7 @@ export const DndNavbar = ({ isSmallView }) => {
     const profilePicture = useSelector(getProfilePicture)
     const hasSelectedCharacter = useSelector(getSelectedCharacter)
     const error = useSelector(getError)
+    const isSmallView = useSelector(getIsSmallView)
 
     const [players, setPlayers] = useState([])
     const [navbarExpanded, setNavbarExpanded] = useState(false)
@@ -115,7 +115,10 @@ export const DndNavbar = ({ isSmallView }) => {
                                     </a>}
                             <a
                                 className='nav-link'
-                                onClick={ () => history.replace('/dice-roller') }
+                                onClick={ () => {
+                                    setNavbarExpanded(false)
+                                    history.replace('/dice-roller') }
+                                }
                             >
                                 Dice Roller
                             </a>
@@ -157,8 +160,4 @@ export const DndNavbar = ({ isSmallView }) => {
             </Toast>
         </Navbar>
     )
-}
-
-DndNavbar.propTypes={
-    isSmallView: PropTypes.bool
 }
