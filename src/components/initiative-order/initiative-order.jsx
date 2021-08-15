@@ -53,24 +53,21 @@ export const InitiativeOrder = () => {
     })
 
     useEffect(() => {
+        setShowSpinner(true)
         getData()
     }, [])
-
-    useEffect(() => {
-        allPlayersConsolidated.size < 1 && !setShowSpinner(true)
-    }, [allPlayersConsolidated])
 
     const getData = async () => {
         const fetchDoc = await doc.get()
         const data = Immutable.fromJS(fetchDoc.data())
         if (data) {
+            setShowSpinner(false)
             const players = data.get('players')
             const npcs = data.get('NPCs')
             const allPlayers = players.merge(npcs).filter(x => x.get('initiativeValue'))
             const sortedPlayers = allPlayers.toOrderedMap().sortBy(x => {
                 return -x.get('initiativeValue')
             })
-            allPlayers.size === 0 && setShowSpinner(false)
             dispatch(setConsolidatedPlayers(sortedPlayers))
             dispatch(setActiveGameData(data))
         }
@@ -160,7 +157,7 @@ export const InitiativeOrder = () => {
             <Col xl={ 12 } lg={ 12 } md={ 12 } sm={ 12 } xs={ 12 }>
                 <Row>
                     <div className='initiative-order-table-wrapper'>
-                        {!showSpinner && allPlayersConsolidated.size > 0 &&
+                        {allPlayersConsolidated.size > 0 &&
                         <table>
                             <tbody>
                                 <tr>
@@ -205,7 +202,7 @@ export const InitiativeOrder = () => {
                                 }
                             </tbody>
                         </table> }
-                        { showSpinner &&
+                        { allPlayersConsolidated.size < 1 && showSpinner &&
                         <div style={{ textAlign: 'center' }}>
                             <img src={ spinner } alt='loading' style={{ width: '75%' }} />
                         </div>}
@@ -354,7 +351,7 @@ export const InitiativeOrder = () => {
                             </Form>
                         </div>
                     </Row>
-                    { !showSpinner && allPlayersConsolidated.size > 0 &&
+                    { allPlayersConsolidated.size > 0 &&
                     <>
                         <Row className='mt-3'>
                             <Button
