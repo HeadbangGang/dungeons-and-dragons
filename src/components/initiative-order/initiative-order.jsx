@@ -1,33 +1,27 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import Immutable from 'immutable'
 import { InputGroup, FormControl, Button, Col, Row, Form, Modal } from 'react-bootstrap'
 import { useSelector, useDispatch } from 'react-redux'
-import { db } from '../../database/firebase'
-import './initiative-order.css'
 import {
     getActiveGameData,
     getActiveGameId,
-    getConsolidatedPlayers,
     getCurrentUser,
-    removeNPC,
     resetInitiative,
-    setActiveGameData,
-    setConsolidatedPlayers,
     setError,
-    setNPC,
-    updateNPCInitiative,
-    updatePlayerInitiative
+    updateActiveGameData,
+    updateChosenInitiative,
 } from '../../store/store'
+import NPCInitiativeModal from './npc-initiative-model'
 import spinner from '../../media/spinner.webp'
 import { GENERAL, INITIATIVE_PAGE } from '../../language-map'
+import './initiative-order.css'
 
 export const InitiativeOrder = () => {
     const dispatch = useDispatch()
 
-    const activeGameId = useSelector(getActiveGameId)
     const userData = useSelector(getCurrentUser)
     const gameData = useSelector(getActiveGameData)
-    const allPlayersConsolidated = useSelector(getConsolidatedPlayers)
+    const gameId = useSelector(getActiveGameId)
 
     const [initiativeValue, setInitiativeValue] = useState('')
     const [npcName, setNpcName] = useState('')
@@ -45,78 +39,39 @@ export const InitiativeOrder = () => {
     const isAdmin = userData.get('admin', false)
     const currentUid = userData.get('uid')
     const isUserDM = gameData.getIn(['players', currentUid, 'gameMaster'])
-    const doc = db.collection('games').doc(activeGameId)
 
-    useEffect(() => {
-        const timeout = setTimeout(getData, 5000)
-        return () => clearTimeout(timeout)
-    })
-
-    useEffect(() => {
-        setShowSpinner(true)
-        getData()
-    }, [])
-
-    const getData = async () => {
-        const fetchDoc = await doc.get()
-        const data = Immutable.fromJS(fetchDoc.data())
-        if (data) {
-            setShowSpinner(false)
-            const players = data.get('players')
-            const npcs = data.get('NPCs')
-            const allPlayers = players.merge(npcs).filter(x => x.get('initiativeValue'))
-            const sortedPlayers = allPlayers.toOrderedMap().sortBy(x => {
-                return -x.get('initiativeValue')
-            })
-            dispatch(setConsolidatedPlayers(sortedPlayers))
-            dispatch(setActiveGameData(data))
-        }
-    }
+    const sortedPlayers = gameData?.get('players')?.filter(x => !x.get('gameMaster')).sortBy(x => -x.get('initiativeValue')) ?? Immutable.List()
+    const allNPCs = gameData.get('players')?.map(player => {
+        return player.get('NPC')
+    }) ?? Immutable.List()
 
     const updatePlayersInitiative = async (e) => {
         e.preventDefault()
         const initiativeToNum = parseInt(initiativeValue || selectedNPCInitiative)
         if (!isNaN(initiativeToNum)) {
-            await getData()
-            await dispatch(updatePlayerInitiative(initiativeToNum, 'players', userData.get('uid')))
-            getData()
+            dispatch(updateChosenInitiative(initiativeToNum, userData.get('uid')))
             setInitiativeValue('')
         } else {
             dispatch(setError('Please enter a valid initiative value in numeric format.'))
             setInitiativeValue('')
-        }
-    }
-
-    const updateNPCsInitiative = async (e) => {
-        e.preventDefault()
-        const initiativeToNum = parseInt(selectedNPCInitiative)
-        if (!isNaN(initiativeToNum)) {
-            setShowInitiativeModal(false)
-            await getData()
-            await dispatch(updateNPCInitiative(initiativeToNum, selectedNPCName))
-            setSelectedNPCInitiative('')
-            setSelectedNPCName('')
-        } else {
-            dispatch(setError('Please enter a valid initiative value in numeric format.'))
-            setSelectedNPCInitiative('')
         }
     }
 
     const addNPC = async (e) => {
         e.preventDefault()
+        const cleanNpc = npcName.trim()
         const initiativeToNum = parseInt(npcInitiative)
-        if (!isNaN(initiativeToNum) && npcName.trim() !== '' && !gameData.get('NPCs')?.keySeq().includes(npcName.trim())) {
-            await getData()
-            await dispatch(setNPC(npcName, initiativeToNum))
-            getData()
+        if (!isNaN(initiativeToNum) && cleanNpc !== '' && gameData.get('players')?.filter(x => x.get('characterName') === cleanNpc).size < 1) {
+            dispatch(updateActiveGameData(gameId, cleanNpc, true, initiativeToNum))
             setNpcName('')
             setNpcInitiative('')
         } else {
-            if (npcName.trim() === '') {
-                dispatch(setError('Please enter a valid NPC name'))
+            if (cleanNpc === '') {
+                dispatch(setError('Please enter a valid NPC name.'))
                 setNpcName('')
-            } else if (gameData.get('NPCs').keySeq().includes(npcName.trim())) {
-                dispatch(setError('This NPC is already created. Please use a new NPC name'))
+            } else if (gameData.get('players')?.filter(x => x.get('characterName') === cleanNpc).size > 0) {
+                dispatch(setError('This character already exists. Please use a different NPC name.'))
+                setNpcName('')
             } else {
                 dispatch(setError('Please enter a valid initiative value in numeric format.'))
                 setNpcInitiative('')
@@ -152,12 +107,25 @@ export const InitiativeOrder = () => {
         document.getElementById(id).focus()
     }
 
+    const npcInitiativeModalProps = {
+        initiativeModifierHandler,
+        npcModifier,
+        numberValidation,
+        selectedNPCInitiative,
+        selectedNPCName,
+        setNpcModifer,
+        setSelectedNPCInitiative,
+        setSelectedNPCName,
+        setShowInitiativeModal,
+        showInitiativeModal
+    }
+
     return (
         <div className='initiative-order-container'>
             <Col xl={ 12 } lg={ 12 } md={ 12 } sm={ 12 } xs={ 12 }>
                 <Row>
                     <div className='initiative-order-table-wrapper'>
-                        {allPlayersConsolidated.size > 0 &&
+                        {sortedPlayers.size > 0 &&
                         <table>
                             <tbody>
                                 <tr>
@@ -172,11 +140,11 @@ export const InitiativeOrder = () => {
                                         <strong>{ INITIATIVE_PAGE.edit }</strong>
                                     </th> }
                                 </tr>
-                                { allPlayersConsolidated?.keySeq().map((player, index) => {
-                                    const name = allPlayersConsolidated.getIn([player, 'characterName'])
-                                    const initiative = allPlayersConsolidated.getIn([player, 'initiativeValue'])
-                                    const isNPC = allPlayersConsolidated.getIn([player, 'NPC'], false)
-                                    const isDM = allPlayersConsolidated.getIn([player, 'gameMaster'], false)
+                                { sortedPlayers?.keySeq().map((player, index) => {
+                                    const name = sortedPlayers.getIn([player, 'characterName'])
+                                    const initiative = sortedPlayers.getIn([player, 'initiativeValue'])
+                                    const isNPC = sortedPlayers.getIn([player, 'NPC'], false)
+                                    const isDM = sortedPlayers.getIn([player, 'gameMaster'], false)
                                     if (!isDM) {
                                         return (
                                             <tr key={ index }>
@@ -202,7 +170,7 @@ export const InitiativeOrder = () => {
                                 }
                             </tbody>
                         </table> }
-                        { allPlayersConsolidated.size < 1 && showSpinner &&
+                        { sortedPlayers.size < 1 && showSpinner &&
                         <div style={{ textAlign: 'center' }}>
                             <img src={ spinner } alt='loading' style={{ width: '75%' }} />
                         </div>}
@@ -351,11 +319,11 @@ export const InitiativeOrder = () => {
                             </Form>
                         </div>
                     </Row>
-                    { allPlayersConsolidated.size > 0 &&
+                    { sortedPlayers.size > 0 &&
                     <>
                         <Row className='mt-3'>
                             <Button
-                                disabled={ !allPlayersConsolidated.some(k => k.get('NPC')) }
+                                disabled={ !sortedPlayers.some(k => k.get('NPC')) }
                                 onClick={ () => {
                                     setShowConfirmationModal(true)
                                     setResetInitiativeGroup('npcs')
@@ -366,7 +334,7 @@ export const InitiativeOrder = () => {
                             Remove All NPCs
                             </Button>
                             <Button
-                                disabled={ !allPlayersConsolidated.some(k => k.get('player')) }
+                                disabled={ !sortedPlayers.some(k => k.get('player')) }
                                 onClick={ () => {
                                     setShowConfirmationModal(true)
                                     setResetInitiativeGroup('players')
@@ -379,7 +347,7 @@ export const InitiativeOrder = () => {
                         </Row>
                         <Row>
                             <Button
-                                disabled={ allPlayersConsolidated.isEmpty() }
+                                disabled={ sortedPlayers.isEmpty() }
                                 tabIndex='-1'
                                 className='ml-3 mr-3 mt-3'
                                 onClick={ () => {
@@ -395,95 +363,7 @@ export const InitiativeOrder = () => {
                 </>
                 }
             </Col>
-            {/* NPC Initiative Modal */}
-            <Modal
-                show={ showInitiativeModal }
-                onHide={ () => setShowInitiativeModal(false) }
-                size="md"
-                aria-labelledby="contained-modal-title-vcenter"
-                enforceFocus
-                onExited={ () => {
-                    setSelectedNPCInitiative('')
-                    setNpcModifer('')
-                } }
-                style={{ textAlign: 'center' }}
-            >
-                <Modal.Header closeButton>
-                    <Modal.Title id="contained-modal-title-vcenter">
-                        {`${ INITIATIVE_PAGE.edit } ${ selectedNPCName }`}
-                    </Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <Row>
-                        <Form onSubmit={ (e) => initiativeModifierHandler(e, 'npc-initiative-submit', 'npc-edit') }>
-                            <InputGroup className="mb-3 mt-3">
-                                <InputGroup.Prepend>
-                                    <InputGroup.Text>
-                                        Modifier
-                                    </InputGroup.Text>
-                                </InputGroup.Prepend>
-                                <FormControl
-                                    className='initiative-order-initiative-modifier'
-                                    maxLength='2'
-                                    placeholder='0'
-                                    onChange={ (e) => {
-                                        if (numberValidation(e.target.value)) {
-                                            setNpcModifer(e.target.value)
-                                        }
-                                    } }
-                                    type="tel"
-                                    value={ npcModifier }
-                                />
-                                <Button className="ml-3" onClick={ (e) => initiativeModifierHandler(e, 'npc-initiative-submit', 'npc-edit') }>
-                            Roll Inititiative
-                                </Button>
-                            </InputGroup>
-                        </Form>
-                    </Row>
-                    <Row>
-                        <Form onSubmit={ (e) => updateNPCsInitiative(e) }>
-                            <InputGroup className="mb-3">
-                                <InputGroup.Prepend>
-                                    <InputGroup.Text>
-                                        { INITIATIVE_PAGE.initiative }
-                                    </InputGroup.Text>
-                                </InputGroup.Prepend>
-                                <FormControl
-                                    className='initiative-order-initiative-input'
-                                    maxLength='2'
-                                    onChange={ (e) => {
-                                        if (numberValidation(e.target.value)) {
-                                            setSelectedNPCInitiative(e.target.value)
-                                        }
-                                    } }
-                                    type="tel"
-                                    value={ selectedNPCInitiative }
-                                />
-                                <Button className='ml-3' disabled={ !selectedNPCInitiative } type='submit' id='npc-initiative-submit' onClick={ (e) => updateNPCsInitiative(e) }>
-                                    { GENERAL.submit }
-                                </Button>
-                            </InputGroup>
-                        </Form>
-                    </Row>
-                    <Row>
-                        <Button
-                            onClick={ async () => {
-                                await getData()
-                                await dispatch(removeNPC(selectedNPCName))
-                                setShowInitiativeModal(false)
-                            } }
-                            variant='danger'
-                        >
-                            {`${ GENERAL.remove } ${ selectedNPCName }`}
-                        </Button>
-                    </Row>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button onClick={ () => setShowInitiativeModal(false) }>
-                        { GENERAL.close }
-                    </Button>
-                </Modal.Footer>
-            </Modal>
+            <NPCInitiativeModal { ...npcInitiativeModalProps } />
             {/* Confirmation Modal */}
             <Modal
                 show={ showConfirmationModal }
@@ -501,8 +381,7 @@ export const InitiativeOrder = () => {
                     <Row>
                         <Button
                             className='mr-3'
-                            onClick={ async () => {
-                                await getData()
+                            onClick={ () => {
                                 dispatch(resetInitiative(resetInitiativeGroup))
                                 setShowConfirmationModal(false)
                             } }

@@ -31,7 +31,7 @@ const dndState = (currentState = initialState, action) => {
         return currentState.set('activeGameData', Immutable.fromJS(action.gameData))
     }
     case UPDATE_ACTIVE_GAME_DATA: {
-        const updatedGameData = updateCurrentActiveGameData(action.gameId, action.characterName, action.isNewGame, action.isDM, action.existingGameData, currentState)
+        const updatedGameData = updateCurrentActiveGameData(action.gameId, action.characterName, action.isNPC, action.initiativeValue, action.isNewGame, action.isDM, currentState)
         return currentState.set('activeGameData', updatedGameData)
     }
     case UPDATE_PHOTO_URL: {
@@ -40,28 +40,17 @@ const dndState = (currentState = initialState, action) => {
     case SET_SELECTED_CHARACTER: {
         return currentState.set('selectedCharacter', action.character)
     }
-    case UPDATE_PLAYER_INITIATIVE: {
-        const updatedPlayerGameData = updateCurrentPlayerInitiative(action.initiative, action.id, currentState)
-        return currentState.setIn(['activeGameData', action.playerType, action.id], updatedPlayerGameData)
-    }
-    case UPDATE_NPC_INITIATIVE: {
-        const updatedNPCInitiative = updateChosenNPCInitiative(action.initiative, action.name, currentState)
-        return currentState.setIn(['activeGameData', 'NPCs', action.name], updatedNPCInitiative)
-    }
-    case SET_NPC: {
-        const addedNPC = setNewNPC(action.name, action.initiative, currentState)
-        return currentState.setIn(['activeGameData', 'NPCs'], addedNPC)
+    case UPDATE_CHOSEN_INITIATIVE: {
+        const updatedGameData = updateInitiative(action.initiative, action.id, currentState)
+        return currentState.setIn(['activeGameData', action.id], updatedGameData)
     }
     case RESET_INITIATIVE: {
         const resetGameInitiative = resetCurrentInitiative(action.group, currentState)
         return currentState.set('activeGameData', Immutable.fromJS(resetGameInitiative))
     }
-    case SET_CONSOLIDATED_PLAYERS: {
-        return currentState.set('allPlayers', action.players)
-    }
     case REMOVE_NPC: {
         const removedNPC = removeCurrentNPC(action.npc, currentState)
-        return currentState.setIn(['activeGameData', 'NPCs'], removedNPC)
+        return currentState.setIn(['activeGameData', 'players'], removedNPC)
     }
     case UPDATE_ACTIVE_GAME_ID: {
         const updatedActiveGameId = updateCurrentActiveGameID(action.id, currentState)
@@ -95,15 +84,12 @@ export const UPDATE_USER_ACCOUNT = 'updateUserData'
 export const setActiveGameData = gameData => ({ type: SET_ACTIVE_GAME_DATA, gameData })
 export const SET_ACTIVE_GAME_DATA = 'activeGameData'
 
-export const updateActiveGameData = (gameId, characterName, isNewGame, isDM, existingGameData) =>
-    ({ type: UPDATE_ACTIVE_GAME_DATA, gameId, characterName, isNewGame, isDM, existingGameData })
+export const updateActiveGameData = (gameId, characterName, isNPC, initiativeValue, isNewGame, isDM) =>
+    ({ type: UPDATE_ACTIVE_GAME_DATA, gameId, characterName, isNPC, initiativeValue, isNewGame, isDM })
 export const UPDATE_ACTIVE_GAME_DATA = 'updateActiveGameData'
 
-export const updatePlayerInitiative = (initiative, playerType, id) => ({ type: UPDATE_PLAYER_INITIATIVE, initiative, playerType, id })
-export const UPDATE_PLAYER_INITIATIVE = 'updatePlayerInitiative'
-
-export const updateNPCInitiative = (initiative, name) => ({ type: UPDATE_NPC_INITIATIVE, initiative, name })
-export const UPDATE_NPC_INITIATIVE = 'updateNPCInitiative'
+export const updateChosenInitiative = (initiative, id) => ({ type: UPDATE_CHOSEN_INITIATIVE, initiative, id })
+export const UPDATE_CHOSEN_INITIATIVE = 'updatePlayerInitiative'
 
 export const updatePhotoUrl = url => ({ type: UPDATE_PHOTO_URL, url })
 export const UPDATE_PHOTO_URL = 'user/photoURL'
@@ -111,14 +97,8 @@ export const UPDATE_PHOTO_URL = 'user/photoURL'
 export const setSelectedCharacter = character => ({ type: SET_SELECTED_CHARACTER, character })
 export const SET_SELECTED_CHARACTER = 'selectedCharacter'
 
-export const setNPC = (name, initiative) => ({ type: SET_NPC, name, initiative })
-export const SET_NPC = 'setNPC'
-
 export const resetInitiative = group => ({ type: RESET_INITIATIVE, group })
 export const RESET_INITIATIVE = 'resetInitiative'
-
-export const setConsolidatedPlayers = players => ({ type: SET_CONSOLIDATED_PLAYERS, players })
-export const SET_CONSOLIDATED_PLAYERS = 'setConsolidatedPlayers'
 
 export const removeNPC = npc => ({ type: REMOVE_NPC, npc })
 export const REMOVE_NPC = 'removeNPC'
@@ -140,22 +120,22 @@ export const getActiveGameData = state => state.get('activeGameData', Immutable.
 export const getSelectedCharacter = state => state.get('selectedCharacter', null)
 export const getProfilePicture = state => getCurrentUser(state)?.get('photoURL', null)
 export const getActiveGameId = state => getCurrentUser(state)?.get('activeGameId', undefined)
-export const getConsolidatedPlayers = state => state.get('allPlayers', Immutable.Map())
 export const getAllUserGames = state => getCurrentUser(state).get('games')
 export const getDiceValues = state => state.get('diceValues', Immutable.fromJS({ '4': [], '6': [], '8': [], '10': [], '12': [], '20': [] }))
 
 // Redux Functions
 const updateCurrentUserAccount = (gameId, characterName, currentGameData, state) => {
     const uid = getCurrentUser(state).get('uid')
-    const playerName = getCurrentUser(state).get('fullName')
-    const profileImg = getCurrentUser(state).get('photoURL', null)
+    const player = getCurrentUser(state).get('fullName')
+    const playerProfileImg = getCurrentUser(state).get('photoURL', null)
     const newData = {
         activeGameId: gameId,
-        games: { ...currentGameData,
+        games: {
+            ...currentGameData,
             [gameId]: {
-                characterName: characterName,
-                player: playerName,
-                playerProfileImg: profileImg
+                characterName,
+                player,
+                playerProfileImg
             }
         }
     }
@@ -165,64 +145,42 @@ const updateCurrentUserAccount = (gameId, characterName, currentGameData, state)
     return userAccountState
 }
 
-const updateCurrentActiveGameData = (gameId, characterName, isNewGame, isDM, existingGameData, state) => {
+const updateCurrentActiveGameData = (gameId, characterName, isNPC, initiativeValue, isNewGame, gameMaster, state) => {
     const uid = getCurrentUser(state).get('uid')
-    const playerName = getCurrentUser(state).get('fullName')
-    const profileImg = getCurrentUser(state).get('photoURL', null)
+    const player = getCurrentUser(state).get('fullName')
+    const playerProfileImg = getCurrentUser(state).get('photoURL', null)
     let newData = {}
-    newData = {
-        players: { ...existingGameData ?? undefined,
-            [uid]: {
-                characterName: characterName,
-                gameMaster: isDM,
-                player: playerName,
-                playerProfileImg: profileImg
+    if (isNPC) {
+        newData = [{
+            [characterName]: {
+                characterName,
+                initiativeValue,
+                NPC: true
             }
-        }
+        }]
+    } else {
+        newData = [{
+            [uid]: {
+                characterName,
+                gameMaster,
+                player,
+                playerProfileImg,
+                uid
+            }
+        }]
     }
     updateExistingGameDB(newData, gameId, isNewGame)
     return Immutable.fromJS(newData)
 }
 
-const updateCurrentPlayerInitiative = (value, id, state) => {
+const updateInitiative = (value, id, state) => {
     const gameId = getCurrentUser(state).get('activeGameId')
     let currentValue = getActiveGameData(state).getIn(['players', id])
     currentValue = currentValue.merge(Immutable.fromJS({ initiativeValue: value }))
-    const dbPath = `players.${ id }.initiativeValue`
-    const dbData = { [dbPath]: value }
+    const dbPath = `${ id }.initiativeValue`
+    const dbData = [{ [dbPath]: value }]
     updateExistingGameDB(dbData, gameId)
     return currentValue
-}
-
-const updateChosenNPCInitiative = (value, name, state) => {
-    const gameId = getCurrentUser(state).get('activeGameId')
-    let currentValue = getActiveGameData(state).getIn(['NPCs', name])
-    currentValue = currentValue.merge(Immutable.fromJS({ initiativeValue: value }))
-    const dbPath = `NPCs.${ name }.initiativeValue`
-    const dbData = { [dbPath]: value }
-    updateExistingGameDB(dbData, gameId)
-    return currentValue
-}
-
-const setNewNPC = (name, initiative, state) => {
-    let dbData
-    let currentState = getActiveGameData(state)
-    const npcData = getActiveGameData(state).get('NPCs', undefined)
-    const gameId = getCurrentUser(state).get('activeGameId')
-    const path = Immutable.fromJS({ [name]: { characterName: name, initiativeValue: initiative, NPC: true } })
-    if (currentState.keySeq().includes('NPCs')) {
-        currentState = currentState.get('NPCs').merge(path)
-    } else {
-        currentState = path
-    }
-
-    if (npcData?.size > 0 && npcData?.keySeq().includes(name)) {
-        dbData = { NPCs: { [name]: { characterName: name, initiativeValue: initiative, NPC: true } } }
-    } else {
-        dbData = { NPCs: { ...npcData?.toJS(), [name]: { characterName: name, initiativeValue: initiative, NPC: true } } }
-    }
-    updateExistingGameDB(dbData, gameId)
-    return currentState
 }
 
 const resetCurrentInitiative = (group, state) => {
@@ -239,24 +197,35 @@ const resetCurrentInitiative = (group, state) => {
             const currentPlayerData = playerData.setIn([player, 'initiativeValue'], null)
             playerData = playerData.merge(currentPlayerData)
         })
-        newData = { 'NPCs': npcData.toJS(), 'players': playerData.toJS() }
+        newData = [{
+            NPCs: npcData.toJS()
+        }, {
+            players: playerData.toJS()
+        }]
     } else {
         players.forEach(player => {
             const currentPlayerData = playerData.setIn([player, 'initiativeValue'], null)
             playerData = playerData.merge(currentPlayerData)
         })
-        newData = { 'NPCs': {}, 'players': playerData.toJS() }
+        newData = [{
+            NPCs: {}
+        }, {
+            players: playerData.toJS()
+        }]
     }
     updateExistingGameDB(newData, gameId)
     return newData
 }
 
-const removeCurrentNPC = (npc, state) => {
+const removeCurrentNPC = async (npc, state) => {
     const gameId = getCurrentUser(state).get('activeGameId')
-    let currentState = getActiveGameData(state).get('NPCs')
+    let currentState = getActiveGameData(state).get('players')
     currentState = currentState.delete(npc)
-    const path = { NPCs: currentState.toJS() }
-    updateExistingGameDB(path, gameId)
+    await db.collection('games')
+        .doc(gameId)
+        .collection('data')
+        .doc('players')
+        .update(currentState.toJS())
     return currentState
 }
 
@@ -279,11 +248,24 @@ const updateCurrentDiceValues = (die, values, state) => {
 const updateExistingGameDB = async (data, gameId, isNewGame) => {
     const games = db.collection('games')
     try {
-        if (isNewGame) {
-            await games.doc(gameId).set(data)
-        } else {
-            await games.doc(gameId).update(data)
-        }
+        data.forEach(async item => {
+            if (isNewGame) {
+                await games
+                    .doc(gameId)
+                    .set({ gameId })
+                await games
+                    .doc(gameId)
+                    .collection('data')
+                    .doc('players')
+                    .set(item)
+            } else {
+                await games
+                    .doc(gameId)
+                    .collection('data')
+                    .doc('players')
+                    .update(item)
+            }
+        })
     } catch (e) {
         setError(e.message)
     }

@@ -3,10 +3,9 @@ import Immutable from 'immutable'
 import { useMediaQuery } from 'react-responsive'
 import { useHistory } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { getCurrentUser, setUserAccount, setActiveGameData, getSelectedCharacter, setIsSmallView } from '../store/store'
-import { auth, db, generateUserDocument } from '../database/firebase'
+import { getActiveGameId, getCurrentUser, setUserAccount, setActiveGameData, getSelectedCharacter, setIsSmallView, setError } from '../store/store'
+import { auth, generateUserDocument } from '../database/firebase'
 import { Route, Switch } from 'react-router-dom'
-import { CharacterProfile } from './character-profile/character-profile'
 import { DndHome } from './homepage/dnd-home'
 import { DndNavbar } from './navbar/dnd-navbar'
 import { InitiativeOrder } from './initiative-order/initiative-order'
@@ -17,12 +16,14 @@ import DndFooter from '../components/footer/dnd-footer'
 import ProfilePage from './authentication/profile-page/profilepage'
 import LandscapePage from './landscape-page/landscape-page'
 import DiceRoller from './dice-roller/dice-roller'
+import { streamGameData } from '../database/firebase'
 import './dnd-container.css'
 
 export const DndContainer = () => {
     const history = useHistory()
     const dispatch = useDispatch()
 
+    const activeGameId = useSelector(getActiveGameId)
     const userData = useSelector(getCurrentUser)
     const selectedCharacter = useSelector(getSelectedCharacter)
 
@@ -43,18 +44,17 @@ export const DndContainer = () => {
     }, [selectedCharacter])
 
     useEffect(() => {
-        async function getPlayers () {
-            const activeGameId = userData.get('activeGameId')
-            const gameDataByActiveGameId = db.collection('games').doc(activeGameId)
-            await gameDataByActiveGameId.get()
-                .then((res) => {
-                    dispatch(setActiveGameData(res.data()))
-                })
-        }
         if (userData?.get('activeGameId')) {
-            getPlayers()
+            const unsubscribe = streamGameData(activeGameId, {
+                next: querySnapshot => {
+                    const playersList = querySnapshot.docs.map(docSnapshot => docSnapshot.data())
+                    dispatch(setActiveGameData(Immutable.fromJS({ players: { ...playersList[0] } })))
+                },
+                error: () => dispatch(setError('Error while updating new data.'))
+            })
+            return unsubscribe
         }
-    }, [userData])
+    }, [setActiveGameData, userData])
 
     return (
         <div>
@@ -64,9 +64,6 @@ export const DndContainer = () => {
                     <Switch>
                         <Route exact path='/'>
                             <DndHome />
-                        </Route>
-                        <Route exact path={ `/profile/${ selectedCharacter }` }>
-                            <CharacterProfile />
                         </Route>
                         <Route exact path='/initiative-order'>
                             <InitiativeOrder />
