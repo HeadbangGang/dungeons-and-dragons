@@ -186,46 +186,43 @@ const updateInitiative = (value, id, state) => {
 const resetCurrentInitiative = (group, state) => {
     const currentState = getActiveGameData(state)
     const gameId = getCurrentUser(state).get('activeGameId')
-    let playerData = currentState.get('players')
-    const npcData = currentState.get('NPCs')
-    const players = playerData.keySeq()
-    let newData
-    if (group === 'npcs'){
-        newData = { 'NPCs': {}, players: playerData.toJS() }
-    } else if (group ==='players') {
+    let data = currentState.get('players')
+    const players = data.keySeq()
+
+    switch (group) {
+    case 'npcs': {
         players.forEach(player => {
-            const currentPlayerData = playerData.setIn([player, 'initiativeValue'], null)
-            playerData = playerData.merge(currentPlayerData)
+            if (data.getIn([player, 'NPC'])) {
+                data = data.delete(player)
+            }
         })
-        newData = [{
-            NPCs: npcData.toJS()
-        }, {
-            players: playerData.toJS()
-        }]
-    } else {
-        players.forEach(player => {
-            const currentPlayerData = playerData.setIn([player, 'initiativeValue'], null)
-            playerData = playerData.merge(currentPlayerData)
-        })
-        newData = [{
-            NPCs: {}
-        }, {
-            players: playerData.toJS()
-        }]
     }
-    updateExistingGameDB(newData, gameId)
-    return newData
+        break
+    case 'players': {
+        players.forEach(player => {
+            if (!data.getIn([player, 'NPC'])) {
+                data = data.setIn([player, 'initiativeValue'], null)
+            }
+        })
+    }
+        break
+    default : {
+        players.forEach(player => {
+            data.getIn([player, 'NPC'])
+                ? data = data.delete(player)
+                : data = data.setIn([player, 'initiativeValue'], null)
+        })
+    }
+    }
+    updateExistingGameDB([data.toJS()], gameId, false, true)
+    return data
 }
 
-const removeCurrentNPC = async (npc, state) => {
+const removeCurrentNPC = (npc, state) => {
     const gameId = getCurrentUser(state).get('activeGameId')
     let currentState = getActiveGameData(state).get('players')
     currentState = currentState.delete(npc)
-    await db.collection('games')
-        .doc(gameId)
-        .collection('data')
-        .doc('players')
-        .update(currentState.toJS())
+    updateExistingGameDB([currentState.toJS()], gameId, false, true)
     return currentState
 }
 
@@ -245,7 +242,7 @@ const updateCurrentDiceValues = (die, values, state) => {
 }
 
 // Firebase Functions
-const updateExistingGameDB = async (data, gameId, isNewGame) => {
+const updateExistingGameDB = (data, gameId, isNewGame, removeData) => {
     const games = db.collection('games')
     try {
         data.forEach(async item => {
@@ -253,6 +250,8 @@ const updateExistingGameDB = async (data, gameId, isNewGame) => {
                 await games
                     .doc(gameId)
                     .set({ gameId })
+            }
+            if (isNewGame || removeData) {
                 await games
                     .doc(gameId)
                     .collection('data')

@@ -28,7 +28,7 @@ export default function AddToGame () {
                 if (res.status === 200) {
                     res = await res.json()
                     res = firebaseParser(res)
-                    res.documents.forEach(doc => {
+                    res.documents && res.documents.forEach(doc => {
                         gameIds.push(doc.name.substr(doc.name.lastIndexOf('/') + 1))
                     })
                     const userAccount = db.collection('users').doc(userData.get('uid'))

@@ -12,7 +12,10 @@ export default function NPCInitiativeModal (props) {
         initiativeModifierHandler: PropTypes.func,
         npcModifier: PropTypes.string,
         numberValidation: PropTypes.func,
-        selectedNPCInitiative: PropTypes.string,
+        selectedNPCInitiative: PropTypes.oneOfType([
+            PropTypes.string,
+            PropTypes.number
+        ]),
         selectedNPCName: PropTypes.string,
         setNpcModifer: PropTypes.func,
         setSelectedNPCInitiative: PropTypes.func,
@@ -63,12 +66,12 @@ export default function NPCInitiativeModal (props) {
         >
             <Modal.Header closeButton>
                 <Modal.Title id="contained-modal-title-vcenter">
-                    {`${ INITIATIVE_PAGE.edit } ${ selectedNPCName }`}
+                    {`${ INITIATIVE_PAGE.modify } ${ selectedNPCName }`}
                 </Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Row>
-                    <Form onSubmit={ (e) => initiativeModifierHandler(e, 'npc-initiative-submit', 'npc-edit') }>
+                    <Form onSubmit={ (e) => initiativeModifierHandler(e, 'npc-initiative-submit', 'npc-modify') }>
                         <InputGroup className="mb-3 mt-3">
                             <InputGroup.Prepend>
                                 <InputGroup.Text>
@@ -87,7 +90,7 @@ export default function NPCInitiativeModal (props) {
                                 type="tel"
                                 value={ npcModifier }
                             />
-                            <Button className="ml-3" onClick={ (e) => initiativeModifierHandler(e, 'npc-initiative-submit', 'npc-edit') }>
+                            <Button className="ml-3" onClick={ (e) => initiativeModifierHandler(e, 'npc-initiative-submit', 'npc-modify') }>
                             Roll Inititiative
                             </Button>
                         </InputGroup>

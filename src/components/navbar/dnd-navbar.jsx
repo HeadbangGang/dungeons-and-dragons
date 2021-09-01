@@ -34,7 +34,7 @@ export const DndNavbar = () => {
     const isDM = activeGameData?.getIn(['players', userData.get('uid'), 'gameMaster'], false)
 
     useEffect(() => {
-        if (activeGameId && activeGameData?.size > 0) {
+        if (activeGameId && activeGameData?.get('players')?.size > 0) {
             activeGameData.forEach(player => {
                 const name = player.get('characterName')
                 const isDM = player.get('gameMaster')

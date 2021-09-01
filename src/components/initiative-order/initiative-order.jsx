@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Immutable from 'immutable'
 import { InputGroup, FormControl, Button, Col, Row, Form, Modal } from 'react-bootstrap'
 import { useSelector, useDispatch } from 'react-redux'
@@ -34,16 +34,21 @@ export const InitiativeOrder = () => {
     const [npcModifier, setNpcModifer] = useState('')
     const [playerModifier, setPlayerModifier] = useState('')
     const [newNpcModifier, setNewNpcModifier] = useState('')
-    const [showSpinner, setShowSpinner] = useState(false)
+    const [sortedPlayers, setSortedPlayers] = useState(Immutable.List())
 
     const isAdmin = userData.get('admin', false)
     const currentUid = userData.get('uid')
     const isUserDM = gameData.getIn(['players', currentUid, 'gameMaster'])
 
-    const sortedPlayers = gameData?.get('players')?.filter(x => !x.get('gameMaster')).sortBy(x => -x.get('initiativeValue')) ?? Immutable.List()
-    const allNPCs = gameData.get('players')?.map(player => {
-        return player.get('NPC')
-    }) ?? Immutable.List()
+    useEffect(() => {
+        if (gameData?.get('players')?.size > 0) {
+            setSortedPlayers(
+                gameData.get('players')
+                    .delete(gameData.get('players')?.find(x => x.get('gameMaster'))?.get('uid'))
+                    .sortBy(x => -x.get('initiativeValue'))
+            )
+        }
+    }, [gameData])
 
     const updatePlayersInitiative = async (e) => {
         e.preventDefault()
@@ -94,15 +99,25 @@ export const InitiativeOrder = () => {
         e.preventDefault()
         let randomNumber = Math.floor(Math.random() * 20) + 1
         randomNumber = randomNumber + (parseInt(npcModifier) || parseInt(playerModifier) || parseInt(newNpcModifier) || 0)
-        if (role === 'player') {
+        switch (role) {
+        case 'player': {
             setInitiativeValue(randomNumber)
             setPlayerModifier('')
-        } else if (role === 'npc-new') {
+        }
+            break
+        case 'npc-new': {
             setNpcInitiative(randomNumber)
             setNewNpcModifier('')
-        } else if (role === 'npc-edit') {
+        }
+            break
+        case 'npc-modify': {
             setSelectedNPCInitiative(randomNumber)
             setNpcModifer('')
+        }
+            break
+        default: {
+            return null
+        }
         }
         document.getElementById(id).focus()
     }
@@ -125,55 +140,54 @@ export const InitiativeOrder = () => {
             <Col xl={ 12 } lg={ 12 } md={ 12 } sm={ 12 } xs={ 12 }>
                 <Row>
                     <div className='initiative-order-table-wrapper'>
-                        {sortedPlayers.size > 0 &&
-                        <table>
-                            <tbody>
-                                <tr>
+                        {sortedPlayers.size > 0 ?
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <th>
+                                            <strong>{ INITIATIVE_PAGE.character }</strong>
+                                        </th>
+                                        <th>
+                                            <strong>{ INITIATIVE_PAGE.initiative }</strong>
+                                        </th>
+                                        {(isAdmin || isUserDM) &&
                                     <th>
-                                        <strong>{ INITIATIVE_PAGE.character }</strong>
-                                    </th>
-                                    <th>
-                                        <strong>{ INITIATIVE_PAGE.initiative }</strong>
-                                    </th>
-                                    {(isAdmin || isUserDM) &&
-                                    <th>
-                                        <strong>{ INITIATIVE_PAGE.edit }</strong>
+                                        <strong>{ INITIATIVE_PAGE.modify }</strong>
                                     </th> }
-                                </tr>
-                                { sortedPlayers?.keySeq().map((player, index) => {
-                                    const name = sortedPlayers.getIn([player, 'characterName'])
-                                    const initiative = sortedPlayers.getIn([player, 'initiativeValue'])
-                                    const isNPC = sortedPlayers.getIn([player, 'NPC'], false)
-                                    const isDM = sortedPlayers.getIn([player, 'gameMaster'], false)
-                                    if (!isDM) {
-                                        return (
-                                            <tr key={ index }>
-                                                <td>{ name }</td>
-                                                <td>{ initiative }</td>
-                                                { (isAdmin || isUserDM) &&
+                                    </tr>
+                                    { sortedPlayers?.keySeq().map((player, index) => {
+                                        const name = sortedPlayers.getIn([player, 'characterName'])
+                                        const initiative = sortedPlayers.getIn([player, 'initiativeValue'])
+                                        const isNPC = sortedPlayers.getIn([player, 'NPC'], false)
+                                        const isDM = sortedPlayers.getIn([player, 'gameMaster'], false)
+                                        if (!isDM) {
+                                            return (
+                                                <tr key={ index }>
+                                                    <td>{ name }</td>
+                                                    <td>{ initiative }</td>
+                                                    { (isAdmin || isUserDM) &&
                                             <td>
                                                 { isNPC &&
                                                 <a
-                                                    className='initiative-order-edit-button'
+                                                    className='initiative-order-modify-button'
                                                     onClick={ () => {
                                                         setShowInitiativeModal(true)
                                                         setSelectedNPCName(name)
                                                     } }
                                                 >
-                                                    { INITIATIVE_PAGE.edit }
+                                                    { INITIATIVE_PAGE.modify }
                                                 </a> }
                                             </td> }
-                                            </tr>
-                                        )
+                                                </tr>
+                                            )
+                                        }
+                                    })
                                     }
-                                })
-                                }
-                            </tbody>
-                        </table> }
-                        { sortedPlayers.size < 1 && showSpinner &&
-                        <div style={{ textAlign: 'center' }}>
-                            <img src={ spinner } alt='loading' style={{ width: '75%' }} />
-                        </div>}
+                                </tbody>
+                            </table>
+                            : <div style={{ textAlign: 'center' }}>
+                                <img src={ spinner } alt='loading' style={{ width: '75%' }} />
+                            </div>}
                     </div>
                 </Row>
                 {!isUserDM &&
@@ -334,7 +348,7 @@ export const InitiativeOrder = () => {
                             Remove All NPCs
                             </Button>
                             <Button
-                                disabled={ !sortedPlayers.some(k => k.get('player')) }
+                                disabled={ !sortedPlayers.some(k => k.get('initiativeValue') && !k.get('NPC')) }
                                 onClick={ () => {
                                     setShowConfirmationModal(true)
                                     setResetInitiativeGroup('players')
@@ -347,7 +361,7 @@ export const InitiativeOrder = () => {
                         </Row>
                         <Row>
                             <Button
-                                disabled={ sortedPlayers.isEmpty() }
+                                disabled={ sortedPlayers.isEmpty() || !sortedPlayers.some(k => k.get('initiativeValue')) }
                                 tabIndex='-1'
                                 className='ml-3 mr-3 mt-3'
                                 onClick={ () => {
@@ -374,7 +388,7 @@ export const InitiativeOrder = () => {
             >
                 <Modal.Header closeButton>
                     <Modal.Title id="contained-modal-title-vcenter">
-                        {`Reset all ${ resetInitiativeGroup || '' } initiative values?`}
+                        {`Reset all ${ resetInitiativeGroup || '' } initiative values${ !resetInitiativeGroup ? ' and remove all NPCs' : '' }?`}
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
