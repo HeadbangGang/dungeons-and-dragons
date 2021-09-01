@@ -19,11 +19,11 @@ td {
     margin: 0 auto;
 }
 
-.initiative-order-edit-button {
+.initiative-order-modify-button {
     color: blue !important;
 }
 
-.initiative-order-edit-button:hover {
+.initiative-order-modify-button:hover {
     color: red !important;
     cursor: pointer;
 }

@@ -53,3 +53,10 @@ const getUserDocument = async uid => {
         console.error('Error fetching user', e)
     }
 }
+
+export const streamGameData = (gameId, observer) => {
+    return db.collection('games')
+        .doc(gameId)
+        .collection('data')
+        .onSnapshot(observer)
+}

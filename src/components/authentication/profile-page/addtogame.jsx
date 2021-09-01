@@ -5,6 +5,7 @@ import { setError } from '../../../store/store'
 import { db } from '../../../database/firebase'
 import { InputGroup, FormControl, Button } from 'react-bootstrap'
 import { ERRORS, AUTHENTICATION } from '../../../language-map'
+import * as firebaseParser from 'firestore-parser'
 import './profile-page.css'
 import { getCurrentUser, updateUserAccount, updateActiveGameData } from '../../../store/store'
 
@@ -15,60 +16,75 @@ export default function AddToGame () {
 
     const userData = useSelector(getCurrentUser)
 
-    const [gameId, setGameId] = useState()
-    const [characterName, setCharacterName] = useState()
+    const [gameId, setGameId] = useState('')
+    const [characterName, setCharacterName] = useState('')
     const [isDM, setIsDM] = useState(false)
 
     const gameQueryHandler = async (isNewGame) => {
-        const gameIds = []
-        const userAccount = db.collection('users').doc(userData.get('uid'))
-        const accountDataCall = await userAccount.get()
-        const userAccountData = accountDataCall.data()
-        const games = db.collection('games')
-        const gamesSnapshot = await games.get()
-        gamesSnapshot.forEach(game => {
-            gameIds.push(game.id)
-        })
-        const existingGameDataUserAccount = userAccountData.games
-        const cleanGameId = gameId.replaceAll(' ', '')
-        if (isNewGame) {
-            if (cleanGameId && !gameIds.includes(cleanGameId)) {
-                dispatch(updateUserAccount(cleanGameId, characterName, existingGameDataUserAccount))
-                dispatch(updateActiveGameData(cleanGameId, characterName, isNewGame, isDM))
-                history.push('/')
+        if (gameId) {
+            if (characterName) {
+                const gameIds = []
+                let res = await fetch('https://firestore.googleapis.com/v1/projects/dungeons-and-dragons-30601/databases/(default)/documents/games/')
+                if (res.status === 200) {
+                    res = await res.json()
+                    res = firebaseParser(res)
+                    res.documents && res.documents.forEach(doc => {
+                        gameIds.push(doc.name.substr(doc.name.lastIndexOf('/') + 1))
+                    })
+                    const userAccount = db.collection('users').doc(userData.get('uid'))
+                    const accountDataCall = await userAccount.get() // Need to migrate to the REST api
+                    const userAccountData = accountDataCall.data()
+                    const existingGameDataUserAccount = userAccountData.games
+                    const cleanGameId = gameId.replaceAll(' ', '')
+                    if (isNewGame) {
+                        if (cleanGameId && !gameIds.includes(cleanGameId)) {
+                            dispatch(updateUserAccount(cleanGameId, characterName, existingGameDataUserAccount))
+                            dispatch(updateActiveGameData(cleanGameId, characterName, false, undefined, isNewGame, isDM))
+                            history.push('/')
+                        } else {
+                            dispatch(setError(ERRORS.gameAlreadyExists))
+                        }
+                    } else {
+                        const gameIndex = res.documents.findIndex(doc => doc.name.substr(doc.name.lastIndexOf('/') + 1) === cleanGameId)
+                        const gameExists = gameIndex > -1
+                        if (gameExists) {
+                            try {
+                                res = await fetch(`https://firestore.googleapis.com/v1/projects/dungeons-and-dragons-30601/databases/(default)/documents/games/${ cleanGameId }/data/players`)
+                                if (res.status === 200) {
+                                    res = await res.json()
+                                    res = firebaseParser(res)
+                                    const gameData = res.fields
+                                    const listOfPlayers = Object.values(gameData)
+                                    const hasDM = listOfPlayers.findIndex(player => player.gameMaster) > -1
+                                    const playerAlreadyExists = listOfPlayers.findIndex(player => player.characterName === characterName) > -1
+                                    if (cleanGameId && gameIds.includes(cleanGameId) && !Object.keys(userAccountData.games).includes(cleanGameId)) {
+                                        dispatch(updateUserAccount(cleanGameId, characterName, existingGameDataUserAccount))
+                                        dispatch(updateActiveGameData(cleanGameId, characterName, false, undefined, isNewGame, isDM))
+                                        history.push('/')
+                                    } else {
+                                        if (playerAlreadyExists) {
+                                            dispatch(setError(ERRORS.playerExists))
+                                        } else if (hasDM && isDM) {
+                                            dispatch(setError('This game already has a Game Master'))
+                                            setIsDM(false)
+                                        }
+                                    }
+                                }
+                            } catch (e) {
+                                dispatch(setError(e.message))
+                            }
+                        } else {
+                            dispatch(setError(ERRORS.gameDoesNotExist))
+                        }}
+                } else {
+                    dispatch(setError(`Status: ${ res.status }: There was an error with your request, please try again.`)) //Revisit this message
+                }
             } else {
-                dispatch(setError(ERRORS.gameAlreadyExists))
+                dispatch(setError('Please enter a Character Name'))
             }
         } else {
-            const globalGameData = games.doc(cleanGameId)
-            const globalGameDataCall = await globalGameData.get()
-            const existingGlobalGameData = globalGameDataCall.data().players
-            const playersList = Object.keys(existingGlobalGameData)
-            let gameHasDM
-            playersList.forEach(player => {
-                if (existingGlobalGameData[player].gameMaster) {
-                    gameHasDM = true
-                }
-            })
-            if (gameHasDM && isDM) {
-                dispatch(setError('This game already has a Game Master'))
-                setIsDM(false)
-            } else {
-                if (cleanGameId && gameIds.includes(cleanGameId) && !Object.keys(userAccountData.games).includes(cleanGameId)) {
-                    dispatch(updateUserAccount(cleanGameId, characterName, existingGameDataUserAccount))
-                    dispatch(updateActiveGameData(cleanGameId, characterName, isNewGame, isDM, existingGlobalGameData))
-                    history.push('/')
-                } else {
-                    const userGames = Object.keys(userData.get('games'))
-                    if (userGames.includes(cleanGameId)) {
-                        dispatch(setError(ERRORS.playerExists))
-                    } else {
-                        dispatch(setError(ERRORS.gameDoesNotExist))
-                    }
-                }
-            }
+            dispatch(setError('Please enter a Game ID'))
         }
-
     }
 
     return (

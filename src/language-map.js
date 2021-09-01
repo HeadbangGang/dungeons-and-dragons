@@ -54,7 +54,7 @@ export const LANDSCAPE_PAGE = {
 export const INITIATIVE_PAGE = {
     character: 'Character',
     disclaimer: '**Please have patience when you submit a change. There is a delay, but it is working.**',
-    edit: 'Edit',
+    modify: 'Modify',
     editInitiativeFor: 'Edit Initiative for',
     initiative: 'Initiative',
     nevermind: 'Nevermind',

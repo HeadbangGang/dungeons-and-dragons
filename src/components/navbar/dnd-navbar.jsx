@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { setError, getError, getIsSmallView } from '../../store/store'
 import { useSelector, useDispatch } from 'react-redux'
-import { Navbar, NavDropdown, Nav, Button, Toast } from 'react-bootstrap'
+import { Navbar, Nav, Button, Toast } from 'react-bootstrap'
 import { useHistory } from 'react-router-dom'
 import d20 from '../../media/d20.png'
 import { AUTHENTICATION, ERRORS } from '../../language-map'
@@ -31,11 +31,11 @@ export const DndNavbar = () => {
     const [players, setPlayers] = useState([])
     const [navbarExpanded, setNavbarExpanded] = useState(false)
 
-    const isDM = activeGameData.getIn(['players', userData.get('uid'), 'gameMaster'], false)
+    const isDM = activeGameData?.getIn(['players', userData.get('uid'), 'gameMaster'], false)
 
     useEffect(() => {
-        if (activeGameId && activeGameData.size > 0) {
-            activeGameData.get('players').forEach(player => {
+        if (activeGameId && activeGameData?.get('players')?.size > 0) {
+            activeGameData.forEach(player => {
                 const name = player.get('characterName')
                 const isDM = player.get('gameMaster')
                 if (!players.includes(name) && !isDM) {
@@ -122,23 +122,6 @@ export const DndNavbar = () => {
                             >
                                 Dice Roller
                             </a>
-                            { players.length > 0 &&
-                                <NavDropdown title="Characters" id="basic-nav-dropdown">
-                                    { players.map((player, index) => {
-                                        return (
-                                            <a
-                                                className='dropdown-item'
-                                                key={ index }
-                                                onClick={ () => {
-                                                    setNavbarExpanded(false)
-                                                    dispatch(setSelectedCharacter(player))
-                                                } }
-                                            >
-                                                { player }
-                                            </a>
-                                        )
-                                    })}
-                                </NavDropdown> }
                         </div>
                     </Nav>
                 </Navbar.Collapse>
