@@ -1,15 +1,12 @@
-import React, { useState } from 'react'
-import { Container, Col, Row, Card } from 'react-bootstrap'
-import { useSelector, useDispatch } from 'react-redux'
-import { getAllUserGames, updateActiveGameID, getCurrentUser } from '../../store/store'
-import d20Vector from '../../media/d20-vector-good.png'
-import spinner from '../../media/spinner.webp'
-import { GENERAL } from '../../language-map'
-import './dnd-home.css'
+/* eslint-disable jsx-a11y/anchor-has-content */
+import React from 'react'
+import { Card, Col, Container, Row } from 'react-bootstrap'
+import { useDispatch, useSelector } from 'react-redux'
+import { getAllUserGames, getCurrentUser, updateActiveGameID } from '../../store/store'
+import { GENERAL } from '../../helpers/language-map'
 
-export const DndHome = () => {
+const DndHome = () => {
     const dispatch = useDispatch()
-    const [isImageLoaded, setIsImageLoaded] = useState(false)
 
     const allUserGames = useSelector(getAllUserGames)
     const userData = useSelector(getCurrentUser)
@@ -19,50 +16,41 @@ export const DndHome = () => {
             <Col xl={ 12 } lg={ 12 } md={ 12 } sm={ 12 } xs={ 12 }>
                 <Row style={{ placeContent: 'center' }}>
                     <div style={{ textAlign: 'center' }}>
-                        { isImageLoaded
-                            ? <img
-                                alt='d20'
-                                className='dnd-home-img'
-                                draggable={ false }
-                                src={ d20Vector }
-                            />
-                            : <img
-                                alt='spinner'
-                                className='dnd-home-img-spinner'
-                                draggable={ false }
-                                onLoad={ () => setIsImageLoaded(true) }
-                                src={ spinner }
-                            />
-                        }
+                        <img
+                            alt="d20"
+                            className="dnd-home-img"
+                            draggable={ false }
+                            src="/media/d20-vector-good.png"
+                        />
                     </div>
                 </Row>
                 <Row>
-                    <div className='dnd-home-title'>
+                    <div className="dnd-home-title">
                         <strong>
                             { GENERAL.dungeonsAndDragons }
                         </strong>
                     </div>
                 </Row>
-                {allUserGames?.keySeq().size > 1 &&
+                { allUserGames && Object.keys(allUserGames).length > 1 &&
                 <Row style={{ marginTop: '25px' }}>
                     <h2>Other Games:</h2>
                 </Row> }
                 <Row>
-                    { allUserGames && allUserGames.keySeq().map((gameId, index) => {
-                        const gameData = allUserGames.get(gameId)
-                        if (gameId !== userData.get('activeGameId')) {
+                    { allUserGames && Object.keys(allUserGames).map((gameId) => {
+                        const gameData = allUserGames[gameId]
+                        if (gameId !== userData.activeGameId) {
                             return (
-                                <div key={ index } style={{ margin: '10px' }}>
-                                    <Card className='dnd-home-card'>
+                                <div key={ gameId } style={{ margin: '10px' }}>
+                                    <Card className="dnd-home-card">
                                         <Card.Body>
                                             <Card.Title>
-                                                { gameData.get('characterName') }
+                                                { gameData.characterName }
                                             </Card.Title>
                                             <Card.Subtitle className="mb-2 text-muted">
-                                                {`ID: ${ gameId }`}
+                                                { `ID: ${ gameId }` }
                                             </Card.Subtitle>
                                         </Card.Body>
-                                        <a className='stretched-link' onClick={ () => {
+                                        <a className="stretched-link" href="#" onClick={ () => {
                                             dispatch(updateActiveGameID(gameId))
                                         } }
                                         ></a>
@@ -70,10 +58,11 @@ export const DndHome = () => {
                                 </div>
                             )
                         }
-                    })
-                    }
+                    }) }
                 </Row>
             </Col>
         </Container>
     )
 }
+
+export default DndHome

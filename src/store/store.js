@@ -1,67 +1,141 @@
-import { createStore, applyMiddleware, compose } from 'redux'
+import { applyMiddleware, compose, createStore } from 'redux'
 import { db } from '../database/firebase'
+import thunk from 'redux-thunk'
 import { createLogger } from 'redux-logger'
-import Immutable from 'immutable'
+import { DEFAULT_DICE_VALUES } from '../helpers/constants'
+import { composeWithDevTools } from 'redux-devtools-extension'
+import { MAX_ERROR_QUANTITY } from '../helpers/constants'
 
-const initialState = Immutable.fromJS({})
-
-const logger = createLogger({
-    collapsed: true,
-    stateTransformer: state => state.toJS(),
-    diff: true
-})
+const initialState = {}
 
 // Reducer
 const dndState = (currentState = initialState, action) => {
-    switch(action.type) {
-    case SET_ERROR: {
-        return currentState.set('error', action.errorData)
+    switch (action.type) {
+    case SET_ERRORS: {
+        let updatedErrors = getErrors(currentState)
+        if (updatedErrors.length >= MAX_ERROR_QUANTITY) {
+            updatedErrors = updateRemovedErrors(currentState)
+        }
+        return currentState = {
+            ...currentState,
+            errors: [action.errorData, ...updatedErrors]
+        }
+    }
+    case REMOVE_ERRORS: {
+        if (action.removeAll) {
+            return currentState = {
+                ...currentState,
+                errors: []
+            }
+        }
+        const updatedErrors = updateRemovedErrors(currentState)
+        return currentState = {
+            ...currentState,
+            errors: updatedErrors
+        }
     }
     case SET_IS_SMALLVIEW: {
-        return currentState.set('smallView', action.isSmallView)
+        return currentState = {
+            ...currentState,
+            ui: {
+                ...currentState.ui,
+                smallView: action.isSmallView
+            }
+        }
     }
     case SET_USER_ACCOUNT: {
-        return currentState.set('user', Immutable.fromJS(action.userData))
+        return currentState = {
+            ...currentState,
+            user: action.userData
+        }
     }
     case UPDATE_USER_ACCOUNT: {
         const updatedUserAccount = updateCurrentUserAccount(action.gameId, action.characterName, action.currentGameData, currentState)
-        return currentState.set('user', updatedUserAccount)
+        return currentState = {
+            ...currentState,
+            user: updatedUserAccount
+        }
     }
     case SET_ACTIVE_GAME_DATA: {
-        return currentState.set('activeGameData', Immutable.fromJS(action.gameData))
+        return currentState = {
+            ...currentState,
+            activeGameData: action.gameData
+        }
     }
     case UPDATE_ACTIVE_GAME_DATA: {
         const updatedGameData = updateCurrentActiveGameData(action.gameId, action.characterName, action.isNPC, action.initiativeValue, action.isNewGame, action.isDM, currentState)
-        return currentState.set('activeGameData', updatedGameData)
+        return currentState = {
+            ...currentState,
+            activeGameData: updatedGameData
+        }
     }
     case UPDATE_PHOTO_URL: {
-        return currentState.setIn(['user', 'photoURL'], action.url)
-    }
-    case SET_SELECTED_CHARACTER: {
-        return currentState.set('selectedCharacter', action.character)
+        return currentState = {
+            ...currentState,
+            user : {
+                ...currentState.user,
+                photoURL: action.url
+            }
+        }
     }
     case UPDATE_CHOSEN_INITIATIVE: {
-        const updatedGameData = updateInitiative(action.initiative, action.id, currentState)
-        return currentState.setIn(['activeGameData', action.id], updatedGameData)
+        const updatedGameData = updateInitiative(action.initiativeValue, action.id, currentState)
+        return currentState = {
+            ...currentState,
+            activeGameData: {
+                ...currentState.activeGameData,
+                [action.id]: updatedGameData
+            }
+        }
     }
     case RESET_INITIATIVE: {
         const resetGameInitiative = resetCurrentInitiative(action.group, currentState)
-        return currentState.set('activeGameData', Immutable.fromJS(resetGameInitiative))
+        return currentState = {
+            ...currentState,
+            activeGameData: resetGameInitiative
+        }
     }
     case REMOVE_NPC: {
         const removedNPC = removeCurrentNPC(action.npc, currentState)
-        return currentState.setIn(['activeGameData', 'players'], removedNPC)
+        return currentState = {
+            ...currentState,
+            activeGameData: {
+                ...currentState.activeGameData,
+                players: removedNPC
+            }
+        }
     }
     case UPDATE_ACTIVE_GAME_ID: {
         const updatedActiveGameId = updateCurrentActiveGameID(action.id, currentState)
-        return currentState.set('user', updatedActiveGameId)
+        return currentState = {
+            ...currentState,
+            user: {
+                ...currentState.user,
+                activeGameId: updatedActiveGameId
+            }
+        }
     }
     case UPDATE_DICE_VALUES: {
         const updatedDiceValues = updateCurrentDiceValues(action.die, action.values, currentState)
-        return currentState.set('diceValues', updatedDiceValues)
+        return currentState = {
+            ...currentState,
+            diceValues: updatedDiceValues
+        }
     }
     case RESET_DICE_VALUES: {
-        return currentState.set('diceValues', Immutable.fromJS({ '4': [], '6': [], '8': [], '10': [], '12': [], '20': [] }))
+        return currentState = {
+            ...currentState,
+            diceValues: DEFAULT_DICE_VALUES
+        }
+    }
+    case SET_HAS_LOADED_TEMPLATE: {
+        return currentState = {
+            ...currentState,
+            ui: {
+                ...currentState.ui,
+                hasLoadedTemplate: action.hasLoadedTemplate
+            }
+        }
     }
     default:
         return currentState
@@ -69,14 +143,17 @@ const dndState = (currentState = initialState, action) => {
 }
 
 // Content Creators
-export const setError = errorData => ({ type: SET_ERROR, errorData })
-export const SET_ERROR = 'setError'
+export const setErrors = errorData => ({ type: SET_ERRORS, errorData })
+export const SET_ERRORS = 'setErrors'
+
+export const removeErrors = (removeAll) => ({ type: REMOVE_ERRORS, removeAll })
+export const REMOVE_ERRORS = 'removeErrors'
 
 export const setIsSmallView = isSmallView => ({ type: SET_IS_SMALLVIEW, isSmallView })
 export const SET_IS_SMALLVIEW = 'setIsSmallView'
 
 export const setUserAccount = userData => ({ type: SET_USER_ACCOUNT, userData })
-export const SET_USER_ACCOUNT = 'user'
+export const SET_USER_ACCOUNT = 'setUserAccount'
 
 export const updateUserAccount = (gameId, characterName, currentGameData) => ({ type: UPDATE_USER_ACCOUNT, gameId, characterName, currentGameData })
 export const UPDATE_USER_ACCOUNT = 'updateUserData'
@@ -84,18 +161,14 @@ export const UPDATE_USER_ACCOUNT = 'updateUserData'
 export const setActiveGameData = gameData => ({ type: SET_ACTIVE_GAME_DATA, gameData })
 export const SET_ACTIVE_GAME_DATA = 'activeGameData'
 
-export const updateActiveGameData = (gameId, characterName, isNPC, initiativeValue, isNewGame, isDM) =>
-    ({ type: UPDATE_ACTIVE_GAME_DATA, gameId, characterName, isNPC, initiativeValue, isNewGame, isDM })
+export const updateActiveGameData = (gameId, characterName, isNPC, initiativeValue, isNewGame, isDM) => ({ type: UPDATE_ACTIVE_GAME_DATA, gameId, characterName, isNPC, initiativeValue, isNewGame, isDM })
 export const UPDATE_ACTIVE_GAME_DATA = 'updateActiveGameData'
 
 export const updateChosenInitiative = (initiative, id) => ({ type: UPDATE_CHOSEN_INITIATIVE, initiative, id })
 export const UPDATE_CHOSEN_INITIATIVE = 'updatePlayerInitiative'
 
 export const updatePhotoUrl = url => ({ type: UPDATE_PHOTO_URL, url })
-export const UPDATE_PHOTO_URL = 'user/photoURL'
-
-export const setSelectedCharacter = character => ({ type: SET_SELECTED_CHARACTER, character })
-export const SET_SELECTED_CHARACTER = 'selectedCharacter'
+export const UPDATE_PHOTO_URL = 'updatePhotoUrl'
 
 export const resetInitiative = group => ({ type: RESET_INITIATIVE, group })
 export const RESET_INITIATIVE = 'resetInitiative'
@@ -112,22 +185,37 @@ export const UPDATE_DICE_VALUES = 'updateDiceValues'
 export const resetDiceValues = () => ({ type: RESET_DICE_VALUES })
 export const RESET_DICE_VALUES = 'resetDiceValues'
 
+export const setHasLoadedTemplate = (hasLoadedTemplate) =>({ type: SET_HAS_LOADED_TEMPLATE, hasLoadedTemplate })
+export const SET_HAS_LOADED_TEMPLATE = 'setHasLoadedTemplate'
+
 // Selectors
-export const getError = state => state.get('error', null)
-export const getIsSmallView = state => state.get('smallView', false)
-export const getCurrentUser = state => state.get('user', Immutable.Map())
-export const getActiveGameData = state => state.get('activeGameData', Immutable.Map())
-export const getSelectedCharacter = state => state.get('selectedCharacter', null)
-export const getProfilePicture = state => getCurrentUser(state)?.get('photoURL', null)
-export const getActiveGameId = state => getCurrentUser(state)?.get('activeGameId', undefined)
-export const getAllUserGames = state => getCurrentUser(state).get('games')
-export const getDiceValues = state => state.get('diceValues', Immutable.fromJS({ '4': [], '6': [], '8': [], '10': [], '12': [], '20': [] }))
+export const getErrors = state => state.errors ?? []
+export const getUi = state => state.ui ?? {}
+export const getIsSmallView = state => getUi(state).smallView ?? false
+export const getCurrentUser = state => state.user ?? {}
+export const getActiveGameData = state => state.activeGameData ?? {}
+export const getAllGamePlayers = state => getActiveGameData(state).players ?? {}
+export const getProfilePicture = state => getCurrentUser(state)?.photoURL ?? null
+export const getAllUserGames = state => getCurrentUser(state)?.games
+export const getDiceValues = state => state.diceValues ?? DEFAULT_DICE_VALUES
+export const getActiveGameId = state => getCurrentUser(state).activeGameId ?? null
+export const getCurrentUID = state => getCurrentUser(state).uid ?? null
+export const getCurrentFullName = state => getCurrentUser(state).fullName ?? ''
+export const getGamePlayerData = (state, uid) => getActiveGameData(state).players[uid] ?? undefined
+export const getHasLoadedTemplate = state => getUi(state).hasLoadedTemplate ?? false
+export const getCurrentEmail = state => getCurrentUser(state).email ?? ''
 
 // Redux Functions
-const updateCurrentUserAccount = (gameId, characterName, currentGameData, state) => {
-    const uid = getCurrentUser(state).get('uid')
-    const player = getCurrentUser(state).get('fullName')
-    const playerProfileImg = getCurrentUser(state).get('photoURL', null)
+const updateRemovedErrors = (state) => {
+    const updatedErrors = getErrors(state)
+    updatedErrors.shift()
+    return updatedErrors
+}
+
+const updateCurrentUserAccount = async (gameId, characterName, currentGameData, state) => {
+    const uid = getCurrentUID(state)
+    const player = getCurrentFullName(state)
+    const playerProfileImg = getProfilePicture(state)
     const newData = {
         activeGameId: gameId,
         games: {
@@ -139,17 +227,19 @@ const updateCurrentUserAccount = (gameId, characterName, currentGameData, state)
             }
         }
     }
-    let userAccountState = getCurrentUser(state)
-    userAccountState = userAccountState.mergeDeep(Immutable.fromJS(newData))
-    updateDBUserAccount(uid, newData)
+    const userAccountState = {
+        ...getCurrentUser(state),
+        ...newData
+    }
+    await updateDBUserAccount(uid, newData)
     return userAccountState
 }
 
-const updateCurrentActiveGameData = (gameId, characterName, isNPC, initiativeValue, isNewGame, gameMaster, state) => {
-    const uid = getCurrentUser(state).get('uid')
-    const player = getCurrentUser(state).get('fullName')
-    const playerProfileImg = getCurrentUser(state).get('photoURL', null)
-    let newData = {}
+const updateCurrentActiveGameData = async (gameId, characterName, isNPC, initiativeValue, isNewGame, gameMaster, state) => {
+    const uid = getCurrentUID(state)
+    const player = getCurrentFullName(state)
+    const playerProfileImg = getProfilePicture(state)
+    let newData = []
     if (isNPC) {
         newData = [{
             [characterName]: {
@@ -169,75 +259,88 @@ const updateCurrentActiveGameData = (gameId, characterName, isNPC, initiativeVal
             }
         }]
     }
-    updateExistingGameDB(newData, gameId, isNewGame)
-    return Immutable.fromJS(newData)
+    await updateExistingGameDB(newData, gameId, isNewGame, false)
+    return newData
 }
 
-const updateInitiative = (value, id, state) => {
-    const gameId = getCurrentUser(state).get('activeGameId')
-    let currentValue = getActiveGameData(state).getIn(['players', id])
-    currentValue = currentValue.merge(Immutable.fromJS({ initiativeValue: value }))
-    const dbPath = `${ id }.initiativeValue`
+const updateInitiative = async (value, uid, state) => {
+    const gameId = getActiveGameId(state)
+    let currentValue = getGamePlayerData(state, uid)
+    currentValue = {
+        ...currentValue,
+        initiativeValue: value
+    }
+    const dbPath = `${uid}.initiativeValue`
     const dbData = [{ [dbPath]: value }]
-    updateExistingGameDB(dbData, gameId)
+    await updateExistingGameDB(dbData, gameId, false, false)
     return currentValue
 }
 
-const resetCurrentInitiative = (group, state) => {
-    const currentState = getActiveGameData(state)
-    const gameId = getCurrentUser(state).get('activeGameId')
-    let data = currentState.get('players')
-    const players = data.keySeq()
+const resetCurrentInitiative = async (group, state) => {
+    const gameId = getActiveGameId(state)
+    const data = getAllGamePlayers(state)
 
     switch (group) {
     case 'npcs': {
-        players.forEach(player => {
-            if (data.getIn([player, 'NPC'])) {
-                data = data.delete(player)
+        Object.keys(data).forEach((player) => {
+            if (data[player].NPC) {
+                delete data[player]
             }
         })
     }
         break
     case 'players': {
-        players.forEach(player => {
-            if (!data.getIn([player, 'NPC'])) {
-                data = data.setIn([player, 'initiativeValue'], null)
+        Object.keys(data).forEach(player => {
+            if (!data[player].NPC) {
+                data[player] = {
+                    ...data[player],
+                    initiativeValue: null
+                }
             }
         })
     }
         break
     default : {
-        players.forEach(player => {
-            data.getIn([player, 'NPC'])
-                ? data = data.delete(player)
-                : data = data.setIn([player, 'initiativeValue'], null)
+        Object.keys(data).forEach(player => {
+            data[player].NPC
+                ? delete data[player]
+                : data[player] = {
+                    ...data[player],
+                    initiativeValue: null
+                }
         })
     }
     }
-    updateExistingGameDB([data.toJS()], gameId, false, true)
+    await updateExistingGameDB([data], gameId, false, true)
     return data
 }
 
-const removeCurrentNPC = (npc, state) => {
-    const gameId = getCurrentUser(state).get('activeGameId')
-    let currentState = getActiveGameData(state).get('players')
-    currentState = currentState.delete(npc)
-    updateExistingGameDB([currentState.toJS()], gameId, false, true)
+const removeCurrentNPC = async (npc, state) => {
+    const gameId = getActiveGameId(state)
+    const currentState = getAllGamePlayers(state)
+    delete currentState[npc]
+    await updateExistingGameDB([currentState], gameId, false, true)
     return currentState
 }
 
-const updateCurrentActiveGameID = (gameId, state) => {
+const updateCurrentActiveGameID = async (gameId, state) => {
     let currentState = getCurrentUser(state)
-    const uid = currentState.get('uid')
-    currentState = currentState.merge(Immutable.fromJS({ activeGameId: gameId }))
-    updateDBUserAccount(uid, currentState.toJS())
+    const uid = getCurrentUID(state)
+    currentState = {
+        ...currentState,
+        activeGameId: gameId
+    }
+    await updateDBUserAccount(uid, currentState)
     return currentState
 }
 
 const updateCurrentDiceValues = (die, values, state) => {
     let currentState = getDiceValues(state)
-    const dieValue = die[0]
-    currentState = currentState.mergeDeep(Immutable.fromJS({ [dieValue]: values }))
+    values.push(...currentState[die])
+    currentState = {
+        ...currentState,
+        [die]: values
+    }
     return currentState
 }
 
@@ -266,7 +369,7 @@ const updateExistingGameDB = (data, gameId, isNewGame, removeData) => {
             }
         })
     } catch (e) {
-        setError(e.message)
+        setErrors(e.message)
     }
 }
 
@@ -275,29 +378,31 @@ const updateDBUserAccount = async (uid, data) => {
     try {
         await userAccount.update(data)
     } catch (e) {
-        setError(e.message)
+        setErrors(e.message)
     }
 }
 
 // Create Store
-const composeEnhancers =
-  window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ ?
-      window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({
-      }) : compose
-let enhancer
-if (process.env.NODE_ENV === 'production') {
-    enhancer = composeEnhancers(
-        applyMiddleware(),
-    )
-} else {
-    enhancer = composeEnhancers(
-        applyMiddleware(logger),
-    )
+const logger = createLogger({
+    collapsed: true,
+    diff: true
+})
+
+let composeEnhancers = compose
+
+const middleware = [thunk]
+
+if (process.env.NODE_ENV === 'development') {
+    composeEnhancers = composeWithDevTools({})
+    middleware.push(logger)
 }
 
 // Initialize
 const store = createStore(
     dndState,
-    enhancer
+    composeEnhancers(
+        applyMiddleware(...middleware)
+    )
 )
+
 export default store

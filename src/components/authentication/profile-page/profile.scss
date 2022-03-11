@@ -1,0 +1,28 @@
+.profile-img-wrapper {
+  border: 2px solid black;
+  border-radius: 40px;
+  min-width: 250px;
+  min-height: 250px;
+  text-align: center;
+}
+
+.profile-page-img {
+  max-width: 200px;
+  max-height: 300px;
+  margin: 15px;
+}
+
+.profile-edit-img {
+  position: relative;
+  height: 20px;
+  top: 35px;
+  left: 215px;
+}
+
+.profile-page-add-to-game-wrapper {
+  min-height: 150px;
+}
+
+.profile-page-spinner {
+  margin-top: 50px;
+}

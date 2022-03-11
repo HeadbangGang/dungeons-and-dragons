@@ -52,3 +52,8 @@ build/*
 
 .firebase/*
 firebase/*
+
+.next/*
+.next
+
+firebase-mock-data/

@@ -1,9 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
-import { InputGroup, FormControl, Button, Row, Form, Modal } from 'react-bootstrap'
-import { removeNPC, updateChosenInitiative, setError } from '../../store/store'
-import { GENERAL, INITIATIVE_PAGE } from '../../language-map'
+import { Button, Form, FormControl, InputGroup, Modal, Row } from 'react-bootstrap'
+import { removeNPC, setError, updateChosenInitiative } from '../../store/store'
+import { GENERAL, INITIATIVE_PAGE } from '../../helpers/language-map'
 
 export default function NPCInitiativeModal (props) {
     const dispatch = useDispatch()
@@ -66,7 +66,7 @@ export default function NPCInitiativeModal (props) {
         >
             <Modal.Header closeButton>
                 <Modal.Title id="contained-modal-title-vcenter">
-                    {`${ INITIATIVE_PAGE.modify } ${ selectedNPCName }`}
+                    { `${ INITIATIVE_PAGE.modify } ${ selectedNPCName }` }
                 </Modal.Title>
             </Modal.Header>
             <Modal.Body>
@@ -79,9 +79,9 @@ export default function NPCInitiativeModal (props) {
                                 </InputGroup.Text>
                             </InputGroup.Prepend>
                             <FormControl
-                                className='initiative-order-initiative-modifier'
-                                maxLength='2'
-                                placeholder='0'
+                                className="initiative-order-initiative-modifier"
+                                maxLength="2"
+                                placeholder="0"
                                 onChange={ (e) => {
                                     if (numberValidation(e.target.value)) {
                                         setNpcModifer(e.target.value)
@@ -105,8 +105,8 @@ export default function NPCInitiativeModal (props) {
                                 </InputGroup.Text>
                             </InputGroup.Prepend>
                             <FormControl
-                                className='initiative-order-initiative-input'
-                                maxLength='2'
+                                className="initiative-order-initiative-input"
+                                maxLength="2"
                                 onChange={ (e) => {
                                     if (numberValidation(e.target.value)) {
                                         setSelectedNPCInitiative(e.target.value)
@@ -115,7 +115,7 @@ export default function NPCInitiativeModal (props) {
                                 type="tel"
                                 value={ selectedNPCInitiative }
                             />
-                            <Button className='ml-3' disabled={ !selectedNPCInitiative } type='submit' id='npc-initiative-submit' onClick={ (e) => updateNPCsInitiative(e) }>
+                            <Button className="ml-3" disabled={ !selectedNPCInitiative } type="submit" id="npc-initiative-submit" onClick={ (e) => updateNPCsInitiative(e) }>
                                 { GENERAL.submit }
                             </Button>
                         </InputGroup>
@@ -127,9 +127,9 @@ export default function NPCInitiativeModal (props) {
                             dispatch(removeNPC(selectedNPCName))
                             setShowInitiativeModal(false)
                         } }
-                        variant='danger'
+                        variant="danger"
                     >
-                        {`${ GENERAL.remove } ${ selectedNPCName }`}
+                        { `${ GENERAL.remove } ${ selectedNPCName }` }
                     </Button>
                 </Row>
             </Modal.Body>
