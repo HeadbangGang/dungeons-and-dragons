@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import Immutable from 'immutable'
-import { InputGroup, FormControl, Button, Col, Row, Form, Modal } from 'react-bootstrap'
-import { useSelector, useDispatch } from 'react-redux'
+import { Button, Col, Form, FormControl, InputGroup, Modal, Row } from 'react-bootstrap'
+import { useDispatch, useSelector } from 'react-redux'
 import {
     getActiveGameData,
     getActiveGameId,
@@ -13,7 +13,7 @@ import {
 } from '../../store/store'
 import NPCInitiativeModal from './npc-initiative-model'
 import spinner from '../../media/spinner.webp'
-import { GENERAL, INITIATIVE_PAGE } from '../../language-map'
+import { GENERAL, INITIATIVE_PAGE } from '../../helpers/language-map'
 import './initiative-order.css'
 
 export const InitiativeOrder = () => {
@@ -136,11 +136,11 @@ export const InitiativeOrder = () => {
     }
 
     return (
-        <div className='initiative-order-container'>
+        <div className="initiative-order-container">
             <Col xl={ 12 } lg={ 12 } md={ 12 } sm={ 12 } xs={ 12 }>
                 <Row>
-                    <div className='initiative-order-table-wrapper'>
-                        {sortedPlayers.size > 0 ?
+                    <div className="initiative-order-table-wrapper">
+                        { sortedPlayers.size > 0 ?
                             <table>
                                 <tbody>
                                     <tr>
@@ -150,7 +150,7 @@ export const InitiativeOrder = () => {
                                         <th>
                                             <strong>{ INITIATIVE_PAGE.initiative }</strong>
                                         </th>
-                                        {(isAdmin || isUserDM) &&
+                                        { (isAdmin || isUserDM) &&
                                     <th>
                                         <strong>{ INITIATIVE_PAGE.modify }</strong>
                                     </th> }
@@ -169,7 +169,7 @@ export const InitiativeOrder = () => {
                                             <td>
                                                 { isNPC &&
                                                 <a
-                                                    className='initiative-order-modify-button'
+                                                    className="initiative-order-modify-button"
                                                     onClick={ () => {
                                                         setShowInitiativeModal(true)
                                                         setSelectedNPCName(name)
@@ -186,15 +186,15 @@ export const InitiativeOrder = () => {
                                 </tbody>
                             </table>
                             : <div style={{ textAlign: 'center' }}>
-                                <img src={ spinner } alt='loading' style={{ width: '75%' }} />
-                            </div>}
+                                <img src={ spinner } alt="loading" style={{ width: '75%' }} />
+                            </div> }
                     </div>
                 </Row>
-                {!isUserDM &&
+                { !isUserDM &&
                 <Row>
-                    <div className='initiative-order-initiative-wrapper'>
+                    <div className="initiative-order-initiative-wrapper">
                         <Form onSubmit={ (e) => initiativeModifierHandler(e, 'player-initiative-submit', 'player') }>
-                            <div className='initiative-order-initiative-header'>
+                            <div className="initiative-order-initiative-header">
                                 { INITIATIVE_PAGE.setInitiative }
                             </div>
                             <InputGroup className="mb-3 mt-3">
@@ -204,9 +204,9 @@ export const InitiativeOrder = () => {
                                     </InputGroup.Text>
                                 </InputGroup.Prepend>
                                 <FormControl
-                                    className='initiative-order-initiative-modifier'
-                                    maxLength='2'
-                                    placeholder='0'
+                                    className="initiative-order-initiative-modifier"
+                                    maxLength="2"
+                                    placeholder="0"
                                     onChange={ (e) => {
                                         if (numberValidation(e.target.value)) {
                                             setPlayerModifier(e.target.value)
@@ -228,8 +228,8 @@ export const InitiativeOrder = () => {
                                     </InputGroup.Text>
                                 </InputGroup.Prepend>
                                 <FormControl
-                                    className='initiative-order-initiative-input'
-                                    maxLength='2'
+                                    className="initiative-order-initiative-input"
+                                    maxLength="2"
                                     onChange={ (e) => {
                                         if (numberValidation(e.target.value)) {
                                             setInitiativeValue(e.target.value)
@@ -238,7 +238,7 @@ export const InitiativeOrder = () => {
                                     type="tel"
                                     value={ initiativeValue }
                                 />
-                                <Button className='ml-3' disabled={ !initiativeValue } id='player-initiative-submit' type='submit' onClick={ (e) => updatePlayersInitiative(e) }>
+                                <Button className="ml-3" disabled={ !initiativeValue } id="player-initiative-submit" type="submit" onClick={ (e) => updatePlayersInitiative(e) }>
                                     { GENERAL.submit }
                                 </Button>
                             </InputGroup>
@@ -246,19 +246,19 @@ export const InitiativeOrder = () => {
                     </div>
                 </Row>
                 }
-                {(isAdmin || isUserDM) &&
+                { (isAdmin || isUserDM) &&
                 <>
                     <Row>
-                        <div className='initiative-order-initiative-wrapper'>
+                        <div className="initiative-order-initiative-wrapper">
                             <Form onSubmit={ (e) => addNPC(e) }>
-                                <div className='initiative-order-initiative-header'>
+                                <div className="initiative-order-initiative-header">
                                     { INITIATIVE_PAGE.npcCreator }
                                 </div>
                                 <Form.Group>
                                     <Form.Label>
                                         { GENERAL.name }
                                     </Form.Label>
-                                    <Form.Control type="text" maxLength='20' value={ npcName } onChange={ (e) => setNpcName(e.target.value) } />
+                                    <Form.Control type="text" maxLength="20" value={ npcName } onChange={ (e) => setNpcName(e.target.value) } />
                                 </Form.Group>
                                 <Form.Group>
                                     <Form.Label>
@@ -271,10 +271,10 @@ export const InitiativeOrder = () => {
                                             </InputGroup.Text>
                                         </InputGroup.Prepend>
                                         <FormControl
-                                            className='initiative-order-initiative-modifier'
-                                            id='initiative-order-initiative-modifier'
-                                            maxLength='2'
-                                            placeholder='0'
+                                            className="initiative-order-initiative-modifier"
+                                            id="initiative-order-initiative-modifier"
+                                            maxLength="2"
+                                            placeholder="0"
                                             onChange={ (e) => {
                                                 if (numberValidation(e.target.value)) {
                                                     setNewNpcModifier(e.target.value)
@@ -296,7 +296,7 @@ export const InitiativeOrder = () => {
                                             </InputGroup.Text>
                                         </InputGroup.Prepend>
                                         <Form.Control
-                                            maxLength='2'
+                                            maxLength="2"
                                             onChange={ (e) => {
                                                 if (numberValidation(e.target.value)) {
                                                     setNpcInitiative(e.target.value)
@@ -306,9 +306,9 @@ export const InitiativeOrder = () => {
                                             value={ npcInitiative }
                                         />
                                         <Button
-                                            className='ml-3'
+                                            className="ml-3"
                                             disabled={ !npcName || !npcInitiative }
-                                            id='npc-creator-submit'
+                                            id="npc-creator-submit"
                                             onClick={ (e) => addNPC(e) }
                                             type="submit"
                                             variant="primary"
@@ -325,8 +325,8 @@ export const InitiativeOrder = () => {
                                         setNpcName('')
                                     } }
                                     style={{ margin: '0 auto' }}
-                                    tabIndex='-1'
-                                    variant='danger'
+                                    tabIndex="-1"
+                                    variant="danger"
                                 >
                                     Clear
                                 </Button>
@@ -335,7 +335,7 @@ export const InitiativeOrder = () => {
                     </Row>
                     { sortedPlayers.size > 0 &&
                     <>
-                        <Row className='mt-3'>
+                        <Row className="mt-3">
                             <Button
                                 disabled={ !sortedPlayers.some(k => k.get('NPC')) }
                                 onClick={ () => {
@@ -343,7 +343,7 @@ export const InitiativeOrder = () => {
                                     setResetInitiativeGroup('npcs')
                                 } }
                                 style={{ margin: '5px' }}
-                                tabIndex='-1'
+                                tabIndex="-1"
                             >
                             Remove All NPCs
                             </Button>
@@ -354,7 +354,7 @@ export const InitiativeOrder = () => {
                                     setResetInitiativeGroup('players')
                                 } }
                                 style={{ margin: '5px ' }}
-                                tabIndex='-1'
+                                tabIndex="-1"
                             >
                             Reset Players Initiatives
                             </Button>
@@ -362,23 +362,23 @@ export const InitiativeOrder = () => {
                         <Row>
                             <Button
                                 disabled={ sortedPlayers.isEmpty() || !sortedPlayers.some(k => k.get('initiativeValue')) }
-                                tabIndex='-1'
-                                className='ml-3 mr-3 mt-3'
+                                tabIndex="-1"
+                                className="ml-3 mr-3 mt-3"
                                 onClick={ () => {
                                     setShowConfirmationModal(true)
                                     setResetInitiativeGroup(null)
                                 } }
-                                variant='danger'
+                                variant="danger"
                             >
                                 { INITIATIVE_PAGE.resetInitiative }
                             </Button>
                         </Row>
-                    </>}
+                    </> }
                 </>
                 }
             </Col>
             <NPCInitiativeModal { ...npcInitiativeModalProps } />
-            {/* Confirmation Modal */}
+            { /* Confirmation Modal */ }
             <Modal
                 show={ showConfirmationModal }
                 onHide={ () => setShowConfirmationModal(false) }
@@ -388,13 +388,13 @@ export const InitiativeOrder = () => {
             >
                 <Modal.Header closeButton>
                     <Modal.Title id="contained-modal-title-vcenter">
-                        {`Reset all ${ resetInitiativeGroup || '' } initiative values${ !resetInitiativeGroup ? ' and remove all NPCs' : '' }?`}
+                        { `Reset all ${ resetInitiativeGroup || '' } initiative values${ !resetInitiativeGroup ? ' and remove all NPCs' : '' }?` }
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Row>
                         <Button
-                            className='mr-3'
+                            className="mr-3"
                             onClick={ () => {
                                 dispatch(resetInitiative(resetInitiativeGroup))
                                 setShowConfirmationModal(false)

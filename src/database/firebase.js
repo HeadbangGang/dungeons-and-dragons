@@ -14,41 +14,46 @@ const firebaseConfig = {
     measurementId: 'G-YPQVF4HKTN'
 }
 
-firebase.initializeApp(firebaseConfig)
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig)
+} else {
+    firebase.app()
+}
+
 export const auth = firebase.auth()
 export const db = firebase.firestore()
 export const storage = firebase.storage()
 
-export const generateUserDocument = async (user, additionalData) => {
-    if (!user) return
-    const userRef = db.doc(`users/${ user.uid }`)
-    const snapshot = await userRef.get()
-    if (!snapshot.exists) {
-        const { email, photoURL } = user
-        try {
-            await userRef.set({
-                email,
-                photoURL,
-                games: {},
-                ...additionalData
-            }).then(() => {
-                window.location.replace('/account/profile')
-            })
-        } catch (e) {
-            console.error('Error creating user document', e)
-        }
-    }
-    return getUserDocument(user.uid)
+if (process.env.NODE_ENV === 'development') {
+    console.log('testing locally -- hitting local auth and firestore emulators')
+    auth.useEmulator('http://localhost:9099/')
+    storage.useEmulator('localhost', 9199)
+    db.useEmulator('localhost', 8080)
 }
 
-const getUserDocument = async uid => {
-    if (!uid) return null
+export const generateUserDocument = async (user, additionalData) => {
+    if (!user) return
+    const { email, photoURL, uid } = user
+    const userRef = db.doc(`users/${ uid }`)
+    const snapshot = await userRef.get()
+    if (!snapshot.exists) {
+        await userRef.set({
+            email,
+            photoURL,
+            uid,
+            games: {},
+            ...additionalData
+        })
+            .catch((err) => console.error('Error creating user document', err))
+    }
+    return getUserDocument(uid)
+}
+
+export const getUserDocument = async (uid) => {
+    if (!uid) return
     try {
         const userDocument = await db.doc(`users/${ uid }`).get()
-        return {
-            uid,
-            ...userDocument.data()
-        }
+        return userDocument.data()
     } catch (e) {
         console.error('Error fetching user', e)
     }

@@ -1,0 +1,31 @@
+.footer {
+  color: white;
+
+  &__active-game-id {
+    margin-left: auto;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+  &__copyright {
+    margin-left: 10px;
+  }
+
+  @media only screen and (max-device-width: 576px) {
+    &__copyright {
+      display: none;
+    }
+  }
+
+  @media only screen and (max-device-width: 992px) {
+    &__copyright {
+      font-size: 14px;
+    }
+
+    &__active-game-id {
+      font-size: 14px;
+    }
+  }
+}

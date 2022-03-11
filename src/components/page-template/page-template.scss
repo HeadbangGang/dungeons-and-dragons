@@ -1,0 +1,13 @@
+.dnd-main-content {
+  padding: 50px 0 75px;
+  min-height: 100vh;
+}
+
+.error {
+  &__toast-container {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 2000;
+  }
+}
