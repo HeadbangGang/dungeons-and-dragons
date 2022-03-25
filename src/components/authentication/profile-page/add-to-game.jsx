@@ -1,12 +1,11 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/router'
 import { useDispatch, useSelector } from 'react-redux'
-import { setError } from '../../../store/store'
+import { setErrors } from '../../../store/store'
 import { db } from '../../../database/firebase'
-import { Button, FormControl, InputGroup } from 'react-bootstrap'
+import { Button } from 'react-bootstrap'
 import { AUTHENTICATION, ERRORS } from '../../../helpers/language-map'
 import { getCurrentUser, updateActiveGameData, updateUserAccount } from '../../../store/store'
-
 
 const AddToGame =  () => {
     const router = useRouter()
@@ -16,98 +15,124 @@ const AddToGame =  () => {
 
     const [gameId, setGameId] = useState('')
     const [characterName, setCharacterName] = useState('')
+    const [previousCharacterName, setPreviousCharacterName] = useState('')
     const [isDM, setIsDM] = useState(false)
-    const [allGameIds, setAllGameIds] = useState([])
 
-    const gameQueryHandler = async (isNewGame) => {
+    const gameHandler = async (isNewGame) => {
         if (gameId && characterName) {
+            let gameExists = false
+
             await db.collection('games').get()
-                .then((allGames) => {
-                    allGames.forEach((game) => {
-                        setAllGameIds([...allGameIds, game.id])
-                    })
+                .then(({ docs }) => {
+                    gameExists = !!docs.find(game => game.id === gameId)
                 })
-                .catch(() => dispatch(setError(ERRORS.generic)))
-            const userAccount = db.collection('users').doc(userData.uid)
-            const accountDataCall = await userAccount.get()
-            const userAccountData = accountDataCall.data()
-            const existingGameDataUserAccount = userAccountData.games
-            const cleanGameId = gameId.replaceAll(' ', '')
-            const gameExists = allGameIds.findIndex((gameId) => gameId === cleanGameId) > -1
+                .catch(() => dispatch(setErrors(ERRORS.generic)))
+
             if (isNewGame) {
                 if (!gameExists) {
-                    dispatch(updateUserAccount(cleanGameId, characterName, existingGameDataUserAccount))
-                    dispatch(updateActiveGameData(cleanGameId, characterName, false, undefined, isNewGame, isDM))
-                    await router.push('/')
+                    await createNewGame(isNewGame)
                 } else {
-                    dispatch(setError(ERRORS.gameAlreadyExists))
+                    dispatch(setErrors(ERRORS.gameAlreadyExists))
                 }
             } else {
                 if (gameExists) {
-                    await db.collection('games').doc(cleanGameId).collection('data').doc('players')
-                        .then((item) => {
-                            console.log(item)
-                        })
-                    // const gameData = res.fields
-                    // const listOfPlayers = Object.values(gameData)
-                    // const hasDM = listOfPlayers.findIndex(player => player.gameMaster) > -1
-                    // const playerAlreadyExists = listOfPlayers.findIndex(player => player.characterName === characterName) > -1
-                    // if (cleanGameId && gameIds.includes(cleanGameId) && !Object.keys(userAccountData.games).includes(cleanGameId)) {
-                    //     dispatch(updateUserAccount(cleanGameId, characterName, existingGameDataUserAccount))
-                    //     dispatch(updateActiveGameData(cleanGameId, characterName, false, undefined, isNewGame, isDM))
-                    //     await router.push('/')
-                    // } else {
-                    //     if (playerAlreadyExists) {
-                    //         dispatch(setError(ERRORS.playerExists))
-                    //     } else if (hasDM && isDM) {
-                    //         dispatch(setError('This game already has a Game Master'))
-                    //         setIsDM(false)
-                    //     }
-                    // }
+                    await joinExistingGame(isNewGame)
                 } else {
-                    dispatch(setError(ERRORS.gameDoesNotExist))
+                    dispatch(setErrors(ERRORS.gameDoesNotExist))
                 }}
         } else {
-            let errorMessage = ERRORS.generic
-            if (!gameId) errorMessage = 'Please enter a Game ID.'
-            if (!characterName) errorMessage = 'Please enter a Character Name.'
-            dispatch(setError(errorMessage))
+            if (!characterName) {
+                dispatch(setErrors('Please enter a Character Name.'))
+            }
+            if (!gameId) {
+                dispatch(setErrors('Please enter a Game ID.'))
+            }
         }
     }
 
+    const createNewGame = async (isNewGame) => {
+        const { games } = userData
+        await dispatch(updateUserAccount(gameId, characterName, games))
+            .then(dispatch(updateActiveGameData(gameId, characterName, false, undefined, isNewGame, isDM)))
+            .then(router.push('/'))
+    }
+
+    const joinExistingGame = async (isNewGame) => {
+        const { games } = userData
+        let gameData = {}
+
+        await db.collection('games').doc(gameId).collection('data').doc('players').get()
+            .then((item) => {
+                gameData = item.data()
+            })
+
+        const allPlayersData = Object.values(gameData)
+        const hasDM = allPlayersData.findIndex(player => player.gameMaster) > -1
+        const playerAlreadyExists = allPlayersData.findIndex(player => player.characterName === characterName) > -1
+        const userAlreadyPlayer = Object.keys(games).includes(gameId)
+
+        if (!userAlreadyPlayer) {
+            await dispatch(updateUserAccount(gameId, characterName, games))
+                .then(dispatch(updateActiveGameData(gameId, characterName, false, undefined, isNewGame, isDM)))
+                .then(router.push('/'))
+        } else {
+            if (playerAlreadyExists) {
+                dispatch(setErrors(ERRORS.playerExists))
+            }
+            if (hasDM && isDM) {
+                dispatch(setErrors('This game already has a Game Master'))
+                setIsDM(false)
+            }
+            if (userAlreadyPlayer) {
+                dispatch(setErrors('You are already apart of this game'))
+            }
+        }
+    }
+
+    const setGameIdHandler = ({ target }) => {
+        setGameId(target.value.replaceAll(' ', ''))
+    }
+
+    const gameMasterCheckboxHandler = () => {
+        if (!isDM) {
+            setPreviousCharacterName(characterName)
+            setCharacterName('Game Master')
+        } else {
+            setCharacterName(previousCharacterName)
+            setPreviousCharacterName('')
+        }
+        setIsDM(!isDM)
+    }
+
     return (
-        <div style={{ marginTop: '25px', border: '1px solid black', padding: '10px' }}>
-            <InputGroup size="sm" className="mb-3">
-                <InputGroup.Text id="inputGroup-sizing-sm">
-                    { AUTHENTICATION.gameId }
-                </InputGroup.Text>
-                <FormControl
-                    maxLength="10"
-                    onChange={ (e) => setGameId(e.target.value) }
-                />
-            </InputGroup>
-            { !isDM &&
-            <InputGroup size="sm" className="mb-3">
-                <InputGroup.Text id="inputGroup-sizing-sm">
-                    { AUTHENTICATION.characterName }
-                </InputGroup.Text>
-                <FormControl
-                    maxLength="15"
-                    onChange={ (e) => setCharacterName(e.target.value) }
-                />
-            </InputGroup> }
-            <div style={{ textAlign: 'center', marginBottom: '5px' }}>
+        <div className="add-to-game">
+            <div className="add-to-game__inputs__container">
+                <div className="add-to-game__inputs__wrapper">
+                    <div className="add-to-game__inputs__label">
+                        { AUTHENTICATION.gameId }
+                    </div>
+                    <input
+                        maxLength="10"
+                        onChange={ setGameIdHandler }
+                    />
+                </div>
+                <div className="add-to-game__inputs__wrapper">
+                    <div className="add-to-game__inputs__label">
+                        { AUTHENTICATION.characterName }
+                    </div>
+                    <input
+                        disabled={ isDM }
+                        maxLength="15"
+                        onChange={ (e) => setCharacterName(e.target.value) }
+                        value={ characterName }
+                    />
+                </div>
+            </div>
+            <div className="add-to-game__checkbox">
                 <input
                     checked={ isDM }
                     id="dm-query"
-                    onChange={ () => {
-                        setIsDM(!isDM)
-                        if (!isDM) {
-                            setCharacterName('Game Master')
-                        } else {
-                            setCharacterName('')
-                        }
-                    } }
+                    onChange={ gameMasterCheckboxHandler }
                     type="checkbox"
                 />
                 <label
@@ -117,11 +142,11 @@ const AddToGame =  () => {
                     Are you the Game Master?
                 </label>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
-                <Button variant="dark" onClick={ () => gameQueryHandler(false) }>
+            <div className="add-to-game__buttons">
+                <Button variant="dark" onClick={ async () => await gameHandler(false) }>
                     { AUTHENTICATION.joinGame }
                 </Button>
-                <Button variant="dark" onClick={ () => gameQueryHandler(true) }>
+                <Button variant="dark" onClick={ async () => await gameHandler(true) }>
                     { AUTHENTICATION.createGame }
                 </Button>
             </div>

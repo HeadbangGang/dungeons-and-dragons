@@ -1,28 +1,36 @@
-.profile-img-wrapper {
-  border: 2px solid black;
-  border-radius: 40px;
-  min-width: 250px;
-  min-height: 250px;
-  text-align: center;
-}
+.profile {
+  &__user-data-wrapper {
+    display: flex;
+    flex-direction: column;
+    place-items: center;
+  }
 
-.profile-page-img {
-  max-width: 200px;
-  max-height: 300px;
-  margin: 15px;
-}
+  &__img {
+    &__edit {
+      position: relative;
+      height: 20px;
+      top: 35px;
+      left: 215px;
+    }
 
-.profile-edit-img {
-  position: relative;
-  height: 20px;
-  top: 35px;
-  left: 215px;
-}
+    &__border {
+      border: 2px solid black;
+      border-radius: 40px;
+      min-width: 250px;
+      min-height: 250px;
+      text-align: center;
+    }
+  }
 
-.profile-page-add-to-game-wrapper {
-  min-height: 150px;
-}
+  &__page {
+    &__img {
+      max-width: 200px;
+      max-height: 300px;
+      margin: 15px;
+    }
 
-.profile-page-spinner {
-  margin-top: 50px;
+    &__spinner {
+      margin-top: 50px;
+    }
+  }
 }

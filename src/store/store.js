@@ -50,10 +50,9 @@ const dndState = (currentState = initialState, action) => {
         }
     }
     case UPDATE_USER_ACCOUNT: {
-        const updatedUserAccount = updateCurrentUserAccount(action.gameId, action.characterName, action.currentGameData, currentState)
         return currentState = {
             ...currentState,
-            user: updatedUserAccount
+            user: action.updatedUserAccount
         }
     }
     case SET_ACTIVE_GAME_DATA: {
@@ -63,10 +62,9 @@ const dndState = (currentState = initialState, action) => {
         }
     }
     case UPDATE_ACTIVE_GAME_DATA: {
-        const updatedGameData = updateCurrentActiveGameData(action.gameId, action.characterName, action.isNPC, action.initiativeValue, action.isNewGame, action.isDM, currentState)
         return currentState = {
             ...currentState,
-            activeGameData: updatedGameData
+            activeGameData: action.updatedGameData
         }
     }
     case UPDATE_PHOTO_URL: {
@@ -79,39 +77,35 @@ const dndState = (currentState = initialState, action) => {
         }
     }
     case UPDATE_CHOSEN_INITIATIVE: {
-        const updatedGameData = updateInitiative(action.initiativeValue, action.id, currentState)
         return currentState = {
             ...currentState,
             activeGameData: {
                 ...currentState.activeGameData,
-                [action.id]: updatedGameData
+                [action.id]: action.updatedGameData
             }
         }
     }
     case RESET_INITIATIVE: {
-        const resetGameInitiative = resetCurrentInitiative(action.group, currentState)
         return currentState = {
             ...currentState,
-            activeGameData: resetGameInitiative
+            activeGameData: action.resetGameInitiative
         }
     }
     case REMOVE_NPC: {
-        const removedNPC = removeCurrentNPC(action.npc, currentState)
         return currentState = {
             ...currentState,
             activeGameData: {
                 ...currentState.activeGameData,
-                players: removedNPC
+                players: action.removedNPC
             }
         }
     }
     case UPDATE_ACTIVE_GAME_ID: {
-        const updatedActiveGameId = updateCurrentActiveGameID(action.id, currentState)
         return currentState = {
             ...currentState,
             user: {
                 ...currentState.user,
-                activeGameId: updatedActiveGameId
+                activeGameId: action.updatedActiveGameId
             }
         }
     }
@@ -143,41 +137,23 @@ const dndState = (currentState = initialState, action) => {
 }
 
 // Content Creators
-export const setErrors = errorData => ({ type: SET_ERRORS, errorData })
-export const SET_ERRORS = 'setErrors'
-
-export const removeErrors = (removeAll) => ({ type: REMOVE_ERRORS, removeAll })
-export const REMOVE_ERRORS = 'removeErrors'
-
-export const setIsSmallView = isSmallView => ({ type: SET_IS_SMALLVIEW, isSmallView })
-export const SET_IS_SMALLVIEW = 'setIsSmallView'
-
 export const setUserAccount = userData => ({ type: SET_USER_ACCOUNT, userData })
 export const SET_USER_ACCOUNT = 'setUserAccount'
-
-export const updateUserAccount = (gameId, characterName, currentGameData) => ({ type: UPDATE_USER_ACCOUNT, gameId, characterName, currentGameData })
-export const UPDATE_USER_ACCOUNT = 'updateUserData'
 
 export const setActiveGameData = gameData => ({ type: SET_ACTIVE_GAME_DATA, gameData })
 export const SET_ACTIVE_GAME_DATA = 'activeGameData'
 
-export const updateActiveGameData = (gameId, characterName, isNPC, initiativeValue, isNewGame, isDM) => ({ type: UPDATE_ACTIVE_GAME_DATA, gameId, characterName, isNPC, initiativeValue, isNewGame, isDM })
-export const UPDATE_ACTIVE_GAME_DATA = 'updateActiveGameData'
-
-export const updateChosenInitiative = (initiative, id) => ({ type: UPDATE_CHOSEN_INITIATIVE, initiative, id })
-export const UPDATE_CHOSEN_INITIATIVE = 'updatePlayerInitiative'
-
 export const updatePhotoUrl = url => ({ type: UPDATE_PHOTO_URL, url })
 export const UPDATE_PHOTO_URL = 'updatePhotoUrl'
 
-export const resetInitiative = group => ({ type: RESET_INITIATIVE, group })
-export const RESET_INITIATIVE = 'resetInitiative'
+export const setErrors = errorData => ({ type: SET_ERRORS, errorData })
+export const SET_ERRORS = 'setErrors'
 
-export const removeNPC = npc => ({ type: REMOVE_NPC, npc })
-export const REMOVE_NPC = 'removeNPC'
+export const removeErrors = removeAll => ({ type: REMOVE_ERRORS, removeAll })
+export const REMOVE_ERRORS = 'removeErrors'
 
-export const updateActiveGameID = id => ({ type: UPDATE_ACTIVE_GAME_ID, id })
-export const UPDATE_ACTIVE_GAME_ID = 'updateActiveGameID'
+export const setIsSmallView = isSmallView => ({ type: SET_IS_SMALLVIEW, isSmallView })
+export const SET_IS_SMALLVIEW = 'setIsSmallView'
 
 export const updateDiceValues = (die, values) => ({ type: UPDATE_DICE_VALUES, die, values })
 export const UPDATE_DICE_VALUES = 'updateDiceValues'
@@ -187,6 +163,43 @@ export const RESET_DICE_VALUES = 'resetDiceValues'
 
 export const setHasLoadedTemplate = (hasLoadedTemplate) =>({ type: SET_HAS_LOADED_TEMPLATE, hasLoadedTemplate })
 export const SET_HAS_LOADED_TEMPLATE = 'setHasLoadedTemplate'
+
+// Thunks
+export const updateUserAccount = (gameId, characterName, currentGameData) => async (dispatch, getState) => {
+    const updatedUserAccount = await updateCurrentUserAccount(gameId, characterName, currentGameData, getState())
+    dispatch({ type: UPDATE_USER_ACCOUNT, updatedUserAccount })
+}
+export const UPDATE_USER_ACCOUNT = 'updateUserAccount'
+
+export const updateActiveGameData = (gameId, characterName, isNPC, initiativeValue, isNewGame, isDM) => async (dispatch, getState) => {
+    const updatedGameData = await updateCurrentActiveGameData(gameId, characterName, isNPC, initiativeValue, isNewGame, isDM, getState())
+    dispatch({ type: UPDATE_ACTIVE_GAME_DATA, updatedGameData })
+}
+export const UPDATE_ACTIVE_GAME_DATA = 'updateActiveGameData'
+
+export const updateChosenInitiative = (initiative, id) => async (dispatch, getState) => {
+    const updatedGameData = await updateInitiative(initiative, id, getState())
+    dispatch({ type: UPDATE_CHOSEN_INITIATIVE, updatedGameData })
+}
+export const UPDATE_CHOSEN_INITIATIVE = 'updatePlayerInitiative'
+
+export const resetInitiative = (group) => async (dispatch, getState) => {
+    const resetGameInitiative = await resetCurrentInitiative(group, getState())
+    dispatch({ type: RESET_INITIATIVE, resetGameInitiative })
+}
+export const RESET_INITIATIVE = 'resetInitiative'
+
+export const removeNPC = (npc) => async (dispatch, getState) => {
+    const removedNPC = removeCurrentNPC(npc, getState())
+    dispatch({ type: REMOVE_NPC, removedNPC })
+}
+export const REMOVE_NPC = 'removeNPC'
+
+export const updateActiveGameID = (id) => async (dispatch, getState) => {
+    const updatedActiveGameId = updateCurrentActiveGameID(id, getState())
+    dispatch({ type: UPDATE_ACTIVE_GAME_ID, updatedActiveGameId })
+}
+export const UPDATE_ACTIVE_GAME_ID = 'updateActiveGameID'
 
 // Selectors
 export const getErrors = state => state.errors ?? []
@@ -227,12 +240,12 @@ const updateCurrentUserAccount = async (gameId, characterName, currentGameData, 
             }
         }
     }
-    const userAccountState = {
+    const updatedUserAccount = {
         ...getCurrentUser(state),
         ...newData
     }
     await updateDBUserAccount(uid, newData)
-    return userAccountState
+    return updatedUserAccount
 }
 
 const updateCurrentActiveGameData = async (gameId, characterName, isNPC, initiativeValue, isNewGame, gameMaster, state) => {
@@ -241,15 +254,15 @@ const updateCurrentActiveGameData = async (gameId, characterName, isNPC, initiat
     const playerProfileImg = getProfilePicture(state)
     let newData = []
     if (isNPC) {
-        newData = [{
+        newData = {
             [characterName]: {
                 characterName,
                 initiativeValue,
                 NPC: true
             }
-        }]
+        }
     } else {
-        newData = [{
+        newData = {
             [uid]: {
                 characterName,
                 gameMaster,
@@ -257,9 +270,9 @@ const updateCurrentActiveGameData = async (gameId, characterName, isNPC, initiat
                 playerProfileImg,
                 uid
             }
-        }]
+        }
     }
-    await updateExistingGameDB(newData, gameId, isNewGame, false)
+    await updateExistingGameDB([newData], gameId, isNewGame, false)
     return newData
 }
 
