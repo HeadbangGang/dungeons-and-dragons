@@ -9,16 +9,18 @@ import { MAX_ERROR_QUANTITY } from '../../helpers/constants'
 class Alerts extends PureComponent {
 
     componentDidMount() {
-        this.props.removeErrors(true)
+        this.props.errors.length && this.props.removeErrors(true)
     }
 
     componentDidUpdate(prevProps) {
         const { errors } = this.props
         if (errors.length !== prevProps.errors.length && errors.length > 0 && errors.length <= MAX_ERROR_QUANTITY) {
-            setTimeout(() => {
-                this.props.removeErrors()
-                this.forceUpdate()
-            }, 5000)
+            for (let i = 0; i < errors.length - prevProps.errors.length; i++) {
+                setTimeout(() => {
+                    this.props.removeErrors()
+                    this.forceUpdate()
+                }, 5000)
+            }
         }
     }
 

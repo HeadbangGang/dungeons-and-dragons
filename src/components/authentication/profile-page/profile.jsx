@@ -45,16 +45,15 @@ class ProfilePage extends Component {
 
     render() {
         return (
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <div className="profile__user-data-wrapper">
                 { this.props.email && this.props.fullName
                     ?   <>
-                        <div style={{ alignSelf: 'center' }}>
-
-                            <img className="profile-edit-img" src="/media/edit.png" alt="" />
-                            <div className="profile-img-wrapper">
+                        <div>
+                            <img className="profile__img__edit" src="/media/edit.png" alt="" />
+                            <div className="profile__img__border">
                                 <input
                                     alt="profile-img"
-                                    className="profile-page-img"
+                                    className="profile__page__img"
                                     onClick={ () => this.inputFile.current.click() }
                                     src={ this.props.profilePicture || '/media/d20.png' }
                                     type="image"
@@ -63,32 +62,26 @@ class ProfilePage extends Component {
                                     accept="image/png, image/jpeg"
                                     type="file"
                                     id="file"
+                                    onChange={ () => this.fileValidation(this.inputFile.current.files[0]) }
                                     ref={ this.inputFile }
                                     style={{ display: 'none' }}
-                                    onChange={ () => {
-                                        this.fileValidation(this.inputFile.current.files[0])
-                                    } }
                                 />
                             </div>
                         </div>
-                        <div>
-                            <div style={{ margin: '25px', textAlign: 'center' }}>
-                                <h2>{ this.props.fullName }</h2>
-                                <h3>{ this.props.email }</h3>
-                                <Button
-                                    onClick={ async () => await this.signOut() }
-                                    variant="danger"
-                                >
-                                    { AUTHENTICATION.signOut }
-                                </Button>
-                            </div>
+                        <div style={{ margin: '25px', textAlign: 'center' }}>
+                            <h2>{ this.props.fullName }</h2>
+                            <h3>{ this.props.email }</h3>
+                            <Button
+                                onClick={ async () => await this.signOut() }
+                                variant="danger"
+                            >
+                                { AUTHENTICATION.signOut }
+                            </Button>
                         </div>
-                        <div className="profile-page-add-to-game-wrapper">
-                            <AddToGame />
-                        </div>
+                        <AddToGame />
                     </>
                     : <div>
-                        <img src="/media/spinner.webp" alt="loading" className="profile-page-spinner" />
+                        <img src="/media/spinner.webp" alt="loading" className="profile__page__spinner" />
                     </div>
                 }
             </div>
@@ -121,7 +114,6 @@ class ProfilePage extends Component {
         const userAccount = db.collection('users').doc(uid)
         await userAccount.update({ photoURL: profilePicturePath })
             .then (() => {
-                console.log(profilePicturePath)
                 updatePhotoUrl(profilePicturePath)
                 this.setState({
                     profilePicturePath: '',
