@@ -1,63 +1,111 @@
-table,
-th,
-td {
-  text-align: center;
-  border: 1px solid black;
+.initiative-order {
+  &__container {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    margin: 25px 10px;
+  }
+
+  &__wrapper {
+    margin-top: 25px;
+    border: 1px solid black;
+    padding: 0 10px 10px;
+    width: 100%;
+    max-width: 600px;
+  }
+
+  &__table {
+    margin: 0 auto;
+
+    &__modify-button {
+      color: blue !important;
+
+      &:hover {
+        color: red !important;
+        cursor: pointer;
+      }
+    }
+
+    table, th, td {
+      table-layout: fixed;
+      width: 100%;
+      max-width: 600px;
+      text-align: center;
+      border: 1px solid black;
+    }
+
+    thead > tr > td {
+      font-size: 22px;
+    }
+
+    th {
+      padding: 10px;
+    }
+
+    td {
+      font-size: 17px;
+      overflow: hidden;
+      padding: 5px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    tr {
+      height: 50px;
+    }
+  }
+
+  &__header {
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+    margin: 10px;
+  }
+}
+.confirmation-modal {
+  &__modal-body {
+    display: flex;
+    justify-content: space-evenly;
+    flex-direction: column;
+
+    button {
+      height: 50px;
+      margin: 5px 0;
+    }
+  }
 }
 
-th {
-  padding: 10px;
+.initiative-roller {
+  &__container {
+    form {
+      margin: 10px 0;
+    }
+
+    .centered {
+      text-align: center;
+    }
+  }
+
+  &__header {
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    margin: 10px;
+  }
+
+  &__info-button {
+    border: none;
+    background-color: transparent;
+    float: right;
+  }
 }
 
-td {
-  padding: 5px;
+.tooltip-inner {
+  max-width: 400px;
+  pre {
+    margin: 0;
+    font-size: 13px;
+    font: var(--bs-font-sans-serif)
+  }
 }
 
-.initiative-order-container {
-  margin: 25px;
-}
-
-.initiative-order-table-wrapper {
-  margin: 0 auto;
-}
-
-.initiative-order-modify-button {
-  color: blue !important;
-}
-
-.initiative-order-modify-button:hover {
-  color: red !important;
-  cursor: pointer;
-}
-
-.initiative-order-disclaimer-row {
-  margin-top: 15px;
-}
-
-.initiative-order-disclaimer {
-  font-size: 11px;
-  font-weight: lighter;
-}
-
-.initiative-order-initiative-wrapper {
-  margin-top: 25px;
-  border: 1px solid black;
-  padding: 10px;
-  width: 300px;
-}
-
-.initiative-order-initiative-header {
-  text-align: center;
-}
-
-.initiative-order-initiative-input {
-  width: 50px !important;
-}
-
-.initiative-order-initiative-modifier {
-  width: 50px !important;
-}
-
-.row {
-  place-content: center;
-}

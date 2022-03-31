@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import {
-    getActiveGameData, 
     getActiveGameId,
+    getAllGamePlayers,
     getCurrentUID,
-    getCurrentUser,
+    getCurrentUser, getCurrentUserIsDm,
+    getGamePlayerData,
     getIsSmallView,
     getProfilePicture
 } from '../../store/store'
@@ -17,33 +18,31 @@ const DndNavbar = () => {
     const router = useRouter()
 
     const userData = useSelector(getCurrentUser)
-    const UID = useSelector(getCurrentUID)
-    const activeGameData = useSelector(getActiveGameData)
+    // const uid = useSelector(getCurrentUID)
     const activeGameId = useSelector(getActiveGameId)
     const profilePicture = useSelector(getProfilePicture)
     const isSmallView = useSelector(getIsSmallView)
+    const gamePlayers = useSelector(getAllGamePlayers)
+    const isDM = useSelector(getCurrentUserIsDm)
 
-    const [players, setPlayers] = useState([])
+    const [totalPlayers, setTotalPlayers] = useState(0)
     const [navbarExpanded, setNavbarExpanded] = useState(false)
 
-    const isDM = activeGameData.players && activeGameData.players[UID]?.gameMaster || false
+    useEffect(() => {
+        if (activeGameId) {
+            setTotalPlayers(Object.keys(gamePlayers)?.length)
+        }
+    }, [gamePlayers])
 
     const handleProfileClick = async () => {
         setNavbarExpanded(false)
         await router.push('/account/profile')
     }
 
-    useEffect(() => {
-        if (activeGameId && activeGameData.players && Object.keys(activeGameData.players).length > 0) {
-            Object.keys(activeGameData.players).forEach(player => {
-                const name = activeGameData.players[player].characterName
-                const isDM = activeGameData.players[player].gameMaster
-                if (players.findIndex(item => item.characterName ===[player][name]) === -1 && !isDM) {
-                    setPlayers([...player, name])
-                }
-            })
-        }
-    }, [])
+    const handleHomeButton = async () => {
+        setNavbarExpanded(false)
+        await router.push('/')
+    }
 
     const signInButton = () => {
         if (userData?.email && userData?.uid && userData?.fullName) {
@@ -72,38 +71,34 @@ const DndNavbar = () => {
                     }
                 </div>
             )
-        } else {
-            return (
-                <Button variant="outline-dark"
-                    className="navbar__sign-in-button"
-                    onClick={ async () => {
-                        setNavbarExpanded(false)
-                        await router.push('/account/sign-in')
-                    } }
-                >
-                    { AUTHENTICATION.signIn }
-                </Button>
-            )
         }
+
+        return (
+            <Button variant="outline-dark"
+                className="navbar__sign-in-button"
+                onClick={ async () => {
+                    setNavbarExpanded(false)
+                    await router.push('/account/sign-in')
+                } }
+            >
+                { AUTHENTICATION.signIn }
+            </Button>
+        )
     }
 
     return (
         <Navbar bg="light" expand="lg" fixed="top" expanded={ navbarExpanded } onToggle={ () => setNavbarExpanded(!navbarExpanded) }>
-            <a
-                href="#"
-                onClick={ async (e) => {
-                    e.preventDefault()
-                    setNavbarExpanded(false)
-                    await router.push('/')
-                } }
+            <button
+                className="navbar__icon"
+                onClick={ async () => await handleHomeButton() }
             >
                 <img
                     alt="dnd-logo"
-                    className="navbar__icon"
+                    className="navbar__icon__img"
                     src="/media/d20.png"
                     draggable={ false }
                 />
-            </a>
+            </button>
             { isSmallView && signInButton() }
             <>
                 <div style={{ marginLeft: '12px' }}>
@@ -111,30 +106,27 @@ const DndNavbar = () => {
                 </div>
                 <Navbar.Collapse>
                     <Nav>
-                        <div>
-                            { activeGameId && (players.length > 0 || isDM) &&
-                                <a
-                                    href="#"
-                                    className="nav-link"
-                                    onClick={ async () => {
-                                        setNavbarExpanded(false)
-                                        await router.push('/initiative-order')
-                                    } }
-                                >
+                        <>
+                            { activeGameId && (totalPlayers > 0 || isDM) &&
+                                <Link href="/initiative-order">
+                                    <a
+                                        href="#"
+                                        className="nav-link"
+                                        onClick={ () => setNavbarExpanded(false) }
+                                    >
                                     Initiative Order
-                                </a> }
+                                    </a>
+                                </Link> }
                             <Link href="/dice-roller">
                                 <a
                                     href="#"
                                     className="nav-link"
-                                    onClick={ () => {
-                                        setNavbarExpanded(false)
-                                    } }
+                                    onClick={ () => setNavbarExpanded(false) }
                                 >
                                     Dice Roller
                                 </a>
                             </Link>
-                        </div>
+                        </>
                     </Nav>
                 </Navbar.Collapse>
             </>

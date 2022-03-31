@@ -214,9 +214,17 @@ export const getDiceValues = state => state.diceValues ?? DEFAULT_DICE_VALUES
 export const getActiveGameId = state => getCurrentUser(state).activeGameId ?? null
 export const getCurrentUID = state => getCurrentUser(state).uid ?? null
 export const getCurrentFullName = state => getCurrentUser(state).fullName ?? ''
-export const getGamePlayerData = (state, uid) => getActiveGameData(state).players[uid] ?? undefined
+export const getGamePlayerData = (state, uid) => getActiveGameData(state).players[uid] ?? null
 export const getHasLoadedTemplate = state => getUi(state).hasLoadedTemplate ?? false
 export const getCurrentEmail = state => getCurrentUser(state).email ?? ''
+export const getCurrentUserIsAdmin = state => getCurrentUser(state).admin ?? false
+export const getCurrentUserIsDm = state => {
+    const uid = getCurrentUID(state)
+    if (uid && Object.keys(getAllGamePlayers(state)).length) {
+        return getGamePlayerData(state, uid).gameMaster
+    }
+    return false
+}
 
 // Redux Functions
 const updateRemovedErrors = (state) => {
