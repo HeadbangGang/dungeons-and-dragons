@@ -107,8 +107,8 @@ const AddToGame =  () => {
     return (
         <div className="add-to-game">
             <div className="add-to-game__inputs__container">
-                <div className="add-to-game__inputs__wrapper">
-                    <div className="add-to-game__inputs__label">
+                <div className="styled-input__wrapper">
+                    <div className="styled-input__label">
                         { AUTHENTICATION.gameId }
                     </div>
                     <input
@@ -116,8 +116,8 @@ const AddToGame =  () => {
                         onChange={ setGameIdHandler }
                     />
                 </div>
-                <div className="add-to-game__inputs__wrapper">
-                    <div className="add-to-game__inputs__label">
+                <div className="styled-input__wrapper">
+                    <div className="styled-input__label">
                         { AUTHENTICATION.characterName }
                     </div>
                     <input

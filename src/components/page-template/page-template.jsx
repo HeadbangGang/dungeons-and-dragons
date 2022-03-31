@@ -23,7 +23,7 @@ const PageTemplate = ({ children }) => {
     const userData = useSelector(getCurrentUser)
     const hasLoadedTemplate = useSelector(getHasLoadedTemplate)
 
-    const isSmallView = useMediaQuery({ query: '(max-width: 1224px)' })
+    const isSmallView = useMediaQuery({ query: '(max-width: 900px)' })
 
     useEffect(() => {
         if (!hasLoadedTemplate) {

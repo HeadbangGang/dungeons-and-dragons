@@ -1,39 +1,15 @@
 .add-to-game {
   border: 1px solid black;
+  margin: 15px;
   max-width: 600px;
   padding: 10px;
-  margin: 15px;
+  width: 100%;
 
   &__inputs {
     &__container {
       display: flex;
       flex-direction: column;
       margin: 10px;
-    }
-
-    &__label {
-      align-items: center;
-      background-color: #e9ecef;
-      border-radius: 10px 0 0 10px;
-      border: 1px solid #ced4da;
-      display: flex;
-      font-weight: 500;
-      min-width: 150px;
-      padding: 0.375rem 0.75rem;
-      text-align: center;
-    }
-
-    &__wrapper {
-      display: flex;
-      margin: 5px 0;
-
-      input {
-        border-radius: 0 10px 10px 0;
-        border: 1px solid #ced4da;
-        display: block;
-        padding: 4px 10px;
-        width: 100%;
-      }
     }
   }
 
