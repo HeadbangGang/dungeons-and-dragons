@@ -1,3 +1,4 @@
+import 'regenerator-runtime/runtime'
 import React from 'react'
 import { Head, Html, Main, NextScript } from 'next/document'
 

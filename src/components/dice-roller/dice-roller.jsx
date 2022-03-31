@@ -156,6 +156,7 @@ const DiceRoller = () => {
                             { Object.keys(diceValues).map((value, index) => (
                                 <td key={ index } style={{ verticalAlign: 'top' }}>
                                     { diceValues[value].map((die, idx) => (
+                                        // eslint-disable-next-line no-nested-ternary
                                         <div key={ idx } style={ die === 20 ? { color: 'green', fontWeight: '600' } : die === 1 ? { color: 'red', fontWeight: '600' } : { color: 'blue' } }>
                                             <em>{ die }</em>
                                             { idx + 1 !== diceValues[value].length && <hr style={{ margin: '0', color: 'black' }} /> }

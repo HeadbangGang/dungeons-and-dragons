@@ -6,7 +6,7 @@ import {
     getCurrentUser,
     getHasLoadedTemplate,
     setActiveGameData,
-    setError,
+    setErrors,
     setHasLoadedTemplate,
     setIsSmallView,
     setUserAccount
@@ -49,7 +49,7 @@ const PageTemplate = ({ children }) => {
                     const playersList = querySnapshot.docs.map(docSnapshot => docSnapshot.data())
                     dispatch(setActiveGameData({ players: { ...playersList[0] } }))
                 },
-                error: () => dispatch(setError('Error while updating new data.'))
+                error: () => dispatch(setErrors('Error while updating new data.'))
             })
             return unsubscribe
         }

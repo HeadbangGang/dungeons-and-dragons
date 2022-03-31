@@ -3,9 +3,7 @@ import { useRouter } from 'next/router'
 import {
     getActiveGameId,
     getAllGamePlayers,
-    getCurrentUID,
     getCurrentUser, getCurrentUserIsDm,
-    getGamePlayerData,
     getIsSmallView,
     getProfilePicture
 } from '../../store/store'
