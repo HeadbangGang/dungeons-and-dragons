@@ -53,7 +53,7 @@ const DndHome = () => {
                                         <a className="stretched-link" href="#" onClick={ () => {
                                             dispatch(updateActiveGameID(gameId))
                                         } }
-                                        ></a>
+                                        >{ '' }</a>
                                     </Card>
                                 </div>
                             )
