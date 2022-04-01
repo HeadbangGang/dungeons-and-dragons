@@ -35,7 +35,7 @@
     "stylelint-scss": "^4.1.0"
   },
   "scripts": {
-    "build": "next build",
+    "build": "rimraf dist & rimraf .next && next build && next export -o dist",
     "clean": "rimraf node_modules",
     "lint:css": "npx stylelint --fix **/*.scss --color",
     "lint:js": "next lint --fix",
