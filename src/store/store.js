@@ -190,13 +190,13 @@ export const resetInitiative = (group) => async (dispatch, getState) => {
 export const RESET_INITIATIVE = 'resetInitiative'
 
 export const removeNPC = (npc) => async (dispatch, getState) => {
-    const removedNPC = removeCurrentNPC(npc, getState())
+    const removedNPC = await removeCurrentNPC(npc, getState())
     dispatch({ type: REMOVE_NPC, removedNPC })
 }
 export const REMOVE_NPC = 'removeNPC'
 
 export const updateActiveGameID = (id) => async (dispatch, getState) => {
-    const updatedActiveGameId = updateCurrentActiveGameID(id, getState())
+    const updatedActiveGameId = await updateCurrentActiveGameID(id, getState())
     dispatch({ type: UPDATE_ACTIVE_GAME_ID, updatedActiveGameId })
 }
 export const UPDATE_ACTIVE_GAME_ID = 'updateActiveGameID'
@@ -352,7 +352,7 @@ const updateCurrentActiveGameID = async (gameId, state) => {
         activeGameId: gameId
     }
     await updateDBUserAccount(uid, currentState)
-    return currentState
+    return gameId
 }
 
 const updateCurrentDiceValues = (die, values, state) => {

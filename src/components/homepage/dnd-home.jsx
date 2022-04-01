@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/anchor-has-content */
 import React from 'react'
 import { Card, Col, Container, Row } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
@@ -50,8 +49,8 @@ const DndHome = () => {
                                                 { `ID: ${ gameId }` }
                                             </Card.Subtitle>
                                         </Card.Body>
-                                        <a className="stretched-link" href="#" onClick={ () => {
-                                            dispatch(updateActiveGameID(gameId))
+                                        <a className="stretched-link" href="#" onClick={ async () => {
+                                            await dispatch(updateActiveGameID(gameId))
                                         } }
                                         >{ '' }</a>
                                     </Card>
