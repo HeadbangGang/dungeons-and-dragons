@@ -1,5 +1,5 @@
 .navbar {
-  padding: 8px;
+padding: 8px;
 
   &__icon {
     background: transparent;
@@ -17,24 +17,42 @@
     }
   }
 
-  &__user {
-    &-icon {
-      border-radius: 8px;
-      height: 35px;
-      margin: 4px;
-      width: 35px;
-    }
+  &__account-button {
+    border: none;
+    background-color: transparent;
+    color: black;
+    margin-left: auto;
+    display: flex;
+    place-self: center;
 
-    &-wrapper {
-      border-radius: 50px;
-      border: 1px solid black;
-      height: 45px;
-      margin-left: auto;
-      width: 45px;
+    & > span {
+      font-size: 43px;
     }
   }
 
-  &__sign-in-button {
-    margin: 0 10px 0 auto;
+  &__buttons {
+    display: flex;
+    width: 100%;
+
+    &.small {
+      flex-direction: column;
+    }
+
+    &.large {
+      & > button:last-of-type {
+        margin-left: auto;
+      }
+    }
+
+    & > .btn-link {
+      text-decoration: none;
+      color: black;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+
   }
 }

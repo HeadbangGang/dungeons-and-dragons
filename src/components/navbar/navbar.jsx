@@ -3,22 +3,19 @@ import { useRouter } from 'next/router'
 import {
     getActiveGameId,
     getAllGamePlayers,
-    getCurrentUser, getCurrentUserIsDm,
-    getIsSmallView,
-    getProfilePicture
+    getCurrentUser,
+    getCurrentUserIsDm,
+    getIsSmallView
 } from '../../store/store'
 import { useSelector } from 'react-redux'
-import { Button, Nav, Navbar } from 'react-bootstrap'
+import { Button, Navbar } from 'react-bootstrap'
 import { AUTHENTICATION } from '../../helpers/language-map'
-import Link from 'next/link'
 
 const DndNavbar = () => {
     const router = useRouter()
 
     const userData = useSelector(getCurrentUser)
-    // const uid = useSelector(getCurrentUID)
     const activeGameId = useSelector(getActiveGameId)
-    const profilePicture = useSelector(getProfilePicture)
     const isSmallView = useSelector(getIsSmallView)
     const gamePlayers = useSelector(getAllGamePlayers)
     const isDM = useSelector(getCurrentUserIsDm)
@@ -33,53 +30,55 @@ const DndNavbar = () => {
     }, [gamePlayers])
 
     const handleProfileClick = async () => {
-        setNavbarExpanded(false)
         await router.push('/account/profile')
     }
 
+    const handleSignInClick = async () => {
+        await router.push('/account/sign-in')
+    }
+
     const handleHomeButton = async () => {
-        setNavbarExpanded(false)
         await router.push('/')
     }
 
-    const signInButton = () => {
+    const handleInitiativeOrder = async () => {
+        await router.push('/initiative-order')
+    }
+
+    const handleDiceRoller = async () => {
+        await router.push('/dice-roller')
+    }
+
+    const renderAccountButton = () => {
         if (userData?.email && userData?.uid && userData?.fullName) {
+            if (isSmallView) {
+                return (
+                    <Button
+                        onClick={ async () => await handleProfileClick() }
+                        variant="dark"
+                    >
+                        Account
+                    </Button>
+                )
+            }
+
             return (
-                <div className="navbar__user-wrapper">
-                    { profilePicture
-                        ? <input
-                            alt=""
-                            className="navbar__user-icon"
-                            onClick={ async () => await handleProfileClick() }
-                            src={ profilePicture || '/media/d20.png' }
-                            type="image"
-                        />
-                        :<a
-                            href="#"
-                            onClick={ async () => await handleProfileClick() }
-                            style={{ color: 'black' }}
-                        >
-                            <span
-                                className="material-icons"
-                                style={{ fontSize: '43px' }}
-                            >
-                                account_circle
-                            </span>
-                        </a>
-                    }
-                </div>
+                <button
+                    className="navbar__account-button"
+                    onClick={ async () => await handleProfileClick() }
+                    title="Account"
+                >
+                    <span className="material-icons">account_circle</span>
+                </button>
             )
         }
 
         return (
-            <Button variant="outline-dark"
-                className="navbar__sign-in-button"
-                onClick={ async () => {
-                    setNavbarExpanded(false)
-                    await router.push('/account/sign-in')
-                } }
+            <Button
+                onClick={ async () => await handleSignInClick() }
+                variant="dark"
             >
-                { AUTHENTICATION.signIn }
+                { AUTHENTICATION.signIn } / Sign Up
             </Button>
         )
     }
@@ -97,38 +96,26 @@ const DndNavbar = () => {
                     draggable={ false }
                 />
             </button>
-            { isSmallView && signInButton() }
-            <>
-                <div style={{ marginLeft: '12px' }}>
-                    <Navbar.Toggle />
+            <Navbar.Toggle />
+            <Navbar.Collapse>
+                <div className={ `navbar__buttons ${isSmallView ? 'small' : 'large'}` }>
+                    { activeGameId && (totalPlayers > 0 || isDM) &&
+                        <Button
+                            onClick={ async () => await handleInitiativeOrder() }
+                            variant="link"
+                        >
+                            Initiative Order
+                        </Button>
+                    }
+                    <Button
+                        onClick={ async () => await handleDiceRoller() }
+                        variant="link"
+                    >
+                        Dice Roller
+                    </Button>
+                    { renderAccountButton() }
                 </div>
-                <Navbar.Collapse>
-                    <Nav>
-                        <>
-                            { activeGameId && (totalPlayers > 0 || isDM) &&
-                                <Link href="/initiative-order">
-                                    <a
-                                        href="#"
-                                        className="nav-link"
-                                        onClick={ () => setNavbarExpanded(false) }
-                                    >
-                                    Initiative Order
-                                    </a>
-                                </Link> }
-                            <Link href="/dice-roller">
-                                <a
-                                    href="#"
-                                    className="nav-link"
-                                    onClick={ () => setNavbarExpanded(false) }
-                                >
-                                    Dice Roller
-                                </a>
-                            </Link>
-                        </>
-                    </Nav>
-                </Navbar.Collapse>
-            </>
-            { !isSmallView && signInButton() }
+            </Navbar.Collapse>
         </Navbar>
     )
 }
