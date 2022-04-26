@@ -5,6 +5,7 @@ import { getErrors, removeErrors } from '../../store/store'
 import { Toast, ToastContainer } from 'react-bootstrap'
 import { connect } from 'react-redux'
 import { MAX_ERROR_QUANTITY } from '../../helpers/constants'
+import './alerts.scss'
 
 class Alerts extends PureComponent {
 

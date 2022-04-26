@@ -15,8 +15,10 @@ import { auth, getUserDocument, streamGameData } from '../../database/firebase'
 import Navbar from '../navbar/navbar'
 import Footer from '../footer/footer'
 import Alerts from '../alerts/alerts'
+import { Outlet } from 'react-router'
+import './page-template.scss'
 
-const PageTemplate = ({ children }) => {
+const PageTemplate = () => {
     const dispatch = useDispatch()
 
     const activeGameId = useSelector(getActiveGameId)
@@ -61,7 +63,7 @@ const PageTemplate = ({ children }) => {
                 <Alerts />
                 <Navbar />
                 <div className="dnd-main-content">
-                    { children }
+                    <Outlet />
                 </div>
                 <Footer />
             </div>

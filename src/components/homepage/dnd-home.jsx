@@ -3,6 +3,7 @@ import { Card, Col, Container, Row } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
 import { getAllUserGames, getCurrentUser, updateActiveGameID } from '../../store/store'
 import { GENERAL } from '../../helpers/language-map'
+import './dnd-home.scss'
 
 const DndHome = () => {
     const dispatch = useDispatch()
@@ -19,7 +20,7 @@ const DndHome = () => {
                             alt="d20"
                             className="dnd-home-img"
                             draggable={ false }
-                            src="/media/d20-vector-good.png"
+                            src="/assets/media/d20-vector-good.png"
                         />
                     </div>
                 </Row>

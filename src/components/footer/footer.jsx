@@ -1,12 +1,13 @@
 import React, { useRef, useState } from 'react'
-import { useRouter } from 'next/router'
 import { useSelector } from 'react-redux'
 import { Navbar, Overlay, Tooltip } from 'react-bootstrap'
 import { GENERAL } from '../../helpers/language-map'
 import { getActiveGameId } from '../../store/store'
+import { useNavigate } from 'react-router'
+import './footer.scss'
 
 const DndFooter = () => {
-    const router = useRouter()
+    const navigate = useNavigate()
 
     const triggerRef = useRef(null)
 
@@ -21,10 +22,10 @@ const DndFooter = () => {
         <Navbar bg="dark" fixed="bottom" className="footer">
             <a
                 href="#"
-                onClick={ async () => await router.push('/') }
+                onClick={ async () => await navigate('/') }
             >
                 <img
-                    src="/media/d20.png"
+                    src="/assets/media/d20.png"
                     width="30"
                     height="30"
                     alt=""

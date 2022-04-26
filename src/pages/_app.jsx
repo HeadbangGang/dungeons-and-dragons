@@ -4,7 +4,7 @@ import { Provider } from 'react-redux'
 import store from '../store/store'
 import Head from 'next/head'
 
-import '../components/styles.scss'
+import '../common.scss'
 
 export default class App extends React.PureComponent {
     render () {

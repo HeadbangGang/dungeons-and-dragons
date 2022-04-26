@@ -1,14 +1,15 @@
 import React, { useState } from 'react'
-import { useRouter } from 'next/router'
 import { useDispatch, useSelector } from 'react-redux'
 import { setErrors } from '../../../store/store'
 import { db } from '../../../database/firebase'
 import { Button } from 'react-bootstrap'
 import { AUTHENTICATION, ERRORS } from '../../../helpers/language-map'
 import { getCurrentUser, updateActiveGameData, updateUserAccount } from '../../../store/store'
+import { useNavigate } from 'react-router'
+import './add-to-game.scss'
 
 const AddToGame =  () => {
-    const router = useRouter()
+    const navigate = useNavigate()
     const dispatch = useDispatch()
 
     const userData = useSelector(getCurrentUser)
@@ -54,7 +55,7 @@ const AddToGame =  () => {
         const { games } = userData
         await dispatch(updateUserAccount(gameId, characterName, games))
             .then(dispatch(updateActiveGameData(gameId, characterName, false, undefined, isNewGame, isDM)))
-            .then(router.push('/'))
+            .then(navigate('/'))
     }
 
     const joinExistingGame = async (isNewGame) => {
@@ -74,7 +75,7 @@ const AddToGame =  () => {
         if (!userAlreadyPlayer) {
             await dispatch(updateUserAccount(gameId, characterName, games))
                 .then(dispatch(updateActiveGameData(gameId, characterName, false, undefined, isNewGame, isDM)))
-                .then(router.push('/'))
+                .then(navigate('/'))
         } else {
             if (playerAlreadyExists) {
                 dispatch(setErrors(ERRORS.playerExists))
