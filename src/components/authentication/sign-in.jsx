@@ -1,103 +1,22 @@
-import React, { PureComponent } from 'react'
-import PropTypes from 'prop-types'
-import { withRouter } from 'next/router'
+import React, { useState } from 'react'
 import { Button, Form } from 'react-bootstrap'
 import { setErrors, setUserAccount } from '../../store/store'
 import { auth, getUserDocument } from '../../database/firebase'
 import { AUTHENTICATION, ERRORS } from '../../helpers/language-map'
-import Link from 'next/link'
-import { connect } from 'react-redux'
+import { Link } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router'
+import './authentication.scss'
 
-class SignIn extends PureComponent {
-    static propTypes = {
-        router: PropTypes.object,
-        setErrors: PropTypes.func
-    }
+const SignIn  = () => {
+    const navigate = useNavigate()
+    const dispatch = useDispatch()
 
-    state = {
-        email: '',
-        password: ''
-    }
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
 
-    render(){
-        const { router } = this.props
-        return (
-            <div className="authentication__page-container">
-                <div className="authentication__box">
-                    <div className="authentication__header">
-                        { AUTHENTICATION.signIn }
-                    </div>
-                    <Form
-                        className="authentication__form-container"
-                        onSubmit={ this.signInToAccountHandler }
-                    >
-                        <Form.Group className="authentication__group-wrapper">
-                            <Form.Label>
-                                { AUTHENTICATION.email }
-                            </Form.Label>
-                            <Form.Control
-                                autoComplete="email"
-                                data-lpignore="true"
-                                onChange={ (e) => this.setState({
-                                    email: e.target.value
-                                }) }
-                                placeholder="example@gmail.com"
-                                type="email"
-                            />
-                        </Form.Group>
-                        <Form.Group className="authentication__group-wrapper">
-                            <Form.Label>
-                                { AUTHENTICATION.password }
-                            </Form.Label>
-                            <Form.Control
-                                autoComplete="current-password"
-                                data-lpignore="true"
-                                onChange={ (e) => {
-                                    this.setState({
-                                        password: e.target.value
-                                    })
-                                } }
-                                placeholder="Password"
-                                type="password"
-                            />
-                            <Link href="/account/password-reset" >
-                                { AUTHENTICATION.forgotPassword }
-                            </Link>
-                        </Form.Group>
-                        <div className="authentication__submit">
-                            <Button
-                                onClick={ async () => {
-                                    await this.signInToAccountHandler()
-                                } }
-                                type="submit"
-                                variant="outline-dark"
-                            >
-                                { AUTHENTICATION.signIn }
-                            </Button>
-                        </div>
-                    </Form>
-                    <div className="authentication__alt-option__container">
-                        <span className="authentication__or">or</span>
-                        <div className="authentication__alt-option">
-                            <Button
-                                onClick={ async () => {
-                                    await router.push('/account/create-account')
-                                } }
-                                variant="dark"
-                            >
-                                { AUTHENTICATION.createAnAccount }
-                            </Button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        )
-    }
-
-    signInToAccountHandler = async () => {
+    const signInToAccountHandler = async () => {
         event.preventDefault()
-        const { email, password } = this.state
-        const { router, setErrors } = this.props
         if (email && password) {
             await auth.signInWithEmailAndPassword(email, password)
                 .then(async (res) => {
@@ -107,30 +26,92 @@ class SignIn extends PureComponent {
                             const { games, activeGameId } = userData
                             setUserAccount(userData)
                             Object.keys(games).length > 0 || activeGameId
-                                ? await router.replace('/')
-                                : await router.replace('/account/profile')
+                                ? await navigate('/', { replace: true })
+                                : await navigate('/account/profile', { replace: true })
                         })
                 })
                 .catch((err) => {
                     switch(err.code) {
-                    case('auth/user-not-found'): 
-                        setErrors(ERRORS.noUserFound)
+                    case('auth/user-not-found'):
+                        dispatch(setErrors(ERRORS.noUserFound))
                         break
                     case('auth/wrong-password'):
-                        setErrors(ERRORS.wrongPassword)
+                        dispatch(setErrors(ERRORS.wrongPassword))
                         break
                     default:
-                        setErrors(ERRORS.signingIn)
+                        dispatch(setErrors(ERRORS.signingIn))
                     }
                 })
         } else {
             if (!email) {
-                setErrors(ERRORS.enterEmail)
+                dispatch(setErrors(ERRORS.enterEmail))
             } else if (!password) {
-                setErrors(ERRORS.enterPassword)
+                dispatch(setErrors(ERRORS.enterPassword))
             }
         }
     }
+
+    return (
+        <div className="authentication__page-container">
+            <div className="authentication__box">
+                <div className="authentication__header">
+                    { AUTHENTICATION.signIn }
+                </div>
+                <Form
+                    className="authentication__form-container"
+                    onSubmit={ async () => await signInToAccountHandler() }
+                >
+                    <Form.Group className="authentication__group-wrapper">
+                        <Form.Label>
+                            { AUTHENTICATION.email }
+                        </Form.Label>
+                        <Form.Control
+                            autoComplete="email"
+                            data-lpignore="true"
+                            onChange={ ({ target }) => setEmail(target.value) }
+                            placeholder="example@gmail.com"
+                            type="email"
+                        />
+                    </Form.Group>
+                    <Form.Group className="authentication__group-wrapper">
+                        <Form.Label>
+                            { AUTHENTICATION.password }
+                        </Form.Label>
+                        <Form.Control
+                            autoComplete="current-password"
+                            data-lpignore="true"
+                            onChange={ ({ target }) => setPassword(target.value) }
+                            placeholder="Password"
+                            type="password"
+                        />
+                        <Link to="/account/password-reset">
+                            { AUTHENTICATION.forgotPassword }
+                        </Link>
+                    </Form.Group>
+                    <div className="authentication__submit">
+                        <Button
+                            onClick={ async () => await signInToAccountHandler() }
+                            type="submit"
+                            variant="outline-dark"
+                        >
+                            { AUTHENTICATION.signIn }
+                        </Button>
+                    </div>
+                </Form>
+                <div className="authentication__alt-option__container">
+                    <span className="authentication__or">or</span>
+                    <div className="authentication__alt-option">
+                        <Button
+                            onClick={ () => navigate('/account/create-account', { replace: true }) }
+                            variant="dark"
+                        >
+                            { AUTHENTICATION.createAnAccount }
+                        </Button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    )
 }
 
-export default connect(null, { setErrors })(withRouter(SignIn))
+export default SignIn

@@ -1,9 +1,8 @@
-import React, { Component, createRef } from 'react'
-import PropTypes from 'prop-types'
-import { connect } from 'react-redux'
+import React, { createRef, useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router'
 import { auth, db, storage } from '../../../database/firebase'
 import { Button } from 'react-bootstrap'
-import { withRouter } from 'next/router'
 import { AUTHENTICATION, ERRORS } from '../../../helpers/language-map'
 import AddToGame from './add-to-game'
 import {
@@ -15,151 +14,119 @@ import {
     setUserAccount,
     updatePhotoUrl
 } from '../../../store/store'
+import './profile.scss'
 
-class ProfilePage extends Component {
-    static propTypes = {
-        email: PropTypes.string,
-        fullName: PropTypes.string,
-        profilePicture: PropTypes.string,
-        router: PropTypes.object,
-        setErrors: PropTypes.func,
-        setUserAccount: PropTypes.func,
-        uid: PropTypes.string,
-        updatePhotoUrl: PropTypes.func
-    }
+const ProfilePage = () => {
+    const navigate = useNavigate()
+    const dispatch = useDispatch()
+    const inputFile = createRef()
 
-    state = {
-        profilePictureBlob: '',
-        profilePicturePath: ''
-    }
+    const [profilePictureBlob, setProfilePictureBlob] = useState(null)
+    const [profilePicturePath, setProfilePicturePath] = useState('')
 
-    async componentDidUpdate(prevProps, prevState) {
-        if (prevState !== this.state){
-            if (this.state.profilePictureBlob && this.state.profilePicturePath) {
-                await this.updateDBProfilePicture()
-            } else if (this.state.profilePictureBlob) {
-                await this.changeProfilePicture()
-            }
+    const email = useSelector(getCurrentEmail)
+    const fullName = useSelector(getCurrentFullName)
+    const uid = useSelector(getCurrentUID)
+    const profilePicture = useSelector(getProfilePicture)
+
+    useEffect(async () => {
+        if (profilePictureBlob && profilePicturePath) {
+            await updateDBProfilePicture()
+        } else if (profilePictureBlob) {
+            await changeProfilePicture()
         }
-    }
+    }, [profilePicturePath, profilePictureBlob])
 
-    render() {
-        return (
-            <div className="profile__user-data-wrapper">
-                { this.props.email && this.props.fullName
-                    ?   <>
-                        <div>
-                            <img className="profile__img__edit" src="/media/edit.png" alt="" />
-                            <div className="profile__img__border">
-                                <input
-                                    alt="profile-img"
-                                    className="profile__page__img"
-                                    onClick={ () => this.inputFile.current.click() }
-                                    src={ this.props.profilePicture || '/media/d20.png' }
-                                    type="image"
-                                />
-                                <input
-                                    accept="image/png, image/jpeg"
-                                    type="file"
-                                    id="file"
-                                    onChange={ () => this.fileValidation(this.inputFile.current.files[0]) }
-                                    ref={ this.inputFile }
-                                    style={{ display: 'none' }}
-                                />
-                            </div>
-                        </div>
-                        <div style={{ margin: '25px', textAlign: 'center' }}>
-                            <h2>{ this.props.fullName }</h2>
-                            <h3>{ this.props.email }</h3>
-                            <Button
-                                onClick={ async () => await this.signOut() }
-                                variant="danger"
-                            >
-                                { AUTHENTICATION.signOut }
-                            </Button>
-                        </div>
-                        <AddToGame />
-                    </>
-                    : <div>
-                        <img src="/media/spinner.webp" alt="loading" className="profile__page__spinner" />
-                    </div>
-                }
-            </div>
-        )
-    }
-
-    inputFile = createRef()
-
-    changeProfilePicture = async () => {
-        const { profilePictureBlob } = this.state
-        const { uid, setErrors } = this.props
+    const changeProfilePicture = async () => {
         const storageRef = storage.ref(`${ uid }/profilePicture/image`)
         await storageRef.put(profilePictureBlob)
             .then(async () => {
                 await storageRef.getDownloadURL()
-                    .then((url) => {
-                        this.setState({
-                            profilePicturePath: url
-                        })
-                    })
+                    .then((url) => setProfilePicturePath(url))
             })
             .catch(() => {
-                setErrors(ERRORS.generic)
+                dispatch(setErrors(ERRORS.generic))
             })
     }
 
-    updateDBProfilePicture = async () => {
-        const { uid, setErrors, updatePhotoUrl } = this.props
-        const { profilePicturePath } = this.state
+    const updateDBProfilePicture = async () => {
         const userAccount = db.collection('users').doc(uid)
         await userAccount.update({ photoURL: profilePicturePath })
             .then (() => {
-                updatePhotoUrl(profilePicturePath)
-                this.setState({
-                    profilePicturePath: '',
-                    profilePictureBlob: ''
-                })
+                dispatch(updatePhotoUrl(profilePicturePath))
+                setProfilePictureBlob('')
+                setProfilePicturePath('')
             })
             .catch((err) => {
-                setErrors(err.message)
+                dispatch(setErrors(err.message))
             })
     }
 
-    fileValidation = (fileBlob) => {
-        const { setErrors } = this.props
+    const fileValidation = (fileBlob) => {
         const fsize = fileBlob.size
         const fileSize = Math.round((fsize / 1024))
         if (fileSize >= 10240) {
-            setErrors('File too Big, please select a file less than 10MB')
+            dispatch(setErrors('The selected image is too big, please select a file less than 10MB'))
         } else {
-            this.setState({
-                profilePictureBlob: fileBlob
-            })
+            setProfilePictureBlob(fileBlob)
         }
     }
 
-    signOut = async () => {
-        const { router, setUserAccount, setErrors } = this.props
+    const signOut = async () => {
         await auth.signOut()
             .then(() => {
-                setUserAccount({})
+                dispatch(setUserAccount({}))
             })
-            .then(async () => {
-                await router.replace('/')
+            .then(() => {
+                navigate('/', { replace: true })
             })
             .catch((err) => {
-                setErrors(err)
+                dispatch(setErrors(err))
             })
     }
+
+    return (
+        <div className="profile__user-data-wrapper">
+            { email && fullName
+                ?   <>
+                    <div>
+                        <img className="profile__img__edit" src="/assets/media/edit.png" alt="" />
+                        <div className="profile__img__border">
+                            <input
+                                alt="profile-img"
+                                className="profile__page__img"
+                                onClick={ () => inputFile.current.click() }
+                                src={ profilePicture || '/assets/media/d20.png' }
+                                type="image"
+                            />
+                            <input
+                                accept="image/png, image/jpeg"
+                                type="file"
+                                id="file"
+                                onChange={ () => fileValidation(inputFile.current.files[0]) }
+                                ref={ inputFile }
+                                style={{ display: 'none' }}
+                            />
+                        </div>
+                    </div>
+                    <div style={{ margin: '25px', textAlign: 'center' }}>
+                        <h2>{ fullName }</h2>
+                        <h3>{ email }</h3>
+                        <Button
+                            onClick={ async () => await signOut() }
+                            variant="danger"
+                        >
+                            { AUTHENTICATION.signOut }
+                        </Button>
+                    </div>
+                    <AddToGame />
+                </>
+                : <div>
+                    <img src="/assets/media/spinner.webp" alt="loading" className="profile__page__spinner" />
+                </div>
+            }
+        </div>
+    )
 }
 
-const mapStateToProps = (state) => {
-    return {
-        email: getCurrentEmail(state),
-        fullName: getCurrentFullName(state),
-        profilePicture: getProfilePicture(state),
-        uid: getCurrentUID(state)
-    }
-}
-
-export default connect(mapStateToProps, { setErrors, setUserAccount, updatePhotoUrl })(withRouter(ProfilePage))
+export default ProfilePage

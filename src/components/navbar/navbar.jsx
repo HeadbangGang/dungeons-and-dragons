@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
 import {
     getActiveGameId,
     getAllGamePlayers,
@@ -10,9 +9,11 @@ import {
 import { useSelector } from 'react-redux'
 import { Button, Navbar } from 'react-bootstrap'
 import { AUTHENTICATION } from '../../helpers/language-map'
+import { useNavigate } from 'react-router'
+import './navbar.scss'
 
 const DndNavbar = () => {
-    const router = useRouter()
+    const navigate = useNavigate()
 
     const userData = useSelector(getCurrentUser)
     const activeGameId = useSelector(getActiveGameId)
@@ -29,24 +30,24 @@ const DndNavbar = () => {
         }
     }, [gamePlayers])
 
-    const handleProfileClick = async () => {
-        await router.push('/account/profile')
+    const handleProfileClick = () => {
+        navigate('account/profile')
     }
 
-    const handleSignInClick = async () => {
-        await router.push('/account/sign-in')
+    const handleSignInClick = () => {
+        navigate('account/sign-in')
     }
 
-    const handleHomeButton = async () => {
-        await router.push('/')
+    const handleHomeButton = () => {
+        navigate('/')
     }
 
-    const handleInitiativeOrder = async () => {
-        await router.push('/initiative-order')
+    const handleInitiativeOrder = () => {
+        navigate('initiative-order')
     }
 
-    const handleDiceRoller = async () => {
-        await router.push('/dice-roller')
+    const handleDiceRoller = () => {
+        navigate('dice-roller')
     }
 
     const renderAccountButton = () => {
@@ -54,7 +55,7 @@ const DndNavbar = () => {
             if (isSmallView) {
                 return (
                     <Button
-                        onClick={ async () => await handleProfileClick() }
+                        onClick={ () => handleProfileClick() }
                         variant="dark"
                     >
                         Account
@@ -65,7 +66,7 @@ const DndNavbar = () => {
             return (
                 <button
                     className="navbar__account-button"
-                    onClick={ async () => await handleProfileClick() }
+                    onClick={ () => handleProfileClick() }
                     title="Account"
                 >
                     <span className="material-icons">account_circle</span>
@@ -75,7 +76,7 @@ const DndNavbar = () => {
 
         return (
             <Button
-                onClick={ async () => await handleSignInClick() }
+                onClick={ () => handleSignInClick() }
                 variant="dark"
             >
                 { AUTHENTICATION.signIn } / Sign Up
@@ -84,15 +85,15 @@ const DndNavbar = () => {
     }
 
     return (
-        <Navbar bg="light" expand="lg" fixed="top" expanded={ navbarExpanded } onToggle={ () => setNavbarExpanded(!navbarExpanded) }>
+        <Navbar onBlur={ () => setNavbarExpanded(false) } bg="light" expand="lg" fixed="top" expanded={ navbarExpanded } onToggle={ () => setNavbarExpanded(!navbarExpanded) }>
             <button
                 className="navbar__icon"
-                onClick={ async () => await handleHomeButton() }
+                onClick={ () => handleHomeButton() }
             >
                 <img
                     alt="dnd-logo"
                     className="navbar__icon__img"
-                    src="/media/d20.png"
+                    src="/assets/media/d20.png"
                     draggable={ false }
                 />
             </button>
@@ -101,14 +102,14 @@ const DndNavbar = () => {
                 <div className={ `navbar__buttons ${isSmallView ? 'small' : 'large'}` }>
                     { activeGameId && (totalPlayers > 0 || isDM) &&
                         <Button
-                            onClick={ async () => await handleInitiativeOrder() }
+                            onClick={ () => handleInitiativeOrder() }
                             variant="link"
                         >
                             Initiative Order
                         </Button>
                     }
                     <Button
-                        onClick={ async () => await handleDiceRoller() }
+                        onClick={ () => handleDiceRoller() }
                         variant="link"
                     >
                         Dice Roller

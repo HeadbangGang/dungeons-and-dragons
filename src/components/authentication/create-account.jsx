@@ -1,240 +1,194 @@
-import React, { PureComponent } from 'react'
-import PropTypes from 'prop-types'
+import React, { useEffect, useState } from 'react'
 import { Button, Collapse, Form } from 'react-bootstrap'
+import { useDispatch } from 'react-redux'
 import { auth, generateUserDocument } from '../../database/firebase'
 import { setErrors, setUserAccount } from '../../store/store'
 import { AUTHENTICATION, ERRORS } from '../../helpers/language-map'
-import { withRouter } from 'next/router'
-import { connect } from 'react-redux'
+import { useNavigate } from 'react-router'
+import './authentication.scss'
 
-class CreateAccount extends PureComponent {
-    static propTypes = {
-        router: PropTypes.object,
-        setErrors: PropTypes.func,
-        setUserAccount: PropTypes.func
-    }
+const CreateAccount = () => {
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
 
-    state = {
-        firstName: '',
-        lastName: '',
-        email: '',
-        password: '',
-        passwordConfirmation: '',
-        passwordMatches: false,
-        shouldShowPasswordConfirmation: false,
-        shouldShowPassword: false
-    }
+    const [firstName, setFirstName] = useState('')
+    const [lastName, setLastName] = useState('')
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
+    const [passwordConfirmation, setPasswordConfirmation] = useState('')
+    const [passwordMatches, setPasswordMatches] = useState(false)
+    const [shouldShowPasswordConfirmation, setShouldShowPasswordConfirmation] = useState(false)
+    const [shouldShowPassword, setShouldShowPassword] = useState(false)
 
-    render() {
-        const { router } = this.props
-        const { shouldShowPasswordConfirmation, shouldShowPassword } = this.state
-
-        return (
-            <div className="authentication__page-container">
-                <div className="authentication__box">
-                    <div className="authentication__header">
-                        { AUTHENTICATION.createAnAccount }
-                    </div>
-                    <Form
-                        className="authentication__form-container"
-                        onSubmit={ this.createAccountHandler }
-                    >
-                        <div className="authentication__users-name__container">
-                            <Form.Group>
-                                <Form.Label>
-                                    { AUTHENTICATION.firstName }
-                                </Form.Label>
-                                <Form.Control
-                                    autoComplete="given-name"
-                                    data-lpignore="true"
-                                    id="first-name"
-                                    onChange={ this.formInputHandler }
-                                    placeholder="Samwise"
-                                    maxLength="20"
-                                />
-                            </Form.Group>
-                            <Form.Group>
-                                <Form.Label>
-                                    { AUTHENTICATION.lastName }
-                                </Form.Label>
-                                <Form.Control
-                                    autoComplete="family-name"
-                                    data-lpignore="true"
-                                    id="last-name"
-                                    onChange={ this.formInputHandler }
-                                    placeholder="Gamgee"
-                                    maxLength="20"
-                                />
-                            </Form.Group>
-                        </div>
-                        <Form.Group className="authentication__group-wrapper">
-                            <Form.Label>
-                                { AUTHENTICATION.email }
-                            </Form.Label>
-                            <Form.Control
-                                autoComplete="email"
-                                data-lpignore="true"
-                                id="email"
-                                onChange={ this.formInputHandler }
-                                placeholder="example@gmail.com"
-                                maxLength="30"
-                                type="email"
-                            />
-                            <Form.Text className="text-muted">
-                                { AUTHENTICATION.noShareInfo }
-                            </Form.Text>
-                        </Form.Group>
-                        <Form.Group className="authentication__group-wrapper">
-                            <Form.Label>{ AUTHENTICATION.password }</Form.Label>
-                            <Form.Control
-                                autoComplete="current-password"
-                                data-lpignore="true"
-                                id="password"
-                                onChange={ this.formInputHandler }
-                                placeholder="Password"
-                                maxLength="15"
-                                type={ shouldShowPassword ? 'text' : 'password' }
-                            />
-                            <a
-                                className="authentication__display-password"
-                                href="#"
-                                onClick={ this.formInputHandler }
-                            >
-                                <span className="material-icons"  id="mask-password">
-                                    { shouldShowPassword ? 'visibility' : 'visibility_off' }
-                                </span>
-                            </a>
-                        </Form.Group>
-                        <Collapse in={ shouldShowPasswordConfirmation }>
-                            <Form.Group className="authentication__group-wrapper">
-                                <Form.Label>{ AUTHENTICATION.confirmPassword }</Form.Label>
-                                <Form.Control
-                                    autoComplete="current-password"
-                                    data-lpignore="true"
-                                    id="confirm-password"
-                                    onChange={ this.formInputHandler }
-                                    placeholder="Password"
-                                    maxLength="15"
-                                    type={ shouldShowPassword ? 'text' : 'password' }
-                                />
-                            </Form.Group>
-                        </Collapse>
-                        <div className="authentication__submit">
-                            <Button
-                                variant="outline-dark"
-                                type="submit"
-                                onClick={ async () => await this.createAccountHandler() }
-                            >
-                                { AUTHENTICATION.createAnAccount }
-                            </Button>
-                        </div>
-                    </Form>
-                    <div className="authentication__alt-option__container">
-                        <span className="authentication__or">or</span>
-                        <div className="authentication__alt-option">
-                            <Button
-                                variant="dark"
-                                onClick={ async () => {
-                                    await router.push('/account/sign-in')
-                                } }
-                            >
-                                { AUTHENTICATION.signIn }
-                            </Button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        )
-    }
-
-    formInputHandler = () => {
-        const { id, value } = event.target
-        switch(id) {
-        case('first-name'):
-            this.setState({
-                firstName: value
-            })
-            break
-        case('last-name'): 
-            this.setState({
-                lastName: value
-            })
-            break
-        case('email'):
-            this.setState({
-                email: value
-            })
-            break
-        case('password'):
-            this.setState({
-                password: value
-            })
-            break
-        case('mask-password'):
-            this.setState({
-                shouldShowPassword: !this.state.shouldShowPassword
-            })
-            break
-        case('confirm-password'):
-            this.setState({
-                passwordConfirmation: value
-            })
+    useEffect(() => {
+        if (password === passwordConfirmation && !passwordMatches) {
+            setPasswordMatches(true)
         }
-    }
+        if (password !== passwordConfirmation && passwordMatches) {
+            setPasswordMatches(false)
+        }
+    }, [password, passwordConfirmation])
 
-    createAccountHandler = async () => {
-        const { router, setErrors, setUserAccount } = this.props
-        const {
-            firstName,
-            lastName,
-            email,
-            password,
-            passwordConfirmation,
-            shouldShowPasswordConfirmation
-        } = this.state
-
+    const createAccountHandler = async () => {
         event.preventDefault()
         if (email && password.length > 5 && firstName && lastName && password) {
-            !shouldShowPasswordConfirmation && this.setState({ shouldShowPasswordConfirmation: true })
-            if (password === passwordConfirmation) {
+            !shouldShowPasswordConfirmation && setShouldShowPasswordConfirmation(true)
+            if (passwordMatches) {
                 const fullName = `${firstName} ${lastName}`
                 await auth.createUserWithEmailAndPassword(email, password)
                     .then(async (res) => {
                         const{ user } = res
                         await generateUserDocument(user, { fullName })
                             .then((data) => {
-                                setUserAccount(data)
+                                dispatch(setUserAccount(data))
                             })
-                            .then(async () => {
-                                await router.replace('/account/profile')
+                            .then(() => {
+                                navigate('/account/profile', { replace: true })
                             })
                     })
                     .catch((err) => {
                         switch(err) {
                         case('auth/email-already-in-use') :
-                            setErrors(ERRORS.emailAlreadyExists)
+                            dispatch(setErrors(ERRORS.emailAlreadyExists))
                             break
                         default:
-                            setErrors(err.message)
+                            dispatch(setErrors(err.message))
                         }
                     })
             } else {
-                shouldShowPasswordConfirmation && setErrors('password broke boi')
+                shouldShowPasswordConfirmation && dispatch(setErrors('password broke boi')) // fix this
             }
         } else {
             if (!firstName) {
-                setErrors(ERRORS.enterFirstName)
+                dispatch(setErrors(ERRORS.enterFirstName))
             } else if (!lastName){
-                setErrors(ERRORS.enterLastName)
+                dispatch(setErrors(ERRORS.enterLastName))
             } else if (!email) {
-                setErrors(ERRORS.enterEmail)
+                dispatch(setErrors(ERRORS.enterEmail))
             } else if (!password) {
-                setErrors(ERRORS.enterPassword)
+                dispatch(setErrors(ERRORS.enterPassword))
             } else if (password.length < 6) {
-                setErrors('password needs to be longer')
+                dispatch(setErrors('password needs to be longer'))
             }
         }
     }
+
+    return (
+        <div className="authentication__page-container">
+            <div className="authentication__box">
+                <div className="authentication__header">
+                    { AUTHENTICATION.createAnAccount }
+                </div>
+                <Form
+                    className="authentication__form-container"
+                    onSubmit={ async () => await createAccountHandler() }
+                >
+                    <div className="authentication__users-name__container">
+                        <Form.Group>
+                            <Form.Label>
+                                { AUTHENTICATION.firstName }
+                            </Form.Label>
+                            <Form.Control
+                                autoComplete="given-name"
+                                data-lpignore="true"
+                                id="first-name"
+                                onChange={ ({target}) => setFirstName(target.value) }
+                                placeholder="Samwise"
+                                maxLength="20"
+                            />
+                        </Form.Group>
+                        <Form.Group>
+                            <Form.Label>
+                                { AUTHENTICATION.lastName }
+                            </Form.Label>
+                            <Form.Control
+                                autoComplete="family-name"
+                                data-lpignore="true"
+                                id="last-name"
+                                onChange={ ({target}) => setLastName(target.value) }
+                                placeholder="Gamgee"
+                                maxLength="20"
+                            />
+                        </Form.Group>
+                    </div>
+                    <Form.Group className="authentication__group-wrapper">
+                        <Form.Label>
+                            { AUTHENTICATION.email }
+                        </Form.Label>
+                        <Form.Control
+                            autoComplete="email"
+                            data-lpignore="true"
+                            id="email"
+                            onChange={ ({target}) => setEmail(target.value) }
+                            placeholder="example@gmail.com"
+                            maxLength="30"
+                            type="email"
+                        />
+                        <Form.Text className="text-muted">
+                            { AUTHENTICATION.noShareInfo }
+                        </Form.Text>
+                    </Form.Group>
+                    <Form.Group className="authentication__group-wrapper">
+                        <Form.Label>{ AUTHENTICATION.password }</Form.Label>
+                        <Form.Control
+                            autoComplete="current-password"
+                            data-lpignore="true"
+                            id="password"
+                            onChange={ ({target}) => setPassword(target.value) }
+                            placeholder="Password"
+                            maxLength="15"
+                            type={ shouldShowPassword ? 'text' : 'password' }
+                        />
+                        <a
+                            className="authentication__display-password"
+                            href="#"
+                            onClick={ () => setShouldShowPassword(!shouldShowPassword) }
+                        >
+                            <span className="material-icons"  id="mask-password">
+                                { shouldShowPassword ? 'visibility' : 'visibility_off' }
+                            </span>
+                        </a>
+                    </Form.Group>
+                    <Collapse in={ shouldShowPasswordConfirmation }>
+                        <Form.Group className="authentication__group-wrapper">
+                            <Form.Label>{ AUTHENTICATION.confirmPassword }</Form.Label>
+                            <Form.Control
+                                autoComplete="current-password"
+                                data-lpignore="true"
+                                id="confirm-password"
+                                onChange={ ({target}) => setPasswordConfirmation(target.value) }
+                                placeholder="Password"
+                                maxLength="15"
+                                type={ shouldShowPassword ? 'text' : 'password' }
+                            />
+                        </Form.Group>
+                    </Collapse>
+                    <div className="authentication__submit">
+                        <Button
+                            variant="outline-dark"
+                            type="submit"
+                            onClick={ async () => await createAccountHandler() }
+                        >
+                            { AUTHENTICATION.createAnAccount }
+                        </Button>
+                    </div>
+                </Form>
+                <div className="authentication__alt-option__container">
+                    <span className="authentication__or">or</span>
+                    <div className="authentication__alt-option">
+                        <Button
+                            variant="dark"
+                            onClick={ () => {
+                                navigate('/account/sign-in')
+                            } }
+                        >
+                            { AUTHENTICATION.signIn }
+                        </Button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    )
 }
 
-export default connect(null, { setErrors, setUserAccount })(withRouter(CreateAccount))
+export default CreateAccount
