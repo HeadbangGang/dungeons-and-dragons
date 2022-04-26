@@ -4,6 +4,7 @@ const autoprefixer = require('autoprefixer')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
 const TerserPlugin = require('terser-webpack-plugin')
 
 const IS_DEV = process.env.NODE_ENV === 'development'
@@ -45,7 +46,8 @@ module.exports = {
         }),
         new MiniCssExtractPlugin({
             filename: 'css/styles.min.css'
-        })
+        }),
+        new CssMinimizerPlugin()
     ],
     module: {
         rules: [
@@ -75,6 +77,6 @@ module.exports = {
     },
     optimization: {
         minimize: true,
-        minimizer: [new TerserPlugin()],
+        minimizer: [new CssMinimizerPlugin(), new TerserPlugin()],
     },
 }

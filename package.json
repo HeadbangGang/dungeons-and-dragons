@@ -25,6 +25,7 @@
     "babel-loader": "^8.2.5",
     "copy-webpack-plugin": "^10.2.4",
     "css-loader": "^6.7.1",
+    "css-minimizer-webpack-plugin": "^3.4.1",
     "eslint": "^8.10.0",
     "eslint-plugin-jsx-a11y": "^6.5.1",
     "eslint-plugin-react": "^7.29.2",
@@ -44,10 +45,12 @@
     "stylelint-config-standard-scss": "^3.0.0",
     "stylelint-scss": "^4.1.0",
     "webpack": "^5.72.0",
+    "webpack-bundle-analyzer": "^4.5.0",
     "webpack-cli": "^4.9.2",
     "webpack-dev-server": "^4.8.1"
   },
   "scripts": {
+    "analyze": "webpack --json > stats.json && webpack-bundle-analyzer stats.json",
     "build": "rimraf dist && webpack",
     "clean": "rimraf node_modules",
     "lint:css": "stylelint '**/*.scss' --color --fix",

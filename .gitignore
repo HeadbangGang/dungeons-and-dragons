@@ -54,3 +54,5 @@ build/*
 firebase/*
 
 firebase-mock-data/
+
+stats.json
