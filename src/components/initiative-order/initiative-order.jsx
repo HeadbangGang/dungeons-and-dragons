@@ -16,6 +16,7 @@ import ConfirmationModal from './confirmation-modal'
 import InitiativeRoller from './initiative-roller'
 import NPCInitiativeModal from './npc-initiative-modal'
 import { GENERAL, INITIATIVE_PAGE } from '../../helpers/language-map'
+import './initiative-order.scss'
 
 const InitiativeOrder = () => {
     const dispatch = useDispatch()
@@ -116,7 +117,7 @@ const InitiativeOrder = () => {
                     <table title="Initiative Order">
                         <thead>
                             <tr>
-                                <td colSpan="3">
+                                <td colSpan={ isAdmin || isDM ? 3 : 2 }>
                                     <strong>Initiative Order</strong>
                                 </td>
                             </tr>
@@ -164,7 +165,7 @@ const InitiativeOrder = () => {
                         </tbody>
                     </table>
                     : <div style={{ textAlign: 'center' }}>
-                        <img src="media/spinner.webp" alt="loading" style={{ width: '75%' }} />
+                        <img src="/assets/media/spinner.webp" alt="loading" style={{ width: '75%' }} />
                     </div> }
             </div>
             { !isDM &&

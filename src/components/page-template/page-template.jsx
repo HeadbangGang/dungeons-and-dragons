@@ -15,6 +15,7 @@ import { auth, getUserDocument, streamGameData } from '../../database/firebase'
 import Navbar from '../navbar/navbar'
 import Footer from '../footer/footer'
 import Alerts from '../alerts/alerts'
+import './page-template.scss'
 
 const PageTemplate = ({ children }) => {
     const dispatch = useDispatch()
@@ -23,7 +24,7 @@ const PageTemplate = ({ children }) => {
     const userData = useSelector(getCurrentUser)
     const hasLoadedTemplate = useSelector(getHasLoadedTemplate)
 
-    const isSmallView = useMediaQuery({ query: '(max-width: 900px)' })
+    const isSmallView = useMediaQuery({ query: '(max-width: 992px)' })
 
     useEffect(() => {
         if (!hasLoadedTemplate) {

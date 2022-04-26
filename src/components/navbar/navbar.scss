@@ -1,5 +1,5 @@
 .navbar {
-padding: 8px;
+  padding: 8px;
 
   &__icon {
     background: transparent;
@@ -25,7 +25,7 @@ padding: 8px;
     display: flex;
     place-self: center;
 
-    & > span {
+    span {
       font-size: 43px;
     }
   }
@@ -34,17 +34,17 @@ padding: 8px;
     display: flex;
     width: 100%;
 
-    &.small {
+    @media screen and (max-width: 991px) {
       flex-direction: column;
     }
 
-    &.large {
-      & > button:last-of-type {
+    @media screen and (min-width: 992px) {
+      button:last-of-type {
         margin-left: auto;
       }
     }
 
-    & > .btn-link {
+    .btn-link {
       text-decoration: none;
       color: black;
 
@@ -52,7 +52,5 @@ padding: 8px;
         text-decoration: underline;
       }
     }
-
-
   }
 }

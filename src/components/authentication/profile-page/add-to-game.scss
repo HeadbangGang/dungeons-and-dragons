@@ -5,6 +5,10 @@
   padding: 10px;
   width: 100%;
 
+  #dm-query {
+    margin-right: 8px;
+  }
+
   &__inputs {
     &__container {
       display: flex;
@@ -21,5 +25,19 @@
   &__buttons {
     display: flex;
     justify-content: space-evenly;
+
+    button {
+      width: 225px;
+      margin: 8px 0;
+      height: 50px;
+    }
+
+    @media screen and (max-width: 992px) {
+      flex-direction: column;
+
+      button {
+        width: 100%;
+      }
+    }
   }
 }

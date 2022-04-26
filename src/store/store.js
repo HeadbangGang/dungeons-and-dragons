@@ -221,7 +221,7 @@ export const getCurrentUserIsAdmin = state => getCurrentUser(state).admin ?? fal
 export const getCurrentUserIsDm = state => {
     const uid = getCurrentUID(state)
     if (uid && Object.keys(getAllGamePlayers(state)).length) {
-        return getGamePlayerData(state, uid).gameMaster
+        return getGamePlayerData(state, uid)?.gameMaster
     }
     return false
 }

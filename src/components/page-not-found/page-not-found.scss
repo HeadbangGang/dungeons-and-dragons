@@ -1,0 +1,17 @@
+.page-not-found {
+  margin: 10px;
+  text-align: center;
+
+  img {
+    max-width: 400px;
+    max-height: 400px;
+  }
+
+  h1 {
+    font-size: 64px;
+
+    @media screen and (max-width: 992px) {
+      font-size: 48px;
+    }
+  }
+}
