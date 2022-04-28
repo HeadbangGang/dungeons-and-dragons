@@ -1,7 +1,7 @@
 import React from 'react'
 import { Card, Col, Container, Row } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
-import { getAllUserGames, getCurrentUser, updateActiveGameID } from '../../store/store'
+import { getAllUserGames, getCurrentUser, updateActiveGameID } from '../../store'
 import { GENERAL } from '../../helpers/language-map'
 import './dnd-home.scss'
 

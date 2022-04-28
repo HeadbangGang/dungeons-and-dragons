@@ -10,7 +10,7 @@ import {
     setErrors,
     updateActiveGameData,
     updateChosenInitiative
-} from '../../store/store'
+} from '../../store'
 import { numberValidation } from '../../helpers/helpers'
 import ConfirmationModal from './confirmation-modal'
 import InitiativeRoller from './initiative-roller'

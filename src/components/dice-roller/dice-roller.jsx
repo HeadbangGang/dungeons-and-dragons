@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { getDiceValues, resetDiceValues, updateDiceValues } from '../../store/store'
+import { getDiceValues, resetDiceValues, updateDiceValues } from '../../store'
 import { Button, FormControl, InputGroup } from 'react-bootstrap'
 import { DEFAULT_DICE_SIDES } from '../../helpers/constants'
 import { numberValidation } from '../../helpers/helpers'

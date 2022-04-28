@@ -1,40 +1,44 @@
 import React, { useState } from 'react'
-import { useDispatch } from 'react-redux'
-import { useNavigate } from 'react-router'
-import { setErrors } from '../../store/store'
+import { AUTHENTICATION } from '../../helpers/language-map'
 import { Button, Form } from 'react-bootstrap'
+import { PAGE_URL } from '../../helpers/constants'
 import { auth } from '../../database/firebase'
-import { AUTHENTICATION, ERRORS } from '../../helpers/language-map'
+import { firebaseErrorResponse, validateEmail } from '../../helpers/helpers'
+import { getCurrentPageId, setErrors } from '../../store'
+import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router'
 import './authentication.scss'
 
 const ResetPassword = () => {
-    const navigate = useNavigate()
     const dispatch = useDispatch()
+    const navigate = useNavigate()
 
     const [email, setEmail] = useState('')
     const [emailHasBeenSent, setEmailHasBeenSent] = useState(false)
 
+    const currentPageId = useSelector(getCurrentPageId)
+
+    const validate = () => {
+        let valid = true
+        const emailError = validateEmail(email)
+
+        if (emailError) {
+            dispatch(setErrors(emailError))
+            valid = false
+        }
+        return valid
+    }
+
     const passwordResetHandler = () => {
         event.preventDefault()
-        if (email) {
+        if (validate()) {
             auth.sendPasswordResetEmail(email)
                 .then(() => {
                     setEmailHasBeenSent(true)
                 })
-                .catch((e) => {
-                    switch(e){
-                    case e.code === 'auth/user-not-found':
-                        dispatch(setErrors(ERRORS.emailNotRegistered))
-                        break
-                    case e.code === 'auth/invalid-email':
-                        dispatch(setErrors(ERRORS.enterEmail))
-                        break
-                    default:
-                        dispatch(setErrors(ERRORS.errorSendingEmail))
-                    }
+                .catch((err) => {
+                    dispatch(setErrors(firebaseErrorResponse(err, currentPageId)))
                 })
-        } else {
-            dispatch(setErrors(ERRORS.enterEmail))
         }
     }
 
@@ -46,7 +50,7 @@ const ResetPassword = () => {
                 </div>
                 <Form
                     className="authentication__form-container"
-                    onSubmit={ () => passwordResetHandler() }
+                    onSubmit={ passwordResetHandler }
                 >
                     <Form.Group>
                         <Form.Label>
@@ -68,7 +72,7 @@ const ResetPassword = () => {
                         <Button
                             variant="outline-dark"
                             type="submit"
-                            onClick={ () => passwordResetHandler() }
+                            onClick={ passwordResetHandler }
                         >
                             { AUTHENTICATION.sendResetEmail }
                         </Button>
@@ -79,7 +83,7 @@ const ResetPassword = () => {
                     <div className="authentication__alt-option">
                         <Button
                             variant="dark"
-                            onClick={ () => navigate('/account/create-account') }
+                            onClick={ () => navigate(PAGE_URL.CREATE_ACCOUNT_PAGE) }
                         >
                             { AUTHENTICATION.createAnAccount }
                         </Button>

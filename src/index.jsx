@@ -1,8 +1,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { Provider } from 'react-redux'
-import store from './store/store'
 import RoutesController from './routes'
+import store from './store'
+import { Provider } from 'react-redux'
 import './common.scss'
 
 ReactDOM.render(

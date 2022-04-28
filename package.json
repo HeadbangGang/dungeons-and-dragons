@@ -57,7 +57,7 @@
     "lint:js": "eslint src --ext .jsx,.js --fix",
     "lint": "npm run lint:js && npm run lint:css",
     "start": "npm run start:firebase & NODE_ENV=development webpack-dev-server",
-    "startquiet": "npm run start -- --no-open & npm run start:firebase",
+    "start:quiet": "npm run start -- --no-open",
     "start:firebase": "firebase emulators:start --export-on-exit=./firebase-mock-data --import=./firebase-mock-data"
   },
   "browserslist": {

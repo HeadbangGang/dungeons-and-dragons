@@ -1,9 +1,10 @@
 import React, { useRef, useState } from 'react'
-import { useSelector } from 'react-redux'
-import { Navbar, Overlay, Tooltip } from 'react-bootstrap'
 import { GENERAL } from '../../helpers/language-map'
-import { getActiveGameId } from '../../store/store'
+import { Navbar, Overlay, Tooltip } from 'react-bootstrap'
+import { PAGE_URL } from '../../helpers/constants'
+import { getActiveGameId } from '../../store'
 import { useNavigate } from 'react-router'
+import { useSelector } from 'react-redux'
 import './footer.scss'
 
 const DndFooter = () => {
@@ -22,7 +23,7 @@ const DndFooter = () => {
         <Navbar bg="dark" fixed="bottom" className="footer">
             <a
                 href="#"
-                onClick={ async () => await navigate('/') }
+                onClick={ async () => await navigate(PAGE_URL.HOME_PAGE) }
             >
                 <img
                     src="/assets/media/d20.png"

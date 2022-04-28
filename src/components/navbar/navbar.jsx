@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router'
+import { PAGE_URL } from '../../helpers/constants'
 import {
     getActiveGameId,
     getAllGamePlayers,
     getCurrentUser,
-    getCurrentUserIsDm,
-    getIsSmallView
-} from '../../store/store'
+    getCurrentUserIsDm
+} from '../../store'
 import { useSelector } from 'react-redux'
 import { Button, Navbar } from 'react-bootstrap'
 import { AUTHENTICATION } from '../../helpers/language-map'
-import { useNavigate } from 'react-router'
 import './navbar.scss'
 
 const DndNavbar = () => {
@@ -17,7 +17,6 @@ const DndNavbar = () => {
 
     const userData = useSelector(getCurrentUser)
     const activeGameId = useSelector(getActiveGameId)
-    const isSmallView = useSelector(getIsSmallView)
     const gamePlayers = useSelector(getAllGamePlayers)
     const isDM = useSelector(getCurrentUserIsDm)
 
@@ -31,46 +30,40 @@ const DndNavbar = () => {
     }, [gamePlayers])
 
     const handleProfileClick = () => {
-        navigate('account/profile')
+        navbarExpanded && setNavbarExpanded(false)
+        navigate(PAGE_URL.PROFILE_PAGE)
     }
 
     const handleSignInClick = () => {
-        navigate('account/sign-in')
+        navbarExpanded && setNavbarExpanded(false)
+        navigate(PAGE_URL.SIGN_IN_PAGE)
     }
 
     const handleHomeButton = () => {
-        navigate('/')
+        navbarExpanded && setNavbarExpanded(false)
+        navigate(PAGE_URL.HOME_PAGE)
     }
 
     const handleInitiativeOrder = () => {
-        navigate('initiative-order')
+        navbarExpanded && setNavbarExpanded(false)
+        navigate(PAGE_URL.INITIATIVE_ORDER_PAGE)
     }
 
     const handleDiceRoller = () => {
-        navigate('dice-roller')
+        navbarExpanded && setNavbarExpanded(false)
+        navigate(PAGE_URL.DICE_ROLLER_PAGE)
     }
 
     const renderAccountButton = () => {
         if (userData?.email && userData?.uid && userData?.fullName) {
-            if (isSmallView) {
-                return (
-                    <Button
-                        onClick={ () => handleProfileClick() }
-                        variant="dark"
-                    >
-                        Account
-                    </Button>
-                )
-            }
-
             return (
-                <button
+                <Button
                     className="navbar__account-button"
                     onClick={ () => handleProfileClick() }
-                    title="Account"
+                    variant="dark"
                 >
-                    <span className="material-icons">account_circle</span>
-                </button>
+                    <div className="material-icons">account_circle</div> Account
+                </Button>
             )
         }
 
@@ -90,7 +83,6 @@ const DndNavbar = () => {
             expand="lg"
             expanded={ navbarExpanded }
             fixed="top"
-            onBlur={ () => setNavbarExpanded(false) }
             onToggle={ () => setNavbarExpanded(!navbarExpanded) }
         >
             <button
@@ -104,7 +96,7 @@ const DndNavbar = () => {
                     draggable={ false }
                 />
             </button>
-            <Navbar.Toggle />
+            <Navbar.Toggle onBlur={ () => setNavbarExpanded(!navbarExpanded) } />
             <Navbar.Collapse>
                 <div className="navbar__buttons">
                     { activeGameId && (totalPlayers > 0 || isDM) &&

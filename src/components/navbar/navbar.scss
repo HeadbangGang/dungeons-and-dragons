@@ -18,15 +18,16 @@
   }
 
   &__account-button {
-    border: none;
-    background-color: transparent;
-    color: black;
-    margin-left: auto;
     display: flex;
     place-self: center;
 
-    span {
-      font-size: 43px;
+    div {
+      margin-right: 4px;
+    }
+
+    @media screen and (max-width: 992px) {
+      width: 100%;
+      justify-content: center;
     }
   }
 

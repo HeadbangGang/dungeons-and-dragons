@@ -1,19 +1,25 @@
 .authentication {
-  &__page-container {
-    margin: 25px;
+  &__group-wrapper {
+    display: flex;
+    flex-direction: column;
+    margin: 10px 0;
   }
 
-  &__group-wrapper {
-    margin: 10px 0;
+  &__forgot-password {
+    text-align: right;
+
+    button {
+      font-size: 12px;
+    }
   }
 
   &__display-password {
     bottom: 32px;
-    float: right;
+    color: black;
     height: 0;
     position: relative;
     right: 10px;
-    color: black;
+    text-align: right;
 
     :hover {
       color: gray;
@@ -23,7 +29,7 @@
   &__box {
     background-color: white;
     border-radius: 25px;
-    border: 1px solid grey;
+    border: 2px solid grey;
     margin: 0 auto;
     max-width: 1000px;
     padding: 3% 0;
@@ -33,16 +39,26 @@
     &__container {
       display: flex;
 
-      > div {
+      div {
         width: 100%;
       }
 
-      div:first-child {
-        margin-right: 10px;
+      @media screen and (min-width: 992px) {
+        div:first-child {
+          margin-right: 10px;
+        }
+
+        div:last-child {
+          margin-left: 10px;
+        }
       }
 
-      div:last-child {
-        margin-left: 10px;
+      @media screen and (max-width: 992px) {
+        flex-direction: column;
+
+        div:last-child {
+          margin-top: 10px;
+        }
       }
     }
   }

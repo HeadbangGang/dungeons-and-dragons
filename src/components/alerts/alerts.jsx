@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { ERRORS } from '../../helpers/language-map'
-import { getErrors, removeErrors } from '../../store/store'
+import { getErrors, removeErrors } from '../../store'
 import { Toast, ToastContainer } from 'react-bootstrap'
 import { connect } from 'react-redux'
 import { MAX_ERROR_QUANTITY } from '../../helpers/constants'

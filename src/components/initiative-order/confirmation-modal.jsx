@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { Button, Modal } from 'react-bootstrap'
 import { INITIATIVE_PAGE } from '../../helpers/language-map'
-import { resetInitiative } from '../../store/store'
+import { resetInitiative } from '../../store'
 
 class ConfirmationModal extends Component {
     static propTypes = {

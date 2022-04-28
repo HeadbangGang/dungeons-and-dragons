@@ -2,7 +2,7 @@ import React, { Suspense } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import PageTemplate from './components/page-template/page-template'
 import SuspenseLoading from './components/suspense-loading/suspense-loading'
-import { SPINNER_DEFAULT } from './helpers/constants'
+import { PAGE_URL, SPINNER_DEFAULT } from './helpers/constants'
 
 const CreateAccount = React.lazy(() => Promise.all([
     import('./components/authentication/create-account'),
@@ -35,7 +35,7 @@ const InitiativeOrder = React.lazy(() => Promise.all([
 ]).then(([moduleExports]) => moduleExports))
 
 const Profile = React.lazy(() => Promise.all([
-    import('./components/authentication/profile-page/profile'),
+    import('./components/profile-page/profile'),
     new Promise(resolve => setTimeout(resolve, SPINNER_DEFAULT))
 ]).then(([moduleExports]) => moduleExports))
 
@@ -45,13 +45,13 @@ const PageNotFound = React.lazy(() => Promise.all([
 ]).then(([moduleExports]) => moduleExports))
 
 const ROUTES = [
-    { element: <DndHome />, path: '/' },
-    { element: <CreateAccount />, path: 'account/create-account' },
-    { element: <ResetPassword />, path: 'account/password-reset' },
-    { element: <Profile />, path: 'account/profile' },
-    { element: <SignIn />, path: 'account/sign-in' },
-    { element: <DiceRoller />, path: 'dice-roller' },
-    { element: <InitiativeOrder />, path: 'initiative-order' },
+    { element: <DndHome />, path: PAGE_URL.HOME_PAGE },
+    { element: <CreateAccount />, path: PAGE_URL.CREATE_ACCOUNT_PAGE },
+    { element: <ResetPassword />, path: PAGE_URL.PASSWORD_RESET_PAGE },
+    { element: <Profile />, path: PAGE_URL.PROFILE_PAGE },
+    { element: <SignIn />, path: PAGE_URL.SIGN_IN_PAGE },
+    { element: <DiceRoller />, path: PAGE_URL.DICE_ROLLER_PAGE },
+    { element: <InitiativeOrder />, path: PAGE_URL.INITIATIVE_ORDER_PAGE },
     { element: <PageNotFound />, path: '*' }
 ]
 
@@ -63,7 +63,7 @@ const renderRoutes = () => {
 
 const RoutesController = () => {
     return (
-        <BrowserRouter basename="/">
+        <BrowserRouter basename={ PAGE_URL.HOME_PAGE }>
             <PageTemplate>
                 <Suspense fallback={ <SuspenseLoading /> }>
                     <Routes>

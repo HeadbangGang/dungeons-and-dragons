@@ -1,10 +1,10 @@
 import { applyMiddleware, compose, createStore } from 'redux'
-import { db } from '../database/firebase'
+import { db } from './database/firebase'
 import thunk from 'redux-thunk'
 import { createLogger } from 'redux-logger'
-import { DEFAULT_DICE_VALUES } from '../helpers/constants'
+import { DEFAULT_DICE_VALUES } from './helpers/constants'
 import { composeWithDevTools } from 'redux-devtools-extension'
-import { MAX_ERROR_QUANTITY } from '../helpers/constants'
+import { MAX_ERROR_QUANTITY } from './helpers/constants'
 
 const initialState = {}
 
@@ -131,6 +131,24 @@ const dndState = (currentState = initialState, action) => {
             }
         }
     }
+    case SET_CURRENT_PAGE_ID: {
+        return currentState = {
+            ...currentState,
+            routing: {
+                ...currentState.routing,
+                currentPageId: action.pageId
+            }
+        }
+    }
+    case SET_PREVIOUS_LOCATIONS: {
+        return currentState = {
+            ...currentState,
+            routing: {
+                ...currentState.routing,
+                previousLocations: action.updatedPreviousLocations
+            }
+        }
+    }
     default:
         return currentState
     }
@@ -161,8 +179,11 @@ export const UPDATE_DICE_VALUES = 'updateDiceValues'
 export const resetDiceValues = () => ({ type: RESET_DICE_VALUES })
 export const RESET_DICE_VALUES = 'resetDiceValues'
 
-export const setHasLoadedTemplate = (hasLoadedTemplate) =>({ type: SET_HAS_LOADED_TEMPLATE, hasLoadedTemplate })
+export const setHasLoadedTemplate = (hasLoadedTemplate) => ({ type: SET_HAS_LOADED_TEMPLATE, hasLoadedTemplate })
 export const SET_HAS_LOADED_TEMPLATE = 'setHasLoadedTemplate'
+
+export const setPreviousLocations = (updatedPreviousLocations) => ({ type: SET_PREVIOUS_LOCATIONS, updatedPreviousLocations })
+export const SET_PREVIOUS_LOCATIONS = 'setPreviousLocations'
 
 // Thunks
 export const updateUserAccount = (gameId, characterName, currentGameData) => async (dispatch, getState) => {
@@ -201,6 +222,16 @@ export const updateActiveGameID = (id) => async (dispatch, getState) => {
 }
 export const UPDATE_ACTIVE_GAME_ID = 'updateActiveGameID'
 
+export const setCurrentPageId = (pageId) => (dispatch, getState) => {
+    const currentPageId = getCurrentPageId(getState())
+    const updatedPreviousLocations = [...getPreviousLocations(getState()), currentPageId]
+    if (currentPageId) {
+        dispatch({ type: SET_PREVIOUS_LOCATIONS, updatedPreviousLocations })
+    }
+    dispatch({ type: SET_CURRENT_PAGE_ID, pageId })
+}
+export const SET_CURRENT_PAGE_ID = 'setCurrentPageId'
+
 // Selectors
 export const getErrors = state => state.errors ?? []
 export const getUi = state => state.ui ?? {}
@@ -225,6 +256,9 @@ export const getCurrentUserIsDm = state => {
     }
     return false
 }
+export const getRouting = state => state.routing ?? {}
+export const getCurrentPageId = state => state.routing?.currentPageId ?? ''
+export const getPreviousLocations = state => state.routing?.previousLocations ?? []
 
 // Redux Functions
 const updateRemovedErrors = (state) => {

@@ -1,23 +1,42 @@
 import React, { useState } from 'react'
+import { AUTHENTICATION } from '../../helpers/language-map'
 import { Button, Form } from 'react-bootstrap'
-import { setErrors, setUserAccount } from '../../store/store'
+import { PAGE_URL } from '../../helpers/constants'
 import { auth, getUserDocument } from '../../database/firebase'
-import { AUTHENTICATION, ERRORS } from '../../helpers/language-map'
-import { Link } from 'react-router-dom'
+import { firebaseErrorResponse, validateEmail, validatePassword } from '../../helpers/helpers'
+import { setErrors, setUserAccount } from '../../store'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
 import './authentication.scss'
 
 const SignIn  = () => {
-    const navigate = useNavigate()
     const dispatch = useDispatch()
+    const navigate = useNavigate()
 
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
 
+    const validate = () => {
+        const emailError = validateEmail(email)
+        const passwordError = validatePassword(password)
+
+        if (emailError) {
+            return handleError(emailError)
+        } else if (passwordError) {
+            return handleError(passwordError)
+        } else {
+            return true
+        }
+    }
+
+    const handleError = (error) => {
+        dispatch(setErrors(error))
+        return false
+    }
+
     const signInToAccountHandler = async () => {
         event.preventDefault()
-        if (email && password) {
+        if (validate()) {
             await auth.signInWithEmailAndPassword(email, password)
                 .then(async (res) => {
                     const { uid } = res.user
@@ -26,28 +45,13 @@ const SignIn  = () => {
                             const { games, activeGameId } = userData
                             setUserAccount(userData)
                             Object.keys(games).length > 0 || activeGameId
-                                ? await navigate('/', { replace: true })
-                                : await navigate('/account/profile', { replace: true })
+                                ? await navigate(PAGE_URL.HOME_PAGE, { replace: true })
+                                : await navigate(PAGE_URL.PROFILE_PAGE, { replace: true })
                         })
                 })
                 .catch((err) => {
-                    switch(err.code) {
-                    case('auth/user-not-found'):
-                        dispatch(setErrors(ERRORS.noUserFound))
-                        break
-                    case('auth/wrong-password'):
-                        dispatch(setErrors(ERRORS.wrongPassword))
-                        break
-                    default:
-                        dispatch(setErrors(ERRORS.signingIn))
-                    }
+                    dispatch(setErrors(firebaseErrorResponse(err)))
                 })
-        } else {
-            if (!email) {
-                dispatch(setErrors(ERRORS.enterEmail))
-            } else if (!password) {
-                dispatch(setErrors(ERRORS.enterPassword))
-            }
         }
     }
 
@@ -84,9 +88,11 @@ const SignIn  = () => {
                             placeholder="Password"
                             type="password"
                         />
-                        <Link to="/account/password-reset">
-                            { AUTHENTICATION.forgotPassword }
-                        </Link>
+                        <div className="authentication__forgot-password">
+                            <Button onClick={ () => navigate(PAGE_URL.PASSWORD_RESET_PAGE) } variant="link">
+                                { AUTHENTICATION.forgotPassword }
+                            </Button>
+                        </div>
                     </Form.Group>
                     <div className="authentication__submit">
                         <Button
@@ -102,7 +108,7 @@ const SignIn  = () => {
                     <span className="authentication__or">or</span>
                     <div className="authentication__alt-option">
                         <Button
-                            onClick={ () => navigate('/account/create-account', { replace: true }) }
+                            onClick={ () => navigate(PAGE_URL.CREATE_ACCOUNT_PAGE, { replace: true }) }
                             variant="dark"
                         >
                             { AUTHENTICATION.createAnAccount }

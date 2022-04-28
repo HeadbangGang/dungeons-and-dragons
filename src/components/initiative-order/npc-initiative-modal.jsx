@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 import { Button, Modal } from 'react-bootstrap'
-import { removeNPC, setErrors, updateChosenInitiative } from '../../store/store'
+import { removeNPC, setErrors, updateChosenInitiative } from '../../store'
 import { GENERAL, INITIATIVE_PAGE } from '../../helpers/language-map'
 import InitiativeRoller from './initiative-roller'
 

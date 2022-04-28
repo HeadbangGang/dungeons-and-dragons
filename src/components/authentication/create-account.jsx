@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import { Button, Collapse, Form } from 'react-bootstrap'
-import { useDispatch } from 'react-redux'
-import { auth, generateUserDocument } from '../../database/firebase'
-import { setErrors, setUserAccount } from '../../store/store'
 import { AUTHENTICATION, ERRORS } from '../../helpers/language-map'
+import { Button, Collapse, Form } from 'react-bootstrap'
+import { PAGE_URL } from '../../helpers/constants'
+import { auth, generateUserDocument } from '../../database/firebase'
+import { firebaseErrorResponse, validateEmail, validateFirstName, validateLastName, validatePassword } from '../../helpers/helpers'
+import { setErrors, setUserAccount } from '../../store'
+import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
 import './authentication.scss'
 
@@ -29,9 +31,33 @@ const CreateAccount = () => {
         }
     }, [password, passwordConfirmation])
 
+    const validateForm = () => {
+        const firstNameError = validateFirstName(firstName)
+        const lastNameError = validateLastName(lastName)
+        const emailError = validateEmail(email)
+        const passwordError = validatePassword(password)
+
+        if (firstNameError) {
+            return handleError(firstNameError)
+        } else if (lastNameError){
+            return handleError(lastNameError)
+        } else if (emailError) {
+            return handleError(emailError)
+        } else if (!password) {
+            return handleError(passwordError)
+        } else {
+            return true
+        }
+    }
+
+    const handleError = (error) => {
+        dispatch(setErrors(error))
+        return false
+    }
+
     const createAccountHandler = async () => {
         event.preventDefault()
-        if (email && password.length > 5 && firstName && lastName && password) {
+        if (validateForm()) {
             !shouldShowPasswordConfirmation && setShouldShowPasswordConfirmation(true)
             if (passwordMatches) {
                 const fullName = `${firstName} ${lastName}`
@@ -43,32 +69,16 @@ const CreateAccount = () => {
                                 dispatch(setUserAccount(data))
                             })
                             .then(() => {
-                                navigate('/account/profile', { replace: true })
+                                navigate(PAGE_URL.PROFILE_PAGE,  { replace: true })
                             })
                     })
                     .catch((err) => {
-                        switch(err) {
-                        case('auth/email-already-in-use') :
-                            dispatch(setErrors(ERRORS.emailAlreadyExists))
-                            break
-                        default:
-                            dispatch(setErrors(err.message))
-                        }
+                        dispatch(setErrors(firebaseErrorResponse(err)))
                     })
             } else {
-                shouldShowPasswordConfirmation && dispatch(setErrors('password broke boi')) // fix this
-            }
-        } else {
-            if (!firstName) {
-                dispatch(setErrors(ERRORS.enterFirstName))
-            } else if (!lastName){
-                dispatch(setErrors(ERRORS.enterLastName))
-            } else if (!email) {
-                dispatch(setErrors(ERRORS.enterEmail))
-            } else if (!password) {
-                dispatch(setErrors(ERRORS.enterPassword))
-            } else if (password.length < 6) {
-                dispatch(setErrors('password needs to be longer'))
+                if (shouldShowPasswordConfirmation) {
+                    dispatch(setErrors(ERRORS.passwordsDoNotMatch))
+                }
             }
         }
     }
@@ -92,9 +102,9 @@ const CreateAccount = () => {
                                 autoComplete="given-name"
                                 data-lpignore="true"
                                 id="first-name"
+                                maxLength="20"
                                 onChange={ ({ target }) => setFirstName(target.value) }
                                 placeholder="Samwise"
-                                maxLength="20"
                             />
                         </Form.Group>
                         <Form.Group>
@@ -105,9 +115,9 @@ const CreateAccount = () => {
                                 autoComplete="family-name"
                                 data-lpignore="true"
                                 id="last-name"
+                                maxLength="20"
                                 onChange={ ({ target }) => setLastName(target.value) }
                                 placeholder="Gamgee"
-                                maxLength="20"
                             />
                         </Form.Group>
                     </div>
@@ -119,9 +129,9 @@ const CreateAccount = () => {
                             autoComplete="email"
                             data-lpignore="true"
                             id="email"
+                            maxLength="30"
                             onChange={ ({ target }) => setEmail(target.value) }
                             placeholder="example@gmail.com"
-                            maxLength="30"
                             type="email"
                         />
                         <Form.Text className="text-muted">
@@ -134,9 +144,9 @@ const CreateAccount = () => {
                             autoComplete="current-password"
                             data-lpignore="true"
                             id="password"
+                            maxLength="15"
                             onChange={ ({ target }) => setPassword(target.value) }
                             placeholder="Password"
-                            maxLength="15"
                             type={ shouldShowPassword ? 'text' : 'password' }
                         />
                         <a
@@ -156,18 +166,18 @@ const CreateAccount = () => {
                                 autoComplete="current-password"
                                 data-lpignore="true"
                                 id="confirm-password"
+                                maxLength="15"
                                 onChange={ ({ target }) => setPasswordConfirmation(target.value) }
                                 placeholder="Password"
-                                maxLength="15"
                                 type={ shouldShowPassword ? 'text' : 'password' }
                             />
                         </Form.Group>
                     </Collapse>
                     <div className="authentication__submit">
                         <Button
-                            variant="outline-dark"
-                            type="submit"
                             onClick={ async () => await createAccountHandler() }
+                            type="submit"
+                            variant="outline-dark"
                         >
                             { AUTHENTICATION.createAnAccount }
                         </Button>
@@ -177,10 +187,8 @@ const CreateAccount = () => {
                     <span className="authentication__or">or</span>
                     <div className="authentication__alt-option">
                         <Button
+                            onClick={ () => navigate(PAGE_URL.SIGN_IN_PAGE) }
                             variant="dark"
-                            onClick={ () => {
-                                navigate('/account/sign-in')
-                            } }
                         >
                             { AUTHENTICATION.signIn }
                         </Button>

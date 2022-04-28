@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux'
 import { Button, Form, OverlayTrigger, Tooltip } from 'react-bootstrap'
 import { numberValidation } from '../../helpers/helpers'
 import { GENERAL, INITIATIVE_PAGE } from '../../helpers/language-map'
-import { getIsSmallView } from '../../store/store'
+import { getIsSmallView } from '../../store'
 
 const InitiativeRoller = (props) => {
     const { center, header, modifierValue, setModifierValue, infoButton, initiativeValue, setInitiativeValue, showHeader, submitInitiativeValue } = props

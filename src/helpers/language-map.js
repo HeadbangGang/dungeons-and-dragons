@@ -22,7 +22,7 @@ export const AUTHENTICATION = {
 export const ERRORS = {
     emailAlreadyExists: 'The email address entered is already in use by another account. Please use a different email address and try again or proceed to Sign In.',
     emailNotRegistered: 'This email address is not registered. Please try another or proceed to Create an Account.',
-    enterEmail: 'Please enter a valid email address.',
+    enterEmail: 'Please enter your email address.',
     enterFirstName: 'Please enter your first name.',
     enterFullName: 'Please enter your first and last name.',
     enterLastName: 'Please enter your last name.',
@@ -33,8 +33,14 @@ export const ERRORS = {
     gameDoesNotExist: 'The entered Game ID does not exist, please proceed to Create Game',
     generic: 'There was an issue. Please try again.',
     noUserFound: 'No user was found with this email. Try another email address or proceed to Create an Account.',
+    passwordLength: 'Please enter a password that is at least 6 characters.',
+    passwordsDoNotMatch: 'Passwords do not match.',
     playerExists: 'You are already a player in this game.',
     signingIn: 'Error signing in with password and email!',
+    updateFirebaseError: 'There was an error while updating your data. Please refresh this page then try again.',
+    validEmail: 'Please enter a valid email address.',
+    validFirstName: 'Please enter a valid first name.',
+    validLastName: 'Please enter a valid last name.',
     wrongPassword: 'Wrong password. Please try again.'
 }
 

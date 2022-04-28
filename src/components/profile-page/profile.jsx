@@ -1,10 +1,12 @@
 import React, { createRef, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router'
-import { auth, db, storage } from '../../../database/firebase'
+import { auth, db, storage } from '../../database/firebase'
 import { Button } from 'react-bootstrap'
-import { AUTHENTICATION, ERRORS } from '../../../helpers/language-map'
-import AddToGame from './add-to-game'
+import { PAGE_URL } from '../../helpers/constants'
+import { firebaseErrorResponse } from '../../helpers/helpers'
+import { AUTHENTICATION } from '../../helpers/language-map'
+import AddToGame from '../add-to-game/add-to-game'
 import {
     getCurrentEmail,
     getCurrentFullName,
@@ -13,7 +15,7 @@ import {
     setErrors,
     setUserAccount,
     updatePhotoUrl
-} from '../../../store/store'
+} from '../../store'
 import './profile.scss'
 
 const ProfilePage = () => {
@@ -44,8 +46,8 @@ const ProfilePage = () => {
                 await storageRef.getDownloadURL()
                     .then((url) => setProfilePicturePath(url))
             })
-            .catch(() => {
-                dispatch(setErrors(ERRORS.generic))
+            .catch((err) => {
+                dispatch(setErrors(firebaseErrorResponse(err)))
             })
     }
 
@@ -78,10 +80,10 @@ const ProfilePage = () => {
                 dispatch(setUserAccount({}))
             })
             .then(() => {
-                navigate('/', { replace: true })
+                navigate(PAGE_URL.HOME_PAGE, { replace: true })
             })
             .catch((err) => {
-                dispatch(setErrors(err))
+                dispatch(setErrors(firebaseErrorResponse(err)))
             })
     }
 
