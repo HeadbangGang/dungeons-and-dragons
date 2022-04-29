@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { AUTHENTICATION } from '../../helpers/language-map'
 import { Button, Form } from 'react-bootstrap'
 import { PAGE_URL } from '../../helpers/constants'
 import { auth } from '../../database/firebase'
@@ -7,6 +6,7 @@ import { firebaseErrorResponse, validateEmail } from '../../helpers/helpers'
 import { getCurrentPageId, setErrors } from '../../store'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router'
+import I18N from '../I18N/i18n'
 import './authentication.scss'
 
 const ResetPassword = () => {
@@ -45,16 +45,14 @@ const ResetPassword = () => {
     return (
         <div className="authentication__page-container">
             <div className="authentication__box">
-                <div className="authentication__header">
-                    { AUTHENTICATION.resetPassword }
-                </div>
+                <I18N blockLevel className="authentication__header" name="authentication.resetPassword" />
                 <Form
                     className="authentication__form-container"
                     onSubmit={ passwordResetHandler }
                 >
                     <Form.Group>
                         <Form.Label>
-                            { AUTHENTICATION.email }
+                            <I18N name="authentication.email" />
                         </Form.Label>
                         <Form.Control
                             autoComplete="email"
@@ -63,10 +61,7 @@ const ResetPassword = () => {
                             placeholder="example@gmail.com"
                             type="email"
                         />
-                        { emailHasBeenSent &&
-                        <div>
-                            { AUTHENTICATION.resetEmailSent }
-                        </div> }
+                        { emailHasBeenSent && <I18N blockLevel name="authentication.resetEmailSent" /> }
                     </Form.Group>
                     <div className="authentication__submit">
                         <Button
@@ -74,7 +69,7 @@ const ResetPassword = () => {
                             type="submit"
                             onClick={ passwordResetHandler }
                         >
-                            { AUTHENTICATION.sendResetEmail }
+                            <I18N name="authentication.sendResetEmail" />
                         </Button>
                     </div>
                 </Form>
@@ -85,7 +80,7 @@ const ResetPassword = () => {
                             variant="dark"
                             onClick={ () => navigate(PAGE_URL.CREATE_ACCOUNT_PAGE) }
                         >
-                            { AUTHENTICATION.createAnAccount }
+                            <I18N name="authentication.createAnAccount" />
                         </Button>
                     </div>
                 </div>

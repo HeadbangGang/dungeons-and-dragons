@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react'
-import { AUTHENTICATION, ERRORS } from '../../helpers/language-map'
 import { Button, Collapse, Form } from 'react-bootstrap'
 import { PAGE_URL } from '../../helpers/constants'
 import { auth, generateUserDocument } from '../../database/firebase'
 import { firebaseErrorResponse, validateEmail, validateFirstName, validateLastName, validatePassword } from '../../helpers/helpers'
-import { setErrors, setUserAccount } from '../../store'
-import { useDispatch } from 'react-redux'
+import { getCurrentPageId, setErrors, setUserAccount } from '../../store'
+import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router'
+import { I18N, language } from '../I18N/i18n'
 import './authentication.scss'
 
 const CreateAccount = () => {
@@ -21,6 +21,8 @@ const CreateAccount = () => {
     const [passwordMatches, setPasswordMatches] = useState(false)
     const [shouldShowPasswordConfirmation, setShouldShowPasswordConfirmation] = useState(false)
     const [shouldShowPassword, setShouldShowPassword] = useState(false)
+
+    const currentPageId = useSelector(getCurrentPageId)
 
     useEffect(() => {
         if (password === passwordConfirmation && !passwordMatches) {
@@ -73,11 +75,12 @@ const CreateAccount = () => {
                             })
                     })
                     .catch((err) => {
-                        dispatch(setErrors(firebaseErrorResponse(err)))
+                        console.log(err)
+                        dispatch(setErrors(firebaseErrorResponse(err, currentPageId)))
                     })
             } else {
                 if (shouldShowPasswordConfirmation) {
-                    dispatch(setErrors(ERRORS.passwordsDoNotMatch))
+                    dispatch(setErrors(language.errors.passwordsDoNotMatch))
                 }
             }
         }
@@ -86,9 +89,7 @@ const CreateAccount = () => {
     return (
         <div className="authentication__page-container">
             <div className="authentication__box">
-                <div className="authentication__header">
-                    { AUTHENTICATION.createAnAccount }
-                </div>
+                <I18N blockLevel className="authentication__header" name="authentication.createAnAccount" />
                 <Form
                     className="authentication__form-container"
                     onSubmit={ async () => await createAccountHandler() }
@@ -96,7 +97,7 @@ const CreateAccount = () => {
                     <div className="authentication__users-name__container">
                         <Form.Group>
                             <Form.Label>
-                                { AUTHENTICATION.firstName }
+                                <I18N name="authentication.firstName" />
                             </Form.Label>
                             <Form.Control
                                 autoComplete="given-name"
@@ -109,7 +110,7 @@ const CreateAccount = () => {
                         </Form.Group>
                         <Form.Group>
                             <Form.Label>
-                                { AUTHENTICATION.lastName }
+                                <I18N name="authentication.lastName" />
                             </Form.Label>
                             <Form.Control
                                 autoComplete="family-name"
@@ -123,7 +124,7 @@ const CreateAccount = () => {
                     </div>
                     <Form.Group className="authentication__group-wrapper">
                         <Form.Label>
-                            { AUTHENTICATION.email }
+                            <I18N name="authentication.email" />
                         </Form.Label>
                         <Form.Control
                             autoComplete="email"
@@ -135,11 +136,13 @@ const CreateAccount = () => {
                             type="email"
                         />
                         <Form.Text className="text-muted">
-                            { AUTHENTICATION.noShareInfo }
+                            <I18N name="authentication.noShareInfo" />
                         </Form.Text>
                     </Form.Group>
                     <Form.Group className="authentication__group-wrapper">
-                        <Form.Label>{ AUTHENTICATION.password }</Form.Label>
+                        <Form.Label>
+                            <I18N name="authentication.password" />
+                        </Form.Label>
                         <Form.Control
                             autoComplete="current-password"
                             data-lpignore="true"
@@ -161,7 +164,9 @@ const CreateAccount = () => {
                     </Form.Group>
                     <Collapse in={ shouldShowPasswordConfirmation }>
                         <Form.Group className="authentication__group-wrapper">
-                            <Form.Label>{ AUTHENTICATION.confirmPassword }</Form.Label>
+                            <Form.Label>
+                                <I18N name="authentication.confirmPassword" />
+                            </Form.Label>
                             <Form.Control
                                 autoComplete="current-password"
                                 data-lpignore="true"
@@ -179,7 +184,7 @@ const CreateAccount = () => {
                             type="submit"
                             variant="outline-dark"
                         >
-                            { AUTHENTICATION.createAnAccount }
+                            <I18N name="authentication.createAnAccount" />
                         </Button>
                     </div>
                 </Form>
@@ -190,7 +195,7 @@ const CreateAccount = () => {
                             onClick={ () => navigate(PAGE_URL.SIGN_IN_PAGE) }
                             variant="dark"
                         >
-                            { AUTHENTICATION.signIn }
+                            <I18N name="authentication.signIn" />
                         </Button>
                     </div>
                 </div>

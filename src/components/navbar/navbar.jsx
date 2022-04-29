@@ -9,8 +9,8 @@ import {
 } from '../../store'
 import { useSelector } from 'react-redux'
 import { Button, Navbar } from 'react-bootstrap'
-import { AUTHENTICATION } from '../../helpers/language-map'
 import './navbar.scss'
+import I18N from '../I18N/i18n'
 
 const DndNavbar = () => {
     const navigate = useNavigate()
@@ -62,7 +62,8 @@ const DndNavbar = () => {
                     onClick={ () => handleProfileClick() }
                     variant="dark"
                 >
-                    <div className="material-icons">account_circle</div> Account
+                    <div className="material-icons">account_circle</div>
+                    <I18N name="navbar.account" />
                 </Button>
             )
         }
@@ -72,7 +73,7 @@ const DndNavbar = () => {
                 onClick={ () => handleSignInClick() }
                 variant="dark"
             >
-                { AUTHENTICATION.signIn } / Sign Up
+                <I18N name="navbar.signInSignUp" />
             </Button>
         )
     }
@@ -96,7 +97,7 @@ const DndNavbar = () => {
                     draggable={ false }
                 />
             </button>
-            <Navbar.Toggle onBlur={ () => setNavbarExpanded(!navbarExpanded) } />
+            <Navbar.Toggle onBlur={ () => setTimeout(() => setNavbarExpanded(false), 100)  } />
             <Navbar.Collapse>
                 <div className="navbar__buttons">
                     { activeGameId && (totalPlayers > 0 || isDM) &&
@@ -104,14 +105,14 @@ const DndNavbar = () => {
                             onClick={ () => handleInitiativeOrder() }
                             variant="link"
                         >
-                            Initiative Order
+                            <I18N name="navbar.initiativeOrder" />
                         </Button>
                     }
                     <Button
                         onClick={ () => handleDiceRoller() }
                         variant="link"
                     >
-                        Dice Roller
+                        <I18N name="navbar.diceRoller" />
                     </Button>
                     { renderAccountButton() }
                 </div>

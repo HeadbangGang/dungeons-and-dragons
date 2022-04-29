@@ -1,10 +1,10 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
-import { ERRORS } from '../../helpers/language-map'
 import { getErrors, removeErrors } from '../../store'
 import { Toast, ToastContainer } from 'react-bootstrap'
 import { connect } from 'react-redux'
 import { MAX_ERROR_QUANTITY } from '../../helpers/constants'
+import I18N from '../I18N/i18n'
 import './alerts.scss'
 
 class Alerts extends PureComponent {
@@ -30,14 +30,14 @@ class Alerts extends PureComponent {
         return (
             <div className="alerts">
                 <ToastContainer className="alerts__toast-container">
-                    { errors.map((item, idx) => (
+                    { errors.map((errorMessage, idx) => (
                         <Toast key={ idx }>
-                            <Toast.Header>
+                            <Toast.Header closeButton={ false }>
                                 <strong>
-                                    { ERRORS.error }
+                                    <I18N name="errors.error" />
                                 </strong>
                             </Toast.Header>
-                            <Toast.Body>{ item }</Toast.Body>
+                            <Toast.Body>{ errorMessage }</Toast.Body>
                         </Toast>
                     )) }
                 </ToastContainer>

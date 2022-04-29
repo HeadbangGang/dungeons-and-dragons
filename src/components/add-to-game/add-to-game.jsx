@@ -1,12 +1,13 @@
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { PAGE_URL } from '../../helpers/constants'
+import { sanitizedVariable, validateCharacterName, validateGameId } from '../../helpers/helpers'
 import { setErrors } from '../../store'
 import { db } from '../../database/firebase'
 import { Button } from 'react-bootstrap'
-import { AUTHENTICATION, ERRORS } from '../../helpers/language-map'
 import { getCurrentUser, updateActiveGameData, updateUserAccount } from '../../store'
 import { useNavigate } from 'react-router'
+import { I18N, language } from '../I18N/i18n'
 import './add-to-game.scss'
 
 const AddToGame =  () => {
@@ -20,35 +21,46 @@ const AddToGame =  () => {
     const [previousCharacterName, setPreviousCharacterName] = useState('')
     const [isDM, setIsDM] = useState(false)
 
+    const validate = () => {
+        const characterNameError = validateCharacterName(characterName)
+        const gameIdError = validateGameId(gameId)
+
+        if (characterNameError) {
+            return handleError(characterNameError)
+        } else if (gameIdError) {
+            return handleError(gameIdError)
+        } else {
+            return true
+        }
+    }
+
+    const handleError = (error) => {
+        dispatch(setErrors(error))
+        return false
+    }
+
     const gameHandler = async (isNewGame) => {
-        if (gameId && characterName) {
+        if (validate()) {
             let gameExists = false
 
             await db.collection('games').get()
                 .then(({ docs }) => {
                     gameExists = !!docs.find(game => game.id === gameId)
                 })
-                .catch(() => dispatch(setErrors(ERRORS.generic)))
+                .catch(() => dispatch(setErrors(language.errors.generic)))
 
             if (isNewGame) {
                 if (!gameExists) {
                     await createNewGame(isNewGame)
                 } else {
-                    dispatch(setErrors(ERRORS.gameAlreadyExists))
+                    dispatch(setErrors(language.errors.gameAlreadyExists))
                 }
             } else {
                 if (gameExists) {
                     await joinExistingGame(isNewGame)
                 } else {
-                    dispatch(setErrors(ERRORS.gameDoesNotExist))
+                    dispatch(setErrors(language.errors.gameDoesNotExist))
                 }}
-        } else {
-            if (!characterName) {
-                dispatch(setErrors('Please enter a Character Name.'))
-            }
-            if (!gameId) {
-                dispatch(setErrors('Please enter a Game ID.'))
-            }
         }
     }
 
@@ -70,7 +82,9 @@ const AddToGame =  () => {
 
         const allPlayersData = Object.values(gameData)
         const hasDM = allPlayersData.findIndex(player => player.gameMaster) > -1
-        const playerAlreadyExists = allPlayersData.findIndex(player => player.characterName === characterName) > -1
+        const characterAlreadyExists = allPlayersData.findIndex(player => {
+            return sanitizedVariable(player.characterName, { lowerCase: true }) === sanitizedVariable(characterName, { lowerCase: true })
+        }) > -1
         const userAlreadyPlayer = Object.keys(games).includes(gameId)
 
         if (!userAlreadyPlayer) {
@@ -78,27 +92,23 @@ const AddToGame =  () => {
                 .then(dispatch(updateActiveGameData(gameId, characterName, false, undefined, isNewGame, isDM)))
                 .then(navigate(PAGE_URL.HOME_PAGE))
         } else {
-            if (playerAlreadyExists) {
-                dispatch(setErrors(ERRORS.playerExists))
+            if (characterAlreadyExists) {
+                dispatch(setErrors(language.errors.characterExists.replace('{{characterName}}', characterName)))
             }
             if (hasDM && isDM) {
-                dispatch(setErrors('This game already has a Game Master'))
+                dispatch(setErrors(language.errors.gameMasterExists))
                 setIsDM(false)
             }
             if (userAlreadyPlayer) {
-                dispatch(setErrors('You are already apart of this game'))
+                dispatch(setErrors(language.errors.playerExists))
             }
         }
-    }
-
-    const setGameIdHandler = ({ target }) => {
-        setGameId(target.value.replaceAll(' ', ''))
     }
 
     const gameMasterCheckboxHandler = () => {
         if (!isDM) {
             setPreviousCharacterName(characterName)
-            setCharacterName('Game Master')
+            setCharacterName(language.common.gameMaster)
         } else {
             setCharacterName(previousCharacterName)
             setPreviousCharacterName('')
@@ -110,22 +120,18 @@ const AddToGame =  () => {
         <div className="add-to-game">
             <div className="add-to-game__inputs__container">
                 <div className="styled-input__wrapper">
-                    <div className="styled-input__label">
-                        { AUTHENTICATION.gameId }
-                    </div>
+                    <I18N blockLevel className="styled-input__label" name="authentication.gameId" />
                     <input
                         maxLength="10"
-                        onChange={ setGameIdHandler }
+                        onChange={ ({ target }) => setGameId(sanitizedVariable(target.value)) }
                     />
                 </div>
                 <div className="styled-input__wrapper">
-                    <div className="styled-input__label">
-                        { AUTHENTICATION.characterName }
-                    </div>
+                    <I18N blockLevel className="styled-input__label" name="authentication.characterName" />
                     <input
                         disabled={ isDM }
                         maxLength="15"
-                        onChange={ (e) => setCharacterName(e.target.value) }
+                        onChange={ ({ target }) => setCharacterName(target.value) }
                         value={ characterName }
                     />
                 </div>
@@ -140,15 +146,15 @@ const AddToGame =  () => {
                 <label
                     htmlFor="dm-query"
                 >
-                    Are you the Game Master?
+                    <I18N name="authentication.gameMasterQuery" />
                 </label>
             </div>
             <div className="add-to-game__buttons">
                 <Button variant="dark" onClick={ async () => await gameHandler(false) }>
-                    { AUTHENTICATION.joinGame }
+                    <I18N name="authentication.joinGame" />
                 </Button>
                 <Button variant="outline-dark" onClick={ async () => await gameHandler(true) }>
-                    { AUTHENTICATION.createGame }
+                    <I18N name="authentication.createGame" />
                 </Button>
             </div>
         </div>

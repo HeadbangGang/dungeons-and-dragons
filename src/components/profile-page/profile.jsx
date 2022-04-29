@@ -3,13 +3,12 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router'
 import { auth, db, storage } from '../../database/firebase'
 import { Button } from 'react-bootstrap'
-import { PAGE_URL } from '../../helpers/constants'
-import { firebaseErrorResponse } from '../../helpers/helpers'
-import { AUTHENTICATION } from '../../helpers/language-map'
+import { MAX_FILE_SIZE, PAGE_URL } from '../../helpers/constants'
+import { convertSmallerToLargerFileSize, firebaseErrorResponse } from '../../helpers/helpers'
 import AddToGame from '../add-to-game/add-to-game'
 import {
     getCurrentEmail,
-    getCurrentFullName,
+    getCurrentFullName, getCurrentPageId,
     getCurrentUID,
     getProfilePicture,
     setErrors,
@@ -17,6 +16,7 @@ import {
     updatePhotoUrl
 } from '../../store'
 import './profile.scss'
+import { I18N, language } from '../I18N/i18n'
 
 const ProfilePage = () => {
     const navigate = useNavigate()
@@ -30,13 +30,17 @@ const ProfilePage = () => {
     const fullName = useSelector(getCurrentFullName)
     const uid = useSelector(getCurrentUID)
     const profilePicture = useSelector(getProfilePicture)
+    const currentPageId = useSelector(getCurrentPageId)
 
-    useEffect(async () => {
-        if (profilePictureBlob && profilePicturePath) {
-            await updateDBProfilePicture()
-        } else if (profilePictureBlob) {
-            await changeProfilePicture()
+    useEffect(() => {
+        const handleProfilePicture = async () => {
+            if (profilePictureBlob && profilePicturePath) {
+                await updateDBProfilePicture()
+            } else if (profilePictureBlob) {
+                await changeProfilePicture()
+            }
         }
+        handleProfilePicture()
     }, [profilePicturePath, profilePictureBlob])
 
     const changeProfilePicture = async () => {
@@ -47,7 +51,7 @@ const ProfilePage = () => {
                     .then((url) => setProfilePicturePath(url))
             })
             .catch((err) => {
-                dispatch(setErrors(firebaseErrorResponse(err)))
+                dispatch(setErrors(firebaseErrorResponse(err, currentPageId)))
             })
     }
 
@@ -60,15 +64,15 @@ const ProfilePage = () => {
                 setProfilePicturePath('')
             })
             .catch((err) => {
-                dispatch(setErrors(err.message))
+                dispatch(setErrors(firebaseErrorResponse(err, currentPageId)))
             })
     }
 
     const fileValidation = (fileBlob) => {
         const fsize = fileBlob.size
-        const fileSize = Math.round((fsize / 1024))
-        if (fileSize >= 10240) {
-            dispatch(setErrors('The selected image is too big, please select a file less than 10MB'))
+        const fileSize = Math.round((fsize / (MAX_FILE_SIZE / 10)))
+        if (fileSize >= MAX_FILE_SIZE) {
+            dispatch(setErrors(language.errors.fileTooLarge.replace('{{fileSize}}', convertSmallerToLargerFileSize(MAX_FILE_SIZE))))
         } else {
             setProfilePictureBlob(fileBlob)
         }
@@ -83,7 +87,7 @@ const ProfilePage = () => {
                 navigate(PAGE_URL.HOME_PAGE, { replace: true })
             })
             .catch((err) => {
-                dispatch(setErrors(firebaseErrorResponse(err)))
+                dispatch(setErrors(firebaseErrorResponse(err, currentPageId)))
             })
     }
 
@@ -116,7 +120,7 @@ const ProfilePage = () => {
                     onClick={ async () => await signOut() }
                     variant="danger"
                 >
-                    { AUTHENTICATION.signOut }
+                    <I18N name="authentication.signOut" />
                 </Button>
             </div>
             <AddToGame />

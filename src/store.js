@@ -34,15 +34,6 @@ const dndState = (currentState = initialState, action) => {
             errors: updatedErrors
         }
     }
-    case SET_IS_SMALLVIEW: {
-        return currentState = {
-            ...currentState,
-            ui: {
-                ...currentState.ui,
-                smallView: action.isSmallView
-            }
-        }
-    }
     case SET_USER_ACCOUNT: {
         return currentState = {
             ...currentState,
@@ -170,9 +161,6 @@ export const SET_ERRORS = 'setErrors'
 export const removeErrors = removeAll => ({ type: REMOVE_ERRORS, removeAll })
 export const REMOVE_ERRORS = 'removeErrors'
 
-export const setIsSmallView = isSmallView => ({ type: SET_IS_SMALLVIEW, isSmallView })
-export const SET_IS_SMALLVIEW = 'setIsSmallView'
-
 export const updateDiceValues = (die, values) => ({ type: UPDATE_DICE_VALUES, die, values })
 export const UPDATE_DICE_VALUES = 'updateDiceValues'
 
@@ -235,12 +223,11 @@ export const SET_CURRENT_PAGE_ID = 'setCurrentPageId'
 // Selectors
 export const getErrors = state => state.errors ?? []
 export const getUi = state => state.ui ?? {}
-export const getIsSmallView = state => getUi(state).smallView ?? false
 export const getCurrentUser = state => state.user ?? {}
 export const getActiveGameData = state => state.activeGameData ?? {}
 export const getAllGamePlayers = state => getActiveGameData(state).players ?? {}
 export const getProfilePicture = state => getCurrentUser(state)?.photoURL ?? null
-export const getAllUserGames = state => getCurrentUser(state)?.games
+export const getAllUserGames = state => getCurrentUser(state)?.games ?? {}
 export const getDiceValues = state => state.diceValues ?? DEFAULT_DICE_VALUES
 export const getActiveGameId = state => getCurrentUser(state).activeGameId ?? null
 export const getCurrentUID = state => getCurrentUser(state).uid ?? null
@@ -336,7 +323,7 @@ const resetCurrentInitiative = async (group, state) => {
     const data = getAllGamePlayers(state)
 
     switch (group) {
-    case 'npcs': {
+    case 'NPCs': {
         Object.keys(data).forEach((player) => {
             if (data[player].NPC) {
                 delete data[player]

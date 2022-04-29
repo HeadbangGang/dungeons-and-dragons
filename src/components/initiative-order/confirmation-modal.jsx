@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import { Button, Modal } from 'react-bootstrap'
 import { INITIATIVE_PAGE } from '../../helpers/language-map'
 import { resetInitiative } from '../../store'
+import I18N from '../I18N/i18n'
 
 class ConfirmationModal extends Component {
     static propTypes = {
@@ -26,7 +27,10 @@ class ConfirmationModal extends Component {
             >
                 <Modal.Header>
                     <Modal.Title>
-                        { `Reset all ${ resetInitiativeGroup || '' } initiative values${ !resetInitiativeGroup ? ' and remove all NPCs' : '' }?` }
+                        { /*{ `Reset all ${ resetInitiativeGroup || '' } initiative values${ !resetInitiativeGroup ? ' and remove all NPCs' : '' }?` }*/ }
+                        <I18N name="initiativeOrder.confirmationModal.header" initiativeGroup={ resetInitiativeGroup } />
+                        { !resetInitiativeGroup && <I18N name="initiativeOrder.confirmationModal.header2" /> }
+                        <I18N name="initiativeOrder.confirmationModal.header3" />
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body className="confirmation-modal__modal-body">
@@ -53,8 +57,4 @@ class ConfirmationModal extends Component {
     }
 }
 
-const mapDispatchToProps = {
-    resetInitiative
-}
-
-export default connect(null, mapDispatchToProps)(ConfirmationModal)
+export default connect(null, { resetInitiative })(ConfirmationModal)

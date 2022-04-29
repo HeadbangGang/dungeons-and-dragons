@@ -5,6 +5,7 @@ import { Button, FormControl, InputGroup } from 'react-bootstrap'
 import { DEFAULT_DICE_SIDES } from '../../helpers/constants'
 import { numberValidation } from '../../helpers/helpers'
 import './dice-roller.scss'
+import I18N from '../I18N/i18n'
 
 const DiceRoller = () => {
     const dispatch = useDispatch()
@@ -86,10 +87,10 @@ const DiceRoller = () => {
 
     return (
         <div className="dice-roller">
-            <h1>Dice Roller</h1>
+            <h1><I18N name="diceRoller.header" /></h1>
             { totalRollValue > 0 &&
                 <h2>
-                    Total value:
+                    <I18N name="diceRoller.totalValue" />
                     <div><strong>{ totalRollValue }</strong></div>
                 </h2> }
             <form onSubmit={ (e) => {
@@ -128,7 +129,7 @@ const DiceRoller = () => {
                         onClick={ roll }
                         type="submit"
                     >
-                        Roll
+                        <I18N name="diceRoller.roll" />
                     </Button>
                     <Button
                         disabled={ !totalRollValue }
@@ -136,7 +137,7 @@ const DiceRoller = () => {
                         tabIndex="-1"
                         variant="danger"
                     >
-                        Reset Table
+                        <I18N name="diceRoller.resetTable" />
                     </Button>
                 </div>
             </form>

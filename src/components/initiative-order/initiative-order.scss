@@ -50,6 +50,7 @@
     }
 
     th {
+      font-weight: bolder;
       padding: 10px;
     }
 
@@ -64,17 +65,40 @@
     margin: 10px;
     text-align: center;
   }
+
+  &__reset-buttons {
+    display: flex;
+
+    button {
+      margin: 10px;
+    }
+
+    @media screen and (max-width: 992px) {
+      flex-direction: column;
+      max-width: 600px;
+      width: 100%;
+
+      button {
+        margin-left: 0;
+        margin-right: 0;
+        height: 45px;
+        width: 100%;
+      }
+    }
+  }
 }
 
 .confirmation-modal {
   &__modal-body {
     display: flex;
     justify-content: space-evenly;
-    flex-direction: column;
 
-    button {
-      height: 50px;
-      margin: 5px 0;
+    @media screen and (max-width: 992px) {
+      flex-direction: column;
+      button {
+        height: 50px;
+        margin: 5px 0;
+      }
     }
   }
 }

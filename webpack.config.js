@@ -36,7 +36,7 @@ module.exports = {
         new HtmlWebpackPlugin({
             template: './template/index.html',
             minify: {
-                collapseWhitespace: true
+                collapseWhitespace: !IS_DEV
             }
         }),
         new CopyWebpackPlugin({
@@ -52,7 +52,7 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.jsx?/,
+                test: /(\.jsx?)(\?|$)/,
                 exclude: /(node_modules)/,
                 use: { loader: 'babel-loader' }
             },
@@ -76,7 +76,7 @@ module.exports = {
         ]
     },
     optimization: {
-        minimize: true,
-        minimizer: [new CssMinimizerPlugin(), new TerserPlugin()],
-    },
+        minimize: !IS_DEV,
+        minimizer: [new CssMinimizerPlugin(), new TerserPlugin()]
+    }
 }

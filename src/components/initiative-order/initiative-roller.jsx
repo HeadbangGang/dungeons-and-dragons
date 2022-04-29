@@ -1,23 +1,17 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useSelector } from 'react-redux'
 import { Button, Form, OverlayTrigger, Tooltip } from 'react-bootstrap'
 import { numberValidation } from '../../helpers/helpers'
-import { GENERAL, INITIATIVE_PAGE } from '../../helpers/language-map'
-import { getIsSmallView } from '../../store'
+import I18N, { language } from '../I18N/i18n'
 
 const InitiativeRoller = (props) => {
     const { center, header, modifierValue, setModifierValue, infoButton, initiativeValue, setInitiativeValue, showHeader, submitInitiativeValue } = props
-
-    const isSmallView = useSelector(getIsSmallView)
 
     const initiativeModifierHandler = () => {
         const randomNumber = (Math.floor(Math.random() * 20) + 1) + +modifierValue
         setInitiativeValue(randomNumber)
         setModifierValue('')
     }
-
-
 
     return (
         <div className="initiative-roller__container">
@@ -26,7 +20,7 @@ const InitiativeRoller = (props) => {
                     overlay={
                         <Tooltip>
                             <pre className="initiative-roller__info-button__tooltip">
-                                <strong>Modifier</strong> + <strong>Initiative</strong> = <strong>Final Initiative Value</strong>
+                                <I18N name="initiativeOrder.tooltipContent" markdown />
                             </pre>
                         </Tooltip>
                     }
@@ -37,9 +31,7 @@ const InitiativeRoller = (props) => {
             { showHeader && <div className={ `initiative-roller__header ${center ? 'centered' : ''}` }>{ header }</div> }
             <Form onSubmit={ initiativeModifierHandler }>
                 <div className="styled-input__wrapper">
-                    <div className="styled-input__label">
-                    Modifier
-                    </div>
+                    <I18N blockLevel className="styled-input__label" name="initiativeOrder.modifier" />
                     <input
                         maxLength="2"
                         placeholder="0"
@@ -52,27 +44,25 @@ const InitiativeRoller = (props) => {
                         value={ modifierValue }
                     />
                     <Button onClick={ initiativeModifierHandler }>
-                        { `Roll${isSmallView ? '': ' Initiative'}` }
+                        <I18N name="initiativeOrder.rollInitiative" />
                     </Button>
                 </div>
             </Form>
             <Form onSubmit={ setInitiativeValue }>
                 <div className="styled-input__wrapper">
-                    <div className="styled-input__label">
-                        { INITIATIVE_PAGE.initiative }
-                    </div>
+                    <I18N blockLevel className="styled-input__label" name="initiativeOrder.initiative" />
                     <input
                         maxLength="2"
-                        onChange={ (e) => {
-                            if (numberValidation(e.target.value)) {
-                                setInitiativeValue(e.target.value)
+                        onChange={ ({ target }) => {
+                            if (numberValidation(target.value)) {
+                                setInitiativeValue(target.value)
                             }
                         } }
                         type="tel"
                         value={ initiativeValue }
                     />
                     <Button disabled={ !initiativeValue } id="player-initiative-submit" type="submit" onClick={ submitInitiativeValue }>
-                        { GENERAL.submit }
+                        <I18N name="common.submit" />
                     </Button>
                 </div>
             </Form>
@@ -102,7 +92,7 @@ InitiativeRoller.defaultProps = {
     center: false,
     infoButton: false,
     showHeader: false,
-    header: INITIATIVE_PAGE.setInitiative
+    header: language.initiativeOrder.setYourInitiative
 }
 
 export default InitiativeRoller

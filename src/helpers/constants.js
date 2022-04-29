@@ -2,6 +2,7 @@ export const DEFAULT_DICE_VALUES = { '4': [], '6': [], '8': [], '10': [], '12': 
 export const DEFAULT_DICE_SIDES = ['4', '6', '8', '10', '12', '20']
 export const MAX_ERROR_QUANTITY = 10
 export const SPINNER_DEFAULT = 750
+export const MAX_FILE_SIZE = 10240 // 10MB
 
 export const FIREBASE_ERRORS = {
     EMAIL_ALREADY_IN_USE: 'auth/email-already-in-use',

@@ -1,8 +1,18 @@
 import { FIREBASE_ERRORS, PAGE_ID, PAGE_URL } from './constants'
+import { language } from '../components/I18N/i18n'
 import { ERRORS } from './language-map'
+
+const { errors } = language
 
 export const numberValidation = (val) => {
     return !(!/^\d+$/.test(val) && val !== '')
+}
+
+export const convertSmallerToLargerFileSize = (bytes = 0, decimals = 2) => {
+    const baseBytes = 1024
+    const val = Math.floor(Math.log(bytes) / Math.log(baseBytes))
+
+    return parseFloat((bytes / Math.pow(baseBytes, val)).toFixed(decimals))
 }
 
 export const validateFirstName = (value) => {
@@ -45,28 +55,50 @@ export const validatePassword = (value) => {
     return null
 }
 
+export const validateCharacterName = (value) => {
+    if (!value) {
+        return errors.enterCharacterName
+    }
+    return null
+}
+
+export const validateGameId = (value) => {
+    if (!value) {
+        return errors.enterGameId
+    }
+    return null
+}
+
+export const sanitizedVariable = (value, options) => {
+    value = value.replaceAll(' ', '')
+    if (options?.lowerCase) {
+        value = value.toLowerCase()
+    }
+    return value
+}
+
 export const firebaseErrorResponse = (error, currentPageId = null) => {
     const { code, message } = error
     switch (code) {
     case (FIREBASE_ERRORS.EMAIL_ALREADY_IN_USE):
-        return ERRORS.emailAlreadyExists
+        return errors.emailAlreadyExists
     case (FIREBASE_ERRORS.INVALID_EMAIL):
-        return ERRORS.enterEmail
+        return errors.enterEmail
     case (FIREBASE_ERRORS.USER_NOT_FOUND):
         if (currentPageId === PAGE_ID[PAGE_URL.PASSWORD_RESET_PAGE]) {
-            return ERRORS.emailNotRegistered
+            return errors.emailNotRegistered
         } else if (currentPageId === PAGE_ID[PAGE_URL.SIGN_IN_PAGE]) {
-            return ERRORS.noUserFound
+            return errors.noUserFound
         } else {
             return message
         }
     case (FIREBASE_ERRORS.WRONG_PASSWORD):
-        return ERRORS.wrongPassword
+        return errors.incorrectPassword
     default:
         if (currentPageId === PAGE_ID[PAGE_URL.PASSWORD_RESET_PAGE]) {
-            return ERRORS.errorSendingEmail
+            return errors.errorSendingEmail
         } else if (currentPageId === PAGE_ID[PAGE_URL.SIGN_IN_PAGE]) {
-            return ERRORS.signingIn
+            return errors.signingIn
         } else {
             return message
         }

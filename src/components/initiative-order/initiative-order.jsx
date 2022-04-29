@@ -12,10 +12,10 @@ import {
     updateChosenInitiative
 } from '../../store'
 import { numberValidation } from '../../helpers/helpers'
+import I18N, { language } from '../I18N/i18n'
 import ConfirmationModal from './confirmation-modal'
 import InitiativeRoller from './initiative-roller'
 import NPCInitiativeModal from './npc-initiative-modal'
-import { GENERAL, INITIATIVE_PAGE } from '../../helpers/language-map'
 import './initiative-order.scss'
 
 const InitiativeOrder = () => {
@@ -62,11 +62,11 @@ const InitiativeOrder = () => {
     const updatePlayersInitiative = async (event) => {
         event.preventDefault()
         const initiativeToNum = +initiativeValue || +selectedNPCInitiative
-        if (!isNaN(initiativeToNum)) {
+        if (numberValidation(initiativeToNum)) {
             dispatch(updateChosenInitiative(initiativeToNum, uid))
             setInitiativeValue('')
         } else {
-            dispatch(setErrors('Please enter a valid initiative value in numeric format.'))
+            dispatch(setErrors(language.errors.enterValidInitiativeValue))
             setInitiativeValue('')
         }
     }
@@ -81,14 +81,20 @@ const InitiativeOrder = () => {
             setNpcInitiative('')
         } else {
             if (cleanNpc === '') {
-                dispatch(setErrors('Please enter a valid NPC name.'))
+                dispatch(setErrors(language.errors.enterNPCName))
                 setNpcName('')
             }
             if (sortedPlayers?.filter(player => player.characterName === cleanNpc).length) {
-                dispatch(setErrors('This character already exists. Please use a different NPC name.'))
+                dispatch(setErrors(language.errors.npcExists))
                 setNpcName('')
             }
         }
+    }
+
+    const resetNPCCreator = () => {
+        setNewNpcModifier('')
+        setNpcInitiative('')
+        setNpcName('')
     }
 
     const npcInitiativeModalProps = {
@@ -118,19 +124,19 @@ const InitiativeOrder = () => {
                         <thead>
                             <tr>
                                 <td colSpan={ isAdmin || isDM ? 3 : 2 }>
-                                    <strong>Initiative Order</strong>
+                                    <strong><I18N name="initiativeOrder.header" /></strong>
                                 </td>
                             </tr>
                             <tr>
                                 <th>
-                                    <strong>{ INITIATIVE_PAGE.character }</strong>
+                                    <I18N name="initiativeOrder.character" />
                                 </th>
                                 <th>
-                                    <strong>{ INITIATIVE_PAGE.initiative }</strong>
+                                    <I18N name="initiativeOrder.initiative" />
                                 </th>
                                 { (isAdmin || isDM) &&
                                     <th>
-                                        <strong>{ INITIATIVE_PAGE.modify }</strong>
+                                        <I18N name="initiativeOrder.modify" />
                                     </th>
                                 }
                             </tr>
@@ -154,7 +160,7 @@ const InitiativeOrder = () => {
                                                             setSelectedNPCName(characterName)
                                                         } }
                                                     >
-                                                        { INITIATIVE_PAGE.modify }
+                                                        <I18N name="initiativeOrder.modify" />
                                                     </Button> }
                                             </td> }
                                         </tr>
@@ -185,17 +191,13 @@ const InitiativeOrder = () => {
             { (isAdmin || isDM) &&
                 <>
                     <div className="initiative-order__wrapper">
-                        <div className="initiative-order__header">
-                            { INITIATIVE_PAGE.npcCreator }
-                        </div>
+                        <I18N blockLevel className="initiative-order__header" name="initiativeOrder.npcCreator" />
                         <div className="styled-input__wrapper">
-                            <div className="styled-input__label">
-                                { GENERAL.name }
-                            </div>
+                            <I18N blockLevel className="styled-input__label" name="common.name" />
                             <input type="text" maxLength="20" value={ npcName } onChange={ (e) => setNpcName(e.target.value) } />
                         </div>
                         <InitiativeRoller
-                            header="Initiative"
+                            header={ language.initiativeOrder.initiative }
                             infoButton
                             initiativeValue={ npcInitiative }
                             modifierValue={ newNpcModifier }
@@ -206,30 +208,24 @@ const InitiativeOrder = () => {
                         />
                         <Button
                             disabled={ !newNpcModifier && !npcInitiative && !npcName }
-                            onClick={ () => {
-                                setNewNpcModifier('')
-                                setNpcInitiative('')
-                                setNpcName('')
-                            } }
-                            style={{ margin: '0 auto' }}
+                            onClick={ resetNPCCreator }
                             tabIndex="-1"
                             variant="danger"
                         >
-                            Clear
+                            <I18N name="common.clear" />
                         </Button>
                     </div>
                     { sortedPlayers.length &&
-                    <>
+                    <div className="initiative-order__reset-buttons">
                         <Button
                             disabled={ !sortedPlayers.some(player => player.NPC) }
                             onClick={ () => {
                                 setShowConfirmationModal(true)
-                                setResetInitiativeGroup('npcs')
+                                setResetInitiativeGroup('NPCs')
                             } }
-                            style={{ margin: '5px' }}
                             tabIndex="-1"
                         >
-                            Remove All NPCs
+                            <I18N name="initiativeOrder.removeAllNPCs" />
                         </Button>
                         <Button
                             disabled={ !sortedPlayers.some(player => player.initiativeValue && !player.NPC) }
@@ -237,23 +233,22 @@ const InitiativeOrder = () => {
                                 setShowConfirmationModal(true)
                                 setResetInitiativeGroup('players')
                             } }
-                            style={{ margin: '5px ' }}
                             tabIndex="-1"
                         >
-                            Reset Players Initiatives
+                            <I18N name="initiativeOrder.resetAllPlayers" />
                         </Button>
                         <Button
                             disabled={ !sortedPlayers.length || !sortedPlayers.some(player => player.initiativeValue) }
-                            tabIndex="-1"
                             onClick={ () => {
                                 setShowConfirmationModal(true)
                                 setResetInitiativeGroup(null)
                             } }
+                            tabIndex="-1"
                             variant="danger"
                         >
-                            { INITIATIVE_PAGE.resetInitiative }
+                            <I18N name="initiativeOrder.resetInitiative" />
                         </Button>
-                    </> }
+                    </div> }
                 </>
             }
             <NPCInitiativeModal { ...npcInitiativeModalProps } />

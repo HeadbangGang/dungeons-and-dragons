@@ -2,8 +2,9 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 import { Button, Modal } from 'react-bootstrap'
+import { I18N, language } from '../I18N/i18n'
+import { numberValidation } from '../../helpers/helpers'
 import { removeNPC, setErrors, updateChosenInitiative } from '../../store'
-import { GENERAL, INITIATIVE_PAGE } from '../../helpers/language-map'
 import InitiativeRoller from './initiative-roller'
 
 export default function NPCInitiativeModal (props) {
@@ -22,13 +23,13 @@ export default function NPCInitiativeModal (props) {
 
     const updateNPCsInitiative = async (event) => {
         event.preventDefault()
-        if (!isNaN(+selectedNPCInitiative)) {
+        if (numberValidation(+selectedNPCInitiative)) {
             setShowInitiativeModal(false)
             await dispatch(updateChosenInitiative(+selectedNPCInitiative, selectedNPCName))
             setSelectedNPCInitiative('')
             setSelectedNPCName('')
         } else {
-            dispatch(setErrors('Please enter a valid initiative value in numeric format.'))
+            dispatch(setErrors(language.initiativeOrder.enterValidInitiativevalue))
             setSelectedNPCInitiative('')
         }
     }
@@ -47,7 +48,7 @@ export default function NPCInitiativeModal (props) {
         >
             <Modal.Header>
                 <Modal.Title>
-                    { `${ INITIATIVE_PAGE.modify } ${ selectedNPCName }` }
+                    <I18N name="initiativeOrder.npcInitiativeModal.modifyNPC" npcName={ selectedNPCName } />
                 </Modal.Title>
             </Modal.Header>
             <Modal.Body>
@@ -65,14 +66,14 @@ export default function NPCInitiativeModal (props) {
                     } }
                     variant="danger"
                 >
-                    { `${ GENERAL.remove } ${ selectedNPCName }` }
+                    <I18N name="initiativeOrder.npcInitiativeModal.removeNPC" npcName={ selectedNPCName } />
                 </Button>
             </Modal.Body>
             <Modal.Footer>
                 <Button
                     onClick={ () => setShowInitiativeModal(false) }
                 >
-                    { GENERAL.close }
+                    <I18N name="common.close" />
                 </Button>
             </Modal.Footer>
         </Modal>

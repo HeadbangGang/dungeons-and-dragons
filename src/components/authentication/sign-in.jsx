@@ -1,13 +1,13 @@
 import React, { useState } from 'react'
-import { AUTHENTICATION } from '../../helpers/language-map'
 import { Button, Form } from 'react-bootstrap'
 import { PAGE_URL } from '../../helpers/constants'
 import { auth, getUserDocument } from '../../database/firebase'
 import { firebaseErrorResponse, validateEmail, validatePassword } from '../../helpers/helpers'
-import { setErrors, setUserAccount } from '../../store'
-import { useDispatch } from 'react-redux'
+import { getCurrentPageId, setErrors, setUserAccount } from '../../store'
+import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router'
 import './authentication.scss'
+import I18N from '../I18N/i18n'
 
 const SignIn  = () => {
     const dispatch = useDispatch()
@@ -15,6 +15,8 @@ const SignIn  = () => {
 
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+
+    const currentPageId = useSelector(getCurrentPageId)
 
     const validate = () => {
         const emailError = validateEmail(email)
@@ -50,7 +52,8 @@ const SignIn  = () => {
                         })
                 })
                 .catch((err) => {
-                    dispatch(setErrors(firebaseErrorResponse(err)))
+                    console.log(err)
+                    dispatch(setErrors(firebaseErrorResponse(err, currentPageId)))
                 })
         }
     }
@@ -58,16 +61,14 @@ const SignIn  = () => {
     return (
         <div className="authentication__page-container">
             <div className="authentication__box">
-                <div className="authentication__header">
-                    { AUTHENTICATION.signIn }
-                </div>
+                <I18N blockLevel className="authentication__header" name="authentication.signIn" />
                 <Form
                     className="authentication__form-container"
                     onSubmit={ async () => await signInToAccountHandler() }
                 >
                     <Form.Group className="authentication__group-wrapper">
                         <Form.Label>
-                            { AUTHENTICATION.email }
+                            <I18N name="authentication.email" />
                         </Form.Label>
                         <Form.Control
                             autoComplete="email"
@@ -79,7 +80,7 @@ const SignIn  = () => {
                     </Form.Group>
                     <Form.Group className="authentication__group-wrapper">
                         <Form.Label>
-                            { AUTHENTICATION.password }
+                            <I18N name="authentication.password" />
                         </Form.Label>
                         <Form.Control
                             autoComplete="current-password"
@@ -90,7 +91,7 @@ const SignIn  = () => {
                         />
                         <div className="authentication__forgot-password">
                             <Button onClick={ () => navigate(PAGE_URL.PASSWORD_RESET_PAGE) } variant="link">
-                                { AUTHENTICATION.forgotPassword }
+                                <I18N name="authentication.forgotPassword" />
                             </Button>
                         </div>
                     </Form.Group>
@@ -100,7 +101,7 @@ const SignIn  = () => {
                             type="submit"
                             variant="outline-dark"
                         >
-                            { AUTHENTICATION.signIn }
+                            <I18N name="authentication.signIn" />
                         </Button>
                     </div>
                 </Form>
@@ -111,7 +112,7 @@ const SignIn  = () => {
                             onClick={ () => navigate(PAGE_URL.CREATE_ACCOUNT_PAGE, { replace: true }) }
                             variant="dark"
                         >
-                            { AUTHENTICATION.createAnAccount }
+                            <I18N name="authentication.createAnAccount" />
                         </Button>
                     </div>
                 </div>

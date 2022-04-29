@@ -1,10 +1,8 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useMediaQuery } from 'react-responsive'
 import { useLocation } from 'react-router'
 import { auth, getUserDocument, streamGameData } from '../../database/firebase'
 import { PAGE_ID } from '../../helpers/constants'
-import { ERRORS } from '../../helpers/language-map'
 import {
     getActiveGameId,
     getCurrentUser,
@@ -13,11 +11,11 @@ import {
     setCurrentPageId,
     setErrors,
     setHasLoadedTemplate,
-    setIsSmallView,
     setUserAccount
 } from '../../store'
 import Alerts from '../alerts/alerts'
 import Footer from '../footer/footer'
+import { language } from '../I18N/i18n'
 import Navbar from '../navbar/navbar'
 import './page-template.scss'
 
@@ -29,8 +27,6 @@ const PageTemplate = ({ children }) => {
     const activeGameId = useSelector(getActiveGameId)
     const userData = useSelector(getCurrentUser)
     const hasLoadedTemplate = useSelector(getHasLoadedTemplate)
-
-    const isSmallView = useMediaQuery({ query: '(max-width: 992px)' })
 
     useEffect(() => {
         if (!hasLoadedTemplate) {
@@ -44,7 +40,6 @@ const PageTemplate = ({ children }) => {
                         })
                 }
             })
-            dispatch(setIsSmallView(isSmallView))
             dispatch(setHasLoadedTemplate(true))
         }
     }, [])
@@ -56,7 +51,7 @@ const PageTemplate = ({ children }) => {
                     const playersList = querySnapshot.docs.map(docSnapshot => docSnapshot.data())
                     dispatch(setActiveGameData({ players: { ...playersList[0] } }))
                 },
-                error: () => dispatch(setErrors(ERRORS.updateFirebaseError))
+                error: () => dispatch(setErrors(language.firebaseErrors.updateFirebase))
             })
         }
     }, [setActiveGameData, userData])
