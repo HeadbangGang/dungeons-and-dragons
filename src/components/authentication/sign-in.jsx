@@ -52,7 +52,6 @@ const SignIn  = () => {
                         })
                 })
                 .catch((err) => {
-                    console.log(err)
                     dispatch(setErrors(firebaseErrorResponse(err, currentPageId)))
                 })
         }

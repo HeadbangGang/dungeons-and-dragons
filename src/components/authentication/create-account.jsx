@@ -75,7 +75,6 @@ const CreateAccount = () => {
                             })
                     })
                     .catch((err) => {
-                        console.log(err)
                         dispatch(setErrors(firebaseErrorResponse(err, currentPageId)))
                     })
             } else {
