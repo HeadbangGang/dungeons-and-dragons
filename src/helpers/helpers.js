@@ -2,7 +2,7 @@ import { FIREBASE_ERRORS, PAGE_ID, PAGE_URL } from './constants'
 import { language } from '../components/I18N/i18n'
 import { ERRORS } from './language-map'
 
-const { errors } = language
+const { errors, firebaseErrors } = language
 
 export const numberValidation = (val) => {
     return !(!/^\d+$/.test(val) && val !== '')
@@ -81,24 +81,24 @@ export const firebaseErrorResponse = (error, currentPageId = null) => {
     const { code, message } = error
     switch (code) {
     case (FIREBASE_ERRORS.EMAIL_ALREADY_IN_USE):
-        return errors.emailAlreadyExists
+        return firebaseErrors.emailAlreadyExists
     case (FIREBASE_ERRORS.INVALID_EMAIL):
         return errors.enterEmail
     case (FIREBASE_ERRORS.USER_NOT_FOUND):
         if (currentPageId === PAGE_ID[PAGE_URL.PASSWORD_RESET_PAGE]) {
-            return errors.emailNotRegistered
+            return firebaseErrors.emailNotRegistered
         } else if (currentPageId === PAGE_ID[PAGE_URL.SIGN_IN_PAGE]) {
-            return errors.noUserFound
+            return firebaseErrors.noUserFound
         } else {
             return message
         }
     case (FIREBASE_ERRORS.WRONG_PASSWORD):
-        return errors.incorrectPassword
+        return firebaseErrors.incorrectPassword
     default:
         if (currentPageId === PAGE_ID[PAGE_URL.PASSWORD_RESET_PAGE]) {
-            return errors.errorSendingEmail
+            return firebaseErrors.issueSendingEmail
         } else if (currentPageId === PAGE_ID[PAGE_URL.SIGN_IN_PAGE]) {
-            return errors.signingIn
+            return firebaseErrors.signingIn
         } else {
             return message
         }

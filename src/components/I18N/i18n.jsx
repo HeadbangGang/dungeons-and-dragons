@@ -1,35 +1,49 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import i18n from 'i18next'
-import enUS from '../../helpers/locales/en-US.json'
 import LanguageDetector from 'i18next-browser-languagedetector'
 import { initReactI18next, useTranslation } from 'react-i18next'
 import ReactMarkdown from 'react-markdown'
+import XHR from 'i18next-http-backend'
+import * as allLocales from '../../helpers/locales/'
 
 const mergedLanguageMap = { resources: {} }
 
-const addLanguageMapTranslation = (languageMap, language) => {
+Object.keys(allLocales).forEach(language => {
     mergedLanguageMap.resources[language] = {
-        translation: { ...languageMap }
+        translation: { ...allLocales[language] }
     }
-}
-
-addLanguageMapTranslation(enUS, 'en-US')
+})
 
 i18n
+    .use(XHR)
     .use(LanguageDetector)
     .use(initReactI18next)
     .init({
         ...mergedLanguageMap,
-        fallbackLng: 'en-US',
+        detection: {
+            order: ['querystring', 'navigator'],
+            lookupQuerystring: 'lng'
+        },
+        fallbackLng: {
+            default: ['en']
+        },
         interpolation: {
             escapeValue: false
         }
     })
-    .then(() => {})
+    .then(() => {
+        console.log(`Current Language: ${i18n.language}`)
+    })
 
 const getCurrentLanguageMap = () => {
-    return mergedLanguageMap.resources[i18n.language].translation
+    const currentLangMap = mergedLanguageMap.resources[i18n.language]?.translation
+    const { translation: enLangMap } = mergedLanguageMap.resources['en']
+
+    if (currentLangMap) {
+        return currentLangMap
+    }
+    return enLangMap
 }
 
 export const language = getCurrentLanguageMap()

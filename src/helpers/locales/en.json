@@ -12,28 +12,28 @@
     },
     "errors": {
         "characterExists": "Your Characterʼs name: {{characterName}}, is already preset in this game.",
-        "emailAlreadyExists": "The email address entered is already in use by another account. Please use a different email address and try again or proceed to Sign In.",
-        "emailNotRegistered": "This email address is not registered. Please try another or proceed to Create an Account.",
         "enterCharacterName": "Please enter a Character Name.",
         "enterEmail": "Please enter a email address.",
         "enterGameId": "Please enter a Game ID.",
         "enterNPCName": "Please enter a NPC name.",
         "enterValidInitiativeValue": "Please enter a valid numeric initiative value.",
         "error": "ERROR",
-        "errorSendingEmail": "There was an error sending the password reset email. Please try again.",
         "fileTooLarge": "The selected image is too big, please select a file less than {{fileSize}}MB",
         "gameAlreadyExists": "Game ID already exists, please proceed to Join Game",
         "gameDoesNotExist": "The entered Game ID does not exist, please proceed to Create Game",
         "gameMasterExists": "This game already has a Game Master.",
         "generic": "There was an issue. Please try again.",
-        "incorrectPassword": "Incorrect password. Please try again.",
-        "noUserFound": "No user was found with this email. Try another email address or proceed to Create an Account.",
         "npcExists": "This character already exists. Please use a different NPC name.",
         "passwordsDoNotMatch": "Passwords do not match.",
-        "playerExists": "You are already a player in this game.",
-        "signingIn": "There was an error signing in. Please try again."
+        "playerExists": "You are already a player in this game."
     },
     "firebaseErrors": {
+        "emailAlreadyExists": "The email address entered is already in use by another account. Please use a different email address and try again or proceed to Sign In.",
+        "emailNotRegistered": "This email address is not registered. Please try another or proceed to Create an Account.",
+        "incorrectPassword": "Incorrect password. Please try again.",
+        "issueSendingEmail": "There was an issue sending the password reset email. Please try again.",
+        "noUserFound": "No user was found with this email. Try another email address or proceed to Create an Account.",
+        "signingIn": "There was an error signing in. Please try again.",
         "updateFirebase": "There was an error while updating your data. Please refresh this page then try again."
     },
     "homepage": {

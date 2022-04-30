@@ -1,0 +1,110 @@
+{
+  "common": {
+    "clear": "Chiaro",
+    "close": "Chiudere",
+    "copyright": "©",
+    "dungeonsAndDragons": "Dungeons and Dragons",
+    "gameMaster": "Direttore di gioco",
+    "myName": "Tayden Flitcroft",
+    "name": "Nome",
+    "remove": "Rimuovere",
+    "submit": "Invia"
+  },
+  "errors": {
+    "characterExists": "Il nome del tuo personaggio: {{characterName}} è già preimpostato in questo gioco.",
+    "enterCharacterName": "Inserisci un nome di carattere.",
+    "enterEmail": "Si prega di inserire un indirizzo e-mail.",
+    "enterGameId": "Inserisci un ID gioco.",
+    "enterNPCName": "Inserisci un nome NPC.",
+    "enterValidInitiativeValue": "Immettere un valore di iniziativa numerico valido.",
+    "error": "ERRORE",
+    "fileTooLarge": "L'immagine selezionata è troppo grande, seleziona un file inferiore a {{fileSize}}MB",
+    "gameAlreadyExists": "L'ID gioco esiste già, procedi a Partecipa al gioco",
+    "gameDoesNotExist": "L'ID gioco inserito non esiste, procedi a Crea gioco",
+    "gameMasterExists": "Questo gioco ha già un Game Master.",
+    "generic": "C'è stato un problema. Per favore riprova.",
+    "npcExists": "Questo personaggio esiste già. Usa un nome NPC diverso.",
+    "passwordsDoNotMatch": "Le passwords non corrispondono.",
+    "playerExists": "Sei già un giocatore in questo gioco."
+  },
+  "firebaseErrors": {
+    "emailAlreadyExists": "L'indirizzo e-mail inserito è già utilizzato da un altro account. Utilizza un indirizzo e-mail diverso e riprova o procedi all'accesso.",
+    "emailNotRegistered": "Questo indirizzo e-mail non è registrato. Provane un altro o procedi alla creazione di un account.",
+    "incorrectPassword": "Password errata. Per favore riprova.",
+    "issueSendingEmail": "Si è verificato un problema durante l'invio dell'e-mail di reimpostazione della password. Per favore riprova.",
+    "noUserFound": "Nessun utente è stato trovato con questa email. Prova un altro indirizzo e-mail o procedi a Crea un account.",
+    "signingIn": "Si è verificato un errore durante l'accesso. Riprova.",
+    "updateFirebase": "Si è verificato un errore durante l'aggiornamento dei dati. Aggiorna questa pagina e riprova."
+  },
+  "homepage": {
+    "otherGames": {
+      "cardGameId": "ID gioco: {{- gameId}}",
+      "header": "Altri giochi"
+    }
+  },
+  "authentication": {
+    "characterName": "Nome del personaggio",
+    "confirmPassword": "Conferma password",
+    "createAnAccount": "Creare un account",
+    "createGame": "Crea gioco",
+    "email": "Indirizzo e-mail",
+    "firstName": "Nome di battesimo",
+    "forgotPassword": "Ha dimenticato la password",
+    "gameId": "Identità di gioco",
+    "gameMasterQuery": "Sei tu il Game Master?",
+    "joinGame": "Unisciti al gioco",
+    "lastName": "Cognome",
+    "noShareInfo": "Non condivideremo mai le tue informazioni.",
+    "password": "Parola d'ordine",
+    "resetEmailSent": "Ti è stata inviata un'e-mail di reimpostazione della password! Dovresti riceverlo momentaneamente.",
+    "resetPassword": "Resetta la password",
+    "sendResetEmail": "Invia e-mail di reimpostazione password",
+    "signIn": "Registrazione",
+    "signOut": "Disconnessione"
+  },
+  "diceRoller": {
+    "header": "Rullo di dadi",
+    "resetTable": "Reimposta tabella",
+    "roll": "Rotolo",
+    "totalValue": "Valore complessivo:"
+  },
+  "footer": {
+    "copyFailure": "C'era un errore. Per favore riprova.",
+    "copySuccess": "ID gioco copiato!",
+    "gameId": "ID gioco attuale: {{- activeGameId}}"
+  },
+  "initiativeOrder": {
+    "character": "Carattere",
+    "header": "Ordine di iniziativa",
+    "initiative": "Iniziativa",
+    "modifier": "Modificatore",
+    "modify": "Modificare",
+    "npcCreator": "Creatore di PNG",
+    "removeAllNPCs": "Rimuovi tutti gli NPC",
+    "resetAllPlayers": "Ripristina le iniziative dei giocatori",
+    "resetInitiative": "Iniziativa di ripristino",
+    "rollInitiative": "Iniziativa Roll",
+    "setYourInitiative": "Imposta la tua iniziativa",
+    "tooltipContent": "**Modificatore** + **Iniziativa** = **Valore Iniziativa Finale**",
+    "confirmationModal": {
+      "header": "Reimposta tutti i valori dell'iniziativa {{- initiativeGroup}}",
+      "header2": " e rimuovi tutti gli NPC",
+      "header3": "?"
+    },
+    "npcInitiativeModal": {
+      "modifyNPC": "Modifica {{- npcName}}",
+      "removeNPC": "Rimuovi {{- npcName}}"
+    }
+  },
+  "navbar": {
+    "account": "Account",
+    "diceRoller": "Rullo di dadi",
+    "initiativeOrder": "Ordine di iniziativa",
+    "signInSignUp": "Accedi / Registrati"
+  },
+  "pageNotFound": {
+    "goToHomepage": "Vai alla pagina principale",
+    "header": "# Fallimento critico!",
+    "subHeader": "## Sembra che la pagina che stai cercando sia inattiva per manutenzione o non esista."
+  }
+}
