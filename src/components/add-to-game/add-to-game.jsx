@@ -7,7 +7,7 @@ import { db } from '../../database/firebase'
 import { Button } from 'react-bootstrap'
 import { getCurrentUser, updateActiveGameData, updateUserAccount } from '../../store'
 import { useNavigate } from 'react-router'
-import { I18N, language } from '../I18N/i18n'
+import I18N, { language } from '../I18N/i18n'
 import './add-to-game.scss'
 
 const AddToGame =  () => {

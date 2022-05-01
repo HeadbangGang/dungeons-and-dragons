@@ -16,7 +16,7 @@ import {
     updatePhotoUrl
 } from '../../store'
 import './profile.scss'
-import { I18N, language } from '../I18N/i18n'
+import I18N, { language } from '../I18N/i18n'
 
 const ProfilePage = () => {
     const navigate = useNavigate()

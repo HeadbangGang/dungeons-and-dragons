@@ -106,5 +106,8 @@
     "goToHomepage": "Ir a la página de inicio",
     "header": "# ¡Fallo crítico!",
     "subHeader": "## Parece que la página que está buscando está fuera de servicio por mantenimiento o no existe."
+  },
+  "changeLanguage": {
+    "header": "Cambiar idioma"
   }
 }

@@ -106,5 +106,8 @@
     "goToHomepage": "Gå till hemsidan",
     "header": "# Kritiskt misslyckande!",
     "subHeader": "## Det ser ut som att sidan du letar efter antingen ligger nere för underhåll eller inte existerar."
+  },
+  "changeLanguage": {
+    "header": "Ändra språk"
   }
 }

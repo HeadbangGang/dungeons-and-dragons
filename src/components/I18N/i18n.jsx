@@ -1,11 +1,11 @@
-import PropTypes from 'prop-types'
 import React from 'react'
-import i18n from 'i18next'
+import * as allLocales from '../../helpers/locales/'
 import LanguageDetector from 'i18next-browser-languagedetector'
-import { initReactI18next, useTranslation } from 'react-i18next'
+import PropTypes from 'prop-types'
 import ReactMarkdown from 'react-markdown'
 import XHR from 'i18next-http-backend'
-import * as allLocales from '../../helpers/locales/'
+import i18n from 'i18next'
+import { initReactI18next, useTranslation } from 'react-i18next'
 
 const mergedLanguageMap = { resources: {} }
 
@@ -33,24 +33,32 @@ i18n
         }
     })
     .then(() => {
-        console.log(`Current Language: ${i18n.language}`)
+        console.info(`Browser Language: ${i18n.language}`)
     })
 
 const getCurrentLanguageMap = () => {
     const currentLangMap = mergedLanguageMap.resources[i18n.language]?.translation
-    const { translation: enLangMap } = mergedLanguageMap.resources['en']
+    const enLangMap = mergedLanguageMap.resources.en.translation
 
-    if (currentLangMap) {
-        return currentLangMap
-    }
-    return enLangMap
+    return currentLangMap ?? enLangMap
 }
 
 export const language = getCurrentLanguageMap()
 
-export const I18N = (props) => {
+export const changeCurrentLanguage = async (language, callback) => {
+    i18n.changeLanguage(language)
+        .then(() => {
+            window.localStorage.setItem('preferredLanguage', language)
+            callback && callback()
+            console.info(`Language Changed: ${language}`)
+        })
+}
+
+const I18N = (props) => {
     const { t } = useTranslation()
+
     const { blockLevel, className, markdown, name, ...options } = props
+
     const text = t(name, options)
     if (markdown) {
         return <ReactMarkdown className={ className }>{ text }</ReactMarkdown>

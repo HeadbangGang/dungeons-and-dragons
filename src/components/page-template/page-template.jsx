@@ -1,22 +1,26 @@
+import i18n from 'i18next'
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation } from 'react-router'
 import { auth, getUserDocument, streamGameData } from '../../database/firebase'
 import { PAGE_ID } from '../../helpers/constants'
+import ChangeLanguage from '../change-language/change-language'
 import {
     getActiveGameId,
     getCurrentUser,
     getHasLoadedTemplate,
     setActiveGameData,
+    setCurrentLanguage,
     setCurrentPageId,
     setErrors,
-    setHasLoadedTemplate,
+    setHasLoadedTemplate, setLocaleNames,
+    setLocales,
     setUserAccount
 } from '../../store'
-import Alerts from '../alerts/alerts'
 import Footer from '../footer/footer'
-import { language } from '../I18N/i18n'
+import { changeCurrentLanguage, language } from '../I18N/i18n'
 import Navbar from '../navbar/navbar'
+import * as allLocales from '../../helpers/locales/'
 import './page-template.scss'
 
 const PageTemplate = ({ children }) => {
@@ -27,6 +31,26 @@ const PageTemplate = ({ children }) => {
     const activeGameId = useSelector(getActiveGameId)
     const userData = useSelector(getCurrentUser)
     const hasLoadedTemplate = useSelector(getHasLoadedTemplate)
+
+
+    useEffect(() => {
+        const preferredLanguage = window.localStorage.getItem('preferredLanguage')
+        const localeArr = Object.keys(allLocales)
+
+        dispatch(setLocales(localeArr))
+        dispatch(setLocaleNames(localeArr))
+        if (!preferredLanguage) {
+            dispatch(setCurrentLanguage(window.navigator.language))
+        }
+        if (preferredLanguage && preferredLanguage !== i18n.language) {
+            changeCurrentLanguage(preferredLanguage, () => dispatch(setCurrentLanguage(preferredLanguage)))
+        }
+    }, [])
+
+    useEffect(() => {
+        dispatch(setCurrentPageId(PAGE_ID[pathname]))
+        document.getElementById('dungeons-and-dragons').scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'start' })
+    }, [pathname])
 
     useEffect(() => {
         if (!hasLoadedTemplate) {
@@ -56,16 +80,12 @@ const PageTemplate = ({ children }) => {
         }
     }, [setActiveGameData, userData])
 
-    useEffect(() => {
-        dispatch(setCurrentPageId(PAGE_ID[pathname]))
-    }, [pathname])
-
     return (
         <div className="dnd-container">
-            <Alerts />
             <Navbar />
             <div className="dnd-main-content">
                 { children }
+                <ChangeLanguage />
             </div>
             <Footer />
         </div>

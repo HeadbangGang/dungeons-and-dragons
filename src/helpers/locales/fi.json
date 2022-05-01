@@ -106,5 +106,8 @@
     "goToHomepage": "Mene kotisivulle",
     "header": "# Kriittinen epäonnistuminen!",
     "subHeader": "## Näyttää siltä, että etsimäsi sivu on joko pois käytöstä huollon vuoksi tai sitä ei ole olemassa."
+  },
+  "changeLanguage": {
+    "header": "Vaihda kieltä"
   }
 }

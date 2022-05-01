@@ -106,5 +106,8 @@
         "goToHomepage": "Go To Homepage",
         "header": "# Critical Failure!",
         "subHeader": "## It looks like the page you are looking for either is down for maintenance or does not exist."
+    },
+    "changeLanguage": {
+        "header": "Change Language"
     }
 }

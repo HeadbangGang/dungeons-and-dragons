@@ -1,3 +1,4 @@
+import { setCurrentLanguage } from '../store'
 import { FIREBASE_ERRORS, PAGE_ID, PAGE_URL } from './constants'
 import { language } from '../components/I18N/i18n'
 import { ERRORS } from './language-map'

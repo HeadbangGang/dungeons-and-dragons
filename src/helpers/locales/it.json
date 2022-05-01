@@ -106,5 +106,8 @@
     "goToHomepage": "Vai alla pagina principale",
     "header": "# Fallimento critico!",
     "subHeader": "## Sembra che la pagina che stai cercando sia inattiva per manutenzione o non esista."
+  },
+  "changeLanguage": {
+    "header": "Cambia lingua"
   }
 }

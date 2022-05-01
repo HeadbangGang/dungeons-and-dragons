@@ -106,5 +106,8 @@
     "goToHomepage": "홈페이지로 이동",
     "header": "# 치명적인 실패!",
     "subHeader": "## 찾고 있는 페이지가 유지 보수를 위해 다운되었거나 존재하지 않는 것 같습니다."
+  },
+  "changeLanguage": {
+    "header": "언어 변경"
   }
 }

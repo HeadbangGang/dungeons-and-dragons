@@ -106,5 +106,8 @@
     "goToHomepage": "Aller à la page d'accueil",
     "header": "# Échec critique !",
     "subHeader": "## Il semble que la page que vous recherchez est en maintenance ou n'existe pas."
+  },
+  "changeLanguage": {
+    "header": "Changer de langue"
   }
 }

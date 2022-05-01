@@ -6,7 +6,7 @@ import { firebaseErrorResponse, validateEmail, validateFirstName, validateLastNa
 import { getCurrentPageId, setErrors, setUserAccount } from '../../store'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router'
-import { I18N, language } from '../I18N/i18n'
+import I18N, { language } from '../I18N/i18n'
 import './authentication.scss'
 
 const CreateAccount = () => {

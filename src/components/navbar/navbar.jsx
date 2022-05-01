@@ -10,6 +10,7 @@ import {
 import { useSelector } from 'react-redux'
 import { Button, Navbar } from 'react-bootstrap'
 import './navbar.scss'
+import Alerts from '../alerts/alerts'
 import I18N from '../I18N/i18n'
 
 const DndNavbar = () => {
@@ -86,6 +87,7 @@ const DndNavbar = () => {
             fixed="top"
             onToggle={ () => setNavbarExpanded(!navbarExpanded) }
         >
+            <Alerts />
             <button
                 className="navbar__icon"
                 onClick={ () => handleHomeButton() }

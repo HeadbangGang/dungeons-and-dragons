@@ -140,6 +140,42 @@ const dndState = (currentState = initialState, action) => {
             }
         }
     }
+    case SET_LOCALES: {
+        return currentState = {
+            ...currentState,
+            localization: {
+                ...currentState.localization,
+                locales: action.locales
+            }
+        }
+    }
+    case SET_LOCALE_NAMES: {
+        return currentState = {
+            ...currentState,
+            localization: {
+                ...currentState.localization,
+                localeNames: action.localeNames
+            }
+        }
+    }
+    case SET_CURRENT_LANGUAGE: {
+        return currentState = {
+            ...currentState,
+            localization: {
+                ...currentState.localization,
+                currentLanguage: action.language
+            }
+        }
+    }
+    case SET_SHOW_CHANGE_LANGUAGE: {
+        return currentState = {
+            ...currentState,
+            localization: {
+                ...currentState.localization,
+                showChangeLanguage: action.shouldShowChangeLanguage
+            }
+        }
+    }
     default:
         return currentState
     }
@@ -172,6 +208,15 @@ export const SET_HAS_LOADED_TEMPLATE = 'setHasLoadedTemplate'
 
 export const setPreviousLocations = (updatedPreviousLocations) => ({ type: SET_PREVIOUS_LOCATIONS, updatedPreviousLocations })
 export const SET_PREVIOUS_LOCATIONS = 'setPreviousLocations'
+
+export const setCurrentLanguage = language => ({ type: SET_CURRENT_LANGUAGE, language })
+export const SET_CURRENT_LANGUAGE = 'setCurrentLanguage'
+
+export const setShowChangeLanguage = shouldShowChangeLanguage => ({ type: SET_SHOW_CHANGE_LANGUAGE, shouldShowChangeLanguage })
+export const SET_SHOW_CHANGE_LANGUAGE = 'showChangeLanguage'
+
+export const setLocales = locales => ({ type: SET_LOCALES, locales })
+export const SET_LOCALES = 'setAvailableLocales'
 
 // Thunks
 export const updateUserAccount = (gameId, characterName, currentGameData) => async (dispatch, getState) => {
@@ -220,6 +265,19 @@ export const setCurrentPageId = (pageId) => (dispatch, getState) => {
 }
 export const SET_CURRENT_PAGE_ID = 'setCurrentPageId'
 
+export const setLocaleNames = locales => (dispatch, getState) => {
+    const languageNames = new Intl.DisplayNames([getCurrentLanguage(getState()) || 'en'], {
+        type: 'language'
+    })
+
+    const localeNames = locales.sort().map(locale => ({
+        code: locale,
+        name: languageNames.of(locale)
+    }))
+    dispatch({ type: SET_LOCALE_NAMES, localeNames })
+}
+export const SET_LOCALE_NAMES = 'setLocaleNames'
+
 // Selectors
 export const getErrors = state => state.errors ?? []
 export const getUi = state => state.ui ?? {}
@@ -246,6 +304,11 @@ export const getCurrentUserIsDm = state => {
 export const getRouting = state => state.routing ?? {}
 export const getCurrentPageId = state => state.routing?.currentPageId ?? ''
 export const getPreviousLocations = state => state.routing?.previousLocations ?? []
+export const getLocalizationData = state => state.localization ?? {}
+export const getCurrentLanguage = state => getLocalizationData(state).currentLanguage ?? window.localStorage.getItem('preferredLanguage') ?? 'en'
+export const getLocales = state => getLocalizationData(state).locales ?? []
+export const getLocaleNames = state => getLocalizationData(state).localeNames ?? []
+export const getShowChangeLanguage = state => getLocalizationData(state).showChangeLanguage ?? false
 
 // Redux Functions
 const updateRemovedErrors = (state) => {

@@ -106,5 +106,8 @@
     "goToHomepage": "Zur Homepage",
     "header": "# Kritischer Fehler!",
     "subHeader": "## Anscheinend ist die Seite, nach der Sie suchen, entweder wegen Wartungsarbeiten nicht verfügbar oder existiert nicht ."
+  },
+  "changeLanguage": {
+    "header": "Sprache ändern"
   }
 }

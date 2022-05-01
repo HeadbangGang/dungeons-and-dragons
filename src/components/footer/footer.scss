@@ -1,16 +1,22 @@
 .footer {
   color: white;
-
-  &__active-game-id {
-    margin-left: auto;
-
-    &:hover {
-      cursor: pointer;
-    }
-  }
+  justify-content: space-between;
 
   &__copyright {
+    &-container {
+      display: flex;
+    }
     margin-left: 10px;
+  }
+
+  &__img-button {
+    background: none;
+    border: none;
+    padding: 0;
+  }
+
+  &__i18n-img {
+    width: 40px;
   }
 
   @media only screen and (max-device-width: 576px) {
