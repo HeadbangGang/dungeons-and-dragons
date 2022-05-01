@@ -16,165 +16,109 @@ const dndState = (currentState = initialState, action) => {
         if (updatedErrors.length >= MAX_ERROR_QUANTITY) {
             updatedErrors = updateRemovedErrors(currentState)
         }
-        return currentState = {
-            ...currentState,
-            errors: [action.errorData, ...updatedErrors]
-        }
+        return currentState.errors = [action.errorData, ...updatedErrors]
     }
     case REMOVE_ERRORS: {
         if (action.removeAll) {
-            return currentState = {
-                ...currentState,
-                errors: []
-            }
+            currentState.errors = []
+        } else {
+            currentState.errors = updateRemovedErrors(currentState)
         }
-        const updatedErrors = updateRemovedErrors(currentState)
-        return currentState = {
-            ...currentState,
-            errors: updatedErrors
-        }
+        return currentState
     }
     case SET_USER_ACCOUNT: {
-        return currentState = {
-            ...currentState,
-            user: action.userData
-        }
+        currentState.user = action.userData
+        return currentState
     }
     case UPDATE_USER_ACCOUNT: {
-        return currentState = {
-            ...currentState,
-            user: action.updatedUserAccount
-        }
+        currentState.user = action.updatedUserAccount
+        return currentState
     }
     case SET_ACTIVE_GAME_DATA: {
-        return currentState = {
-            ...currentState,
-            activeGameData: action.gameData
-        }
+        currentState.activeGameData = action.gameData
+        return currentState
     }
     case UPDATE_ACTIVE_GAME_DATA: {
-        return currentState = {
-            ...currentState,
-            activeGameData: action.updatedGameData
-        }
+        currentState.activeGameData = action.updatedGameData
+        return currentState
     }
     case UPDATE_PHOTO_URL: {
-        return currentState = {
-            ...currentState,
-            user : {
-                ...currentState.user,
-                photoURL: action.url
-            }
+        currentState.user = {
+            photoURL: action.url
         }
+        return currentState
     }
     case UPDATE_CHOSEN_INITIATIVE: {
-        return currentState = {
-            ...currentState,
-            activeGameData: {
-                ...currentState.activeGameData,
-                [action.id]: action.updatedGameData
-            }
+        currentState.activeGameData = {
+            [action.id]: action.updatedGameData
         }
+        return currentState
     }
     case RESET_INITIATIVE: {
-        return currentState = {
-            ...currentState,
-            activeGameData: action.resetGameInitiative
-        }
+        currentState.activeGameData = action.resetGameInitiative
+        return currentState
     }
     case REMOVE_NPC: {
-        return currentState = {
-            ...currentState,
-            activeGameData: {
-                ...currentState.activeGameData,
-                players: action.removedNPC
-            }
+        currentState.activeGameData = {
+            players: action.removedNPC
         }
+        return currentState
     }
     case UPDATE_ACTIVE_GAME_ID: {
-        return currentState = {
-            ...currentState,
-            user: {
-                ...currentState.user,
-                activeGameId: action.updatedActiveGameId
-            }
+        currentState.user = {
+            activeGameData: action.updatedActiveGameId
         }
+        return currentState
     }
     case UPDATE_DICE_VALUES: {
-        const updatedDiceValues = updateCurrentDiceValues(action.die, action.values, currentState)
-        return currentState = {
-            ...currentState,
-            diceValues: updatedDiceValues
-        }
+        currentState.diceValues = updateCurrentDiceValues(action.die, action.values, currentState)
+        return currentState
     }
     case RESET_DICE_VALUES: {
-        return currentState = {
-            ...currentState,
-            diceValues: DEFAULT_DICE_VALUES
-        }
+        currentState.diceValues = DEFAULT_DICE_VALUES
+        return currentState
     }
     case SET_HAS_LOADED_TEMPLATE: {
-        return currentState = {
-            ...currentState,
-            ui: {
-                ...currentState.ui,
-                hasLoadedTemplate: action.hasLoadedTemplate
-            }
+        currentState.ui = {
+            hasLoadedTemplate: action.hasLoadedTemplate
         }
+        return currentState
     }
     case SET_CURRENT_PAGE_ID: {
-        return currentState = {
-            ...currentState,
-            routing: {
-                ...currentState.routing,
-                currentPageId: action.pageId
-            }
+        currentState.routing = {
+            currentPageId: action.pageId
         }
+        return currentState
     }
     case SET_PREVIOUS_LOCATIONS: {
-        return currentState = {
-            ...currentState,
-            routing: {
-                ...currentState.routing,
-                previousLocations: action.updatedPreviousLocations
-            }
+        currentState.routing ={
+            previousLocations: action.updatedPreviousLocations
         }
+        return currentState
     }
     case SET_LOCALES: {
-        return currentState = {
-            ...currentState,
-            localization: {
-                ...currentState.localization,
-                locales: action.locales
-            }
+        currentState.localization = {
+            locales: action.locales
         }
+        return currentState
     }
     case SET_LOCALE_NAMES: {
-        return currentState = {
-            ...currentState,
-            localization: {
-                ...currentState.localization,
-                localeNames: action.localeNames
-            }
+        currentState.locales = {
+            localName: action.localeNames
         }
+        return currentState
     }
     case SET_CURRENT_LANGUAGE: {
-        return currentState = {
-            ...currentState,
-            localization: {
-                ...currentState.localization,
-                currentLanguage: action.language
-            }
+        currentState.localization ={
+            currentLanguage: action.language
         }
+        return currentState
     }
     case SET_SHOW_CHANGE_LANGUAGE: {
-        return currentState = {
-            ...currentState,
-            localization: {
-                ...currentState.localization,
-                showChangeLanguage: action.shouldShowChangeLanguage
-            }
+        currentState.localization ={
+            showChangeLanguage: action.shouldShowChangeLanguage
         }
+        return currentState
     }
     default:
         return currentState
