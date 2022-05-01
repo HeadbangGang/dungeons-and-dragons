@@ -1,0 +1,113 @@
+{
+  "common": {
+    "clear": "Dégager",
+    "close": "proche",
+    "copyright": "©",
+    "dungeonsAndDragons": "Donjons et Dragons",
+    "gameMaster": "Maître du jeu",
+    "myName": "Tayden Flitcroft",
+    "name": "Nom",
+    "remove": "Éliminer",
+    "submit": "Soumettre"
+  },
+  "errors": {
+    "characterExists": "Le nom de votre personnage : {{characterName}}, est déjà prédéfini dans ce jeu.",
+    "enterCharacterName": "Veuillez entrer un nom de personnage.",
+    "enterEmail": "Veuillez saisir une adresse e-mail.",
+    "enterGameId": "Veuillez saisir un ID de jeu.",
+    "enterNPCName": "Veuillez entrer un nom de PNJ.",
+    "enterValidInitiativeValue": "Veuillez saisir une valeur d'initiative numérique valide.",
+    "error": "ERREUR",
+    "fileTooLarge": "L'image sélectionnée est trop grande, veuillez sélectionner un fichier de moins de {{fileSize}} Mo",
+    "gameAlreadyExists": "L'ID de jeu existe déjà, veuillez passer à Rejoindre le jeu",
+    "gameDoesNotExist": "L'ID de jeu saisi n'existe pas, veuillez passer à Créer un jeu",
+    "gameMasterExists": "Ce jeu a déjà un Game Master.",
+    "generic": "Il y avait un problème. Veuillez réessayer.",
+    "npcExists": "Ce personnage existe déjà. Veuillez utiliser un autre nom de PNJ.",
+    "passwordsDoNotMatch": "Les mots de passe ne correspondent pas.",
+    "playerExists": "Vous êtes déjà un joueur dans ce jeu."
+  },
+  "firebaseErrors": {
+    "emailAlreadyExists": "L'adresse e-mail saisie est déjà utilisée par un autre compte. Veuillez utiliser une adresse e-mail différente et réessayer ou procéder à la connexion.",
+    "emailNotRegistered": "Cette adresse e-mail n'est pas enregistrée. Veuillez en essayer une autre ou procéder à la création d'un compte.",
+    "incorrectPassword": "Mot de passe incorrect. Veuillez réessayer.",
+    "issueSendingEmail": "Un problème est survenu lors de l'envoi de l'e-mail de réinitialisation du mot de passe. Veuillez réessayer.",
+    "noUserFound": "Aucun utilisateur n'a été trouvé avec cet e-mail. Essayez une autre adresse e-mail ou passez à Créer un compte.",
+    "signingIn": "Une erreur s'est produite lors de la connexion. Veuillez réessayer.",
+    "updateFirebase": "Une erreur s'est produite lors de la mise à jour de vos données. Veuillez actualiser cette page, puis réessayer."
+  },
+  "homepage": {
+    "otherGames": {
+      "cardGameId": "ID de jeu : {{- gameId}}",
+      "header": "D'autres jeux"
+    }
+  },
+  "authentication": {
+    "characterName": "Le nom du personnage",
+    "confirmPassword": "Confirmez le mot de passe",
+    "createAnAccount": "Créer un compte",
+    "createGame": "Créer un jeu",
+    "email": "Adresse e-mail",
+    "firstName": "Prénom",
+    "forgotPassword": "Mot de passe oublié",
+    "gameId": "Identifiant de jeu",
+    "gameMasterQuery": "Êtes-vous le maître du jeu ?",
+    "joinGame": "Rejoins une partie",
+    "lastName": "Nom de famille",
+    "noShareInfo": "Nous ne partagerons jamais vos informations.",
+    "password": "Mot de passe",
+    "resetEmailSent": "Un email de réinitialisation de mot de passe vous a été envoyé ! Vous devriez le recevoir momentanément.",
+    "resetPassword": "réinitialiser le mot de passe",
+    "sendResetEmail": "Envoyer un e-mail de réinitialisation du mot de passe",
+    "signIn": "S'identifier",
+    "signOut": "Se déconnecter"
+  },
+  "diceRoller": {
+    "header": "Lanceur de dés",
+    "resetTable": "Réinitialiser le tableau",
+    "roll": "Roulent",
+    "totalValue": "Valeur totale:"
+  },
+  "footer": {
+    "copyFailure": "Il y avait une erreur. Veuillez réessayer.",
+    "copySuccess": "ID de jeu copié !",
+    "gameId": "ID de jeu actuel : {{- activeGameId}}"
+  },
+  "initiativeOrder": {
+    "character": "Personnage",
+    "header": "Ordre d'initiative",
+    "initiative": "Initiative",
+    "modifier": "Modificateur",
+    "modify": "Modifier",
+    "npcCreator": "Créateur de PNJ",
+    "removeAllNPCs": "Supprimer tous les PNJ",
+    "resetAllPlayers": "Réinitialiser les initiatives des joueurs",
+    "resetInitiative": "Initiative de réinitialisation",
+    "rollInitiative": "Lancer l'initiative",
+    "setYourInitiative": "Définissez votre initiative",
+    "tooltipContent": "**Modificateur** + **Initiative** = **Valeur d'initiative finale**",
+    "confirmationModal": {
+      "header": "Réinitialiser toutes les valeurs d'initiative {{- initiativeGroup}}",
+      "header2": " et supprimer tous les PNJ",
+      "header3": "?"
+    },
+    "npcInitiativeModal": {
+      "modifyNPC": "Modifier {{- npcName}}",
+      "removeNPC": "Supprimer {{- npcName}}"
+    }
+  },
+  "navbar": {
+    "account": "Compte",
+    "diceRoller": "Lanceur de dés",
+    "initiativeOrder": "Ordre d'initiative",
+    "signInSignUp": "Vous connecter vous inscrire"
+  },
+  "pageNotFound": {
+    "goToHomepage": "Aller à la page d'accueil",
+    "header": "# Échec critique !",
+    "subHeader": "## Il semble que la page que vous recherchez est en maintenance ou n'existe pas."
+  },
+  "changeLanguage": {
+    "header": "Changer de langue"
+  }
+}

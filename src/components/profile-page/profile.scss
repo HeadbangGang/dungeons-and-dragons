@@ -1,0 +1,41 @@
+.profile {
+  &__user-data-wrapper {
+    display: flex;
+    flex-direction: column;
+    place-items: center;
+
+    &__user-data {
+      margin: 25px;
+      text-align: center;
+    }
+  }
+
+  &__img {
+    &__edit {
+      height: 20px;
+      left: 215px;
+      position: relative;
+      top: 35px;
+    }
+
+    &__border {
+      border: 2px solid black;
+      border-radius: 40px;
+      min-width: 250px;
+      min-height: 250px;
+      text-align: center;
+    }
+  }
+
+  &__page {
+    &__img {
+      max-width: 200px;
+      max-height: 300px;
+      margin: 15px;
+    }
+
+    &__spinner {
+      margin-top: 50px;
+    }
+  }
+}

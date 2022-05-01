@@ -1,0 +1,113 @@
+{
+  "common": {
+    "clear": "Löschen",
+    "close": "Schließen",
+    "copyright": "©",
+    "dungeonsAndDragons": "Verliese und Drachen",
+    "gameMaster": "Spielleiter",
+    "myName": "Tayden Flitcroft",
+    "name": "Name",
+    "remove": "Entfernen",
+    "submit": "Senden"
+  },
+  "errors": {
+    "characterExists": "Der Name Ihres Charakters: {{characterName}}, ist in diesem Spiel bereits voreingestellt.",
+    "enterCharacterName": "Bitte geben Sie einen Charakternamen ein.",
+    "enterEmail": "Bitte geben Sie eine E-Mail-Adresse ein.",
+    "enterGameId": "Bitte geben Sie eine Spiel-ID ein.",
+    "enterNPCName": "Bitte geben Sie einen NPC-Namen ein. ",
+    "enterValidInitiativeValue": "Bitte geben Sie einen gültigen numerischen Initiativewert ein.",
+    "error": "FEHLER",
+    "fileTooLarge": "Das ausgewählte Bild ist zu groß, bitte wählen Sie eine Datei mit weniger als {{fileSize}} MB",
+    "gameAlreadyExists": "Spiel-ID existiert bereits, bitte fahren Sie mit „Spiel beitreten“ fort",
+    "gameDoesNotExist": "Die eingegebene Spiel-ID existiert nicht, bitte fahren Sie mit Spiel erstellen fort",
+    "gameMasterExists": "Bitte geben Sie einen Charakternamen ein.0",
+    "generic": "Bitte geben Sie einen Charakternamen ein.1",
+    "npcExists": "Bitte geben Sie einen Charakternamen ein.2",
+    "passwordsDoNotMatch": "Bitte geben Sie einen Charakternamen ein.3",
+    "playerExists": "Bitte geben Sie einen Charakternamen ein.4"
+  },
+  "firebaseErrors": {
+    "emailAlreadyExists": "Die eingegebene E-Mail-Adresse wird bereits von einem anderen Konto verwendet. Bitte verwenden Sie eine andere E-Mail-Adresse und versuchen Sie es erneut oder fahren Sie mit der Anmeldung fort.",
+    "emailNotRegistered": "Diese E-Mail-Adresse ist nicht registriert. Bitte versuchen Sie es mit einem anderen oder fahren Sie mit Konto erstellen fort.",
+    "incorrectPassword": "Falsches Passwort. Bitte versuchen Sie es erneut.",
+    "issueSendingEmail": "Beim Senden der E-Mail zum Zurücksetzen des Passworts ist ein Problem aufgetreten. Bitte versuchen Sie es erneut.",
+    "noUserFound": "Mit dieser E-Mail wurde kein Benutzer gefunden. Versuchen Sie es mit einer anderen E-Mail-Adresse oder fahren Sie mit Konto erstellen fort.",
+    "signingIn": "Beim Anmelden ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
+    "updateFirebase": "Beim Aktualisieren Ihrer Daten ist ein Fehler aufgetreten. Bitte aktualisieren Sie diese Seite und versuchen Sie es erneut."
+  },
+  "homepage": {
+    "otherGames": {
+      "cardGameId": "Spiel-ID: {{- gameId}}",
+      "header": "Andere Spiele"
+    }
+  },
+  "authentication": {
+    "characterName": "Charaktername",
+    "confirmPassword": "Passwort bestätigen",
+    "createAnAccount": "Konto erstellen",
+    "createGame": "Spiel erstellen",
+    "email": "E-Mail-Adresse",
+    "firstName": "Vorname",
+    "forgotPassword": "Passwort vergessen",
+    "gameId": "Spiel-ID",
+    "gameMasterQuery": "Sind Sie der Spielleiter?",
+    "joinGame": "Spiel beitreten",
+    "lastName": "Nachname",
+    "noShareInfo": "Wir werden Ihre Informationen niemals weitergeben.",
+    "password": "Passwort",
+    "resetEmailSent": "Eine E-Mail zum Zurücksetzen des Passworts wurde an Sie gesendet! Sie sollten es in Kürze erhalten.",
+    "resetPassword": "Passwort zurücksetzen",
+    "sendResetEmail": "E-Mail zum Zurücksetzen des Passworts senden",
+    "signIn": "Anmelden",
+    "signOut": "Abmelden"
+  },
+  "diceRoller": {
+    "header": "Würfelrolle",
+    "resetTable": "Tabelle zurücksetzen",
+    "roll": "Wurf",
+    "totalValue": "Gesamtwert:"
+  },
+  "footer": {
+    "copyFailure": "Es ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
+    "copySuccess": "Spiel-ID kopiert!",
+    "gameId": "Aktuelle Spiel-ID: {{- activeGameId}}"
+  },
+  "initiativeOrder": {
+    "character": "Charakter",
+    "header": "Reihenfolge der Initiative",
+    "initiative": "Initiative",
+    "modifier": "Tabelle zurücksetzen0",
+    "modify": "Tabelle zurücksetzen1",
+    "npcCreator": "Tabelle zurücksetzen2",
+    "removeAllNPCs": "Tabelle zurücksetzen3",
+    "resetAllPlayers": "Tabelle zurücksetzen4",
+    "resetInitiative": "Tabelle zurücksetzen5",
+    "rollInitiative": "Tabelle zurücksetzen6",
+    "setYourInitiative": "Tabelle zurücksetzen7",
+    "tooltipContent": "Tabelle zurücksetzen8",
+    "confirmationModal": {
+      "header": "Tabelle zurücksetzen9",
+      "header2": "Wurf0",
+      "header3": "Wurf1"
+    },
+    "npcInitiativeModal": {
+      "modifyNPC": "Wurf2",
+      "removeNPC": "Wurf3"
+    }
+  },
+  "navbar": {
+    "account": "Konto",
+    "diceRoller": "Würfelroller",
+    "initiativeOrder": "Initiativbestellung",
+    "signInSignUp": "Anmelden / Registrieren"
+  },
+  "pageNotFound": {
+    "goToHomepage": "Zur Homepage",
+    "header": "# Kritischer Fehler!",
+    "subHeader": "## Anscheinend ist die Seite, nach der Sie suchen, entweder wegen Wartungsarbeiten nicht verfügbar oder existiert nicht ."
+  },
+  "changeLanguage": {
+    "header": "Sprache ändern"
+  }
+}

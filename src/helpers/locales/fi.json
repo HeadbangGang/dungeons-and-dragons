@@ -1,0 +1,113 @@
+{
+  "common": {
+    "clear": "Asia selvä",
+    "close": "kiinni",
+    "copyright": "©",
+    "dungeonsAndDragons": "Dungeons and Dragons",
+    "gameMaster": "Pelimestari",
+    "myName": "Tayden Flitcroft",
+    "name": "Nimi",
+    "remove": "Poista",
+    "submit": "Lähetä"
+  },
+  "errors": {
+    "characterExists": "Hahmosi nimi: {{characterName}} on jo esiasetettu tässä pelissä.",
+    "enterCharacterName": "Anna hahmon nimi.",
+    "enterEmail": "Anna sähköpostiosoite.",
+    "enterGameId": "Anna pelitunnus.",
+    "enterNPCName": "Anna NPC-nimi.",
+    "enterValidInitiativeValue": "Anna kelvollinen numeerinen aloitusarvo.",
+    "error": "VIRHE",
+    "fileTooLarge": "Valittu kuva on liian suuri, valitse tiedosto, joka on pienempi kuin {{fileSize}} Mt",
+    "gameAlreadyExists": "Pelitunnus on jo olemassa, siirry Liity peliin",
+    "gameDoesNotExist": "Annettua pelitunnusta ei ole olemassa, siirry kohtaan Luo peli",
+    "gameMasterExists": "Tällä pelissä on jo Game Master.",
+    "generic": "Oli ongelma. Yritä uudelleen.",
+    "npcExists": "Tämä hahmo on jo olemassa. Käytä toista NPC-nimeä.",
+    "passwordsDoNotMatch": "Salasanat eivät täsmää.",
+    "playerExists": "Olet jo tämän pelin pelaaja."
+  },
+  "firebaseErrors": {
+    "emailAlreadyExists": "Annettu sähköpostiosoite on jo toisen tilin käytössä. Käytä toista sähköpostiosoitetta ja yritä uudelleen tai jatka kirjautumiseen.",
+    "emailNotRegistered": "Tätä sähköpostiosoitetta ei ole rekisteröity. Kokeile toista tai jatka Luo tili.",
+    "incorrectPassword": "Väärä salasana. Yritä uudelleen.",
+    "issueSendingEmail": "Salasanan vaihtosähköpostin lähettämisessä oli ongelma. Yritä uudelleen.",
+    "noUserFound": "Tällä sähköpostilla ei löytynyt käyttäjää. Kokeile toista sähköpostiosoitetta tai siirry kohtaan Luo tili.",
+    "signingIn": "Sisäänkirjautumisessa tapahtui virhe. Yritä uudelleen.",
+    "updateFirebase": "Tietojesi päivityksessä tapahtui virhe. Päivitä tämä sivu ja yritä uudelleen."
+  },
+  "homepage": {
+    "otherGames": {
+      "cardGameId": "Pelitunnus: {{- gameId}}",
+      "header": "Muut pelit"
+    }
+  },
+  "authentication": {
+    "characterName": "Hahmon nimi",
+    "confirmPassword": "Vahvista salasana",
+    "createAnAccount": "Luo tili",
+    "createGame": "Luoda peli",
+    "email": "Sähköpostiosoite",
+    "firstName": "Etunimi",
+    "forgotPassword": "Unohtuiko salasana",
+    "gameId": "Pelin tunnus",
+    "gameMasterQuery": "Oletko pelin mestari?",
+    "joinGame": "Liity peliin",
+    "lastName": "Sukunimi",
+    "noShareInfo": "Emme koskaan jaa tietojasi.",
+    "password": "Salasana",
+    "resetEmailSent": "Salasanan vaihtosähköposti on lähetetty sinulle! Sinun pitäisi saada se hetkessä.",
+    "resetPassword": "Nollaa salasana",
+    "sendResetEmail": "Lähetä salasanan palautusviesti",
+    "signIn": "Kirjaudu sisään",
+    "signOut": "Kirjaudu ulos"
+  },
+  "diceRoller": {
+    "header": "Nopparulla",
+    "resetTable": "Nollaa taulukko",
+    "roll": "Rullaa",
+    "totalValue": "Kokonaisarvo:"
+  },
+  "footer": {
+    "copyFailure": "Tapahtui virhe. Yritä uudelleen.",
+    "copySuccess": "Pelitunnus kopioitu!",
+    "gameId": "Nykyinen pelitunnus: {{- activeGameId}}"
+  },
+  "initiativeOrder": {
+    "character": "Merkki",
+    "header": "Aloitteen tilaus",
+    "initiative": "Aloite",
+    "modifier": "Muokkaus",
+    "modify": "Muuttaa",
+    "npcCreator": "NPC Creator",
+    "removeAllNPCs": "Poista kaikki NPC:t",
+    "resetAllPlayers": "Nollaa Players Initiatives",
+    "resetInitiative": "Reset Initiative",
+    "rollInitiative": "Roll Initiative",
+    "setYourInitiative": "Aseta oma aloitteesi",
+    "tooltipContent": "**Modifier** + **Aloitus** = **Lopullinen aloitusarvo**",
+    "confirmationModal": {
+      "header": "Nollaa kaikki {{- initiativeGroup}} aloitusarvot",
+      "header2": " ja poista kaikki NPC:t",
+      "header3": "?"
+    },
+    "npcInitiativeModal": {
+      "modifyNPC": "Muokkaa {{- npcName}}",
+      "removeNPC": "Poista {{- npcName}}"
+    }
+  },
+  "navbar": {
+    "account": "Tili",
+    "diceRoller": "Nopparulla",
+    "initiativeOrder": "Aloitteen tilaus",
+    "signInSignUp": "Kirjaudu Rekisteröidy"
+  },
+  "pageNotFound": {
+    "goToHomepage": "Mene kotisivulle",
+    "header": "# Kriittinen epäonnistuminen!",
+    "subHeader": "## Näyttää siltä, että etsimäsi sivu on joko pois käytöstä huollon vuoksi tai sitä ei ole olemassa."
+  },
+  "changeLanguage": {
+    "header": "Vaihda kieltä"
+  }
+}

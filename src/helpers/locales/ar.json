@@ -1,0 +1,113 @@
+{
+  "common": {
+    "clear": "واضح",
+    "close": "يغلق",
+    "copyright": "©",
+    "dungeonsAndDragons": "الأبراج المحصنة والتنين",
+    "gameMaster": "سيد اللعبة",
+    "myName": "تايدن فليتكروفت",
+    "name": "اسم",
+    "remove": "إزالة",
+    "submit": "إرسال"
+  },
+  "errors": {
+    "characterExists": "اسم شخصيتك: {{characterName}} ، محدد مسبقًا في هذه اللعبة.",
+    "enterCharacterName": "الرجاء إدخال اسم الحرف.",
+    "enterEmail": "الرجاء إدخال عنوان البريد الإلكتروني.",
+    "enterGameId": "الرجاء إدخال معرف اللعبة.",
+    "enterNPCName": "الرجاء إدخال اسم NPC.",
+    "enterValidInitiativeValue": "الرجاء إدخال قيمة مبادرة رقمية صالحة.",
+    "error": "خطأ",
+    "fileTooLarge": "الصورة المحددة كبيرة جدًا ، يرجى تحديد ملف أقل من {{fileSize}} ميغابايت",
+    "gameAlreadyExists": "معرف اللعبة موجود بالفعل ، يرجى المتابعة للانضمام إلى اللعبة",
+    "gameDoesNotExist": "معرف اللعبة الذي تم إدخاله غير موجود ، يرجى المتابعة إلى إنشاء اللعبة",
+    "gameMasterExists": "تحتوي هذه اللعبة بالفعل على Game Master.",
+    "generic": "كانت هناك مشكلة. حاول مرة اخرى.",
+    "npcExists": "هذه الشخصية موجودة بالفعل. الرجاء استخدام اسم NPC مختلف.",
+    "passwordsDoNotMatch": "كلمة المرور غير مطابقة.",
+    "playerExists": "أنت بالفعل لاعب في هذه اللعبة."
+  },
+  "firebaseErrors": {
+    "emailAlreadyExists": "عنوان البريد الإلكتروني الذي تم إدخاله قيد الاستخدام بالفعل من قبل حساب آخر. يرجى استخدام عنوان بريد إلكتروني مختلف والمحاولة مرة أخرى أو المتابعة إلى تسجيل الدخول.",
+    "emailNotRegistered": "هذا البريد الإلكترونى ليس مسجلا. يرجى المحاولة مرة أخرى أو المتابعة لإنشاء حساب.",
+    "incorrectPassword": "كلمة سر خاطئة. حاول مرة اخرى.",
+    "issueSendingEmail": "كانت هناك مشكلة في إرسال البريد الإلكتروني الخاص بإعادة تعيين كلمة المرور. حاول مرة اخرى.",
+    "noUserFound": "لم يتم العثور على مستخدم بهذا البريد الإلكتروني. جرب عنوان بريد إلكتروني آخر أو تابع إنشاء حساب.",
+    "signingIn": "حدث خطأ أثناء تسجيل الدخول. يرجى المحاولة مرة أخرى.",
+    "updateFirebase": "كان هناك خطأ أثناء تحديث البيانات الخاصة بك. يرجى تحديث هذه الصفحة ثم حاول مرة أخرى."
+  },
+  "homepage": {
+    "otherGames": {
+      "cardGameId": "معرف اللعبة: {{- gameId}}",
+      "header": "ألعاب أخرى"
+    }
+  },
+  "authentication": {
+    "characterName": "اسم الشخصية",
+    "confirmPassword": "تأكيد كلمة المرور",
+    "createAnAccount": "انشئ حساب",
+    "createGame": "ابتكر لعبة",
+    "email": "عنوان بريد الكتروني",
+    "firstName": "الاسم الأول",
+    "forgotPassword": "هل نسيت كلمة السر",
+    "gameId": "رقم اللعبة",
+    "gameMasterQuery": "هل أنت سيد اللعبة؟",
+    "joinGame": "انضم للعبة",
+    "lastName": "الكنية",
+    "noShareInfo": "لن يتم مشاركة معلوماتك.",
+    "password": "كلمه السر",
+    "resetEmailSent": "تم إرسال بريد إلكتروني لإعادة تعيين كلمة المرور إليك! يجب أن تستلمها للحظات.",
+    "resetPassword": "إعادة تعيين كلمة المرور",
+    "sendResetEmail": "إرسال بريد إلكتروني لإعادة تعيين كلمة المرور",
+    "signIn": "تسجيل الدخول",
+    "signOut": "خروج"
+  },
+  "diceRoller": {
+    "header": "النرد الرول",
+    "resetTable": "إعادة ضبط الجدول",
+    "roll": "لفافة",
+    "totalValue": "القيمة الإجمالية:"
+  },
+  "footer": {
+    "copyFailure": "كان هناك خطأ. حاول مرة اخرى.",
+    "copySuccess": "معرف اللعبة المنسوخ!",
+    "gameId": "معرّف اللعبة الحالي: {{- activeGameId}}"
+  },
+  "initiativeOrder": {
+    "character": "حرف",
+    "header": "أمر المبادرة",
+    "initiative": "مبادرة",
+    "modifier": "المعدل",
+    "modify": "تعديل",
+    "npcCreator": "NPC Creator",
+    "removeAllNPCs": "إزالة جميع الشخصيات",
+    "resetAllPlayers": "إعادة تعيين مبادرات اللاعبين",
+    "resetInitiative": "مبادرة إعادة التعيين",
+    "rollInitiative": "مبادرة رول",
+    "setYourInitiative": "ضع مبادرتك",
+    "tooltipContent": "** المعدل ** + ** المبادرة ** = ** قيمة المبادرة النهائية **",
+    "confirmationModal": {
+      "header": "إعادة تعيين جميع قيم المبادرة {{- initiativeGroup}}",
+      "header2": " وإزالة جميع الشخصيات",
+      "header3": "؟"
+    },
+    "npcInitiativeModal": {
+      "modifyNPC": "تعديل {{- npcName}}",
+      "removeNPC": "إزالة {{- npcName}}"
+    }
+  },
+  "navbar": {
+    "account": "الحساب",
+    "diceRoller": "النرد الرول",
+    "initiativeOrder": "أمر المبادرة",
+    "signInSignUp": "تسجيل الدخول / التسجيل"
+  },
+  "pageNotFound": {
+    "goToHomepage": "اذهب إلى الصفحة الرئيسية",
+    "header": "# فشل فادح!",
+    "subHeader": "## يبدو أن الصفحة التي تبحث عنها إما معطلة للصيانة أو غير موجودة."
+  },
+  "changeLanguage": {
+    "header": "تغيير اللغة"
+  }
+}
