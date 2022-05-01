@@ -14,46 +14,41 @@ const firebaseConfig = {
     measurementId: 'G-YPQVF4HKTN'
 }
 
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig)
-} else {
-    firebase.app()
-}
-
+firebase.initializeApp(firebaseConfig)
 export const auth = firebase.auth()
 export const db = firebase.firestore()
 export const storage = firebase.storage()
 
-if (process.env.NODE_ENV === 'development') {
-    console.log('testing locally -- hitting local auth and firestore emulators')
-    auth.useEmulator('http://localhost:9099/')
-    storage.useEmulator('localhost', 9199)
-    db.useEmulator('localhost', 8080)
-}
-
 export const generateUserDocument = async (user, additionalData) => {
     if (!user) return
-    const { email, photoURL, uid } = user
-    const userRef = db.doc(`users/${ uid }`)
+    const userRef = db.doc(`users/${ user.uid }`)
     const snapshot = await userRef.get()
     if (!snapshot.exists) {
-        await userRef.set({
-            email,
-            photoURL,
-            uid,
-            games: {},
-            ...additionalData
-        })
-            .catch((err) => console.error('Error creating user document', err))
+        const { email, photoURL } = user
+        try {
+            await userRef.set({
+                email,
+                photoURL,
+                games: {},
+                ...additionalData
+            }).then(() => {
+                window.location.replace('/account/profile')
+            })
+        } catch (e) {
+            console.error('Error creating user document', e)
+        }
     }
-    return getUserDocument(uid)
+    return getUserDocument(user.uid)
 }
 
-export const getUserDocument = async (uid) => {
-    if (!uid) return
+const getUserDocument = async uid => {
+    if (!uid) return null
     try {
         const userDocument = await db.doc(`users/${ uid }`).get()
-        return userDocument.data()
+        return {
+            uid,
+            ...userDocument.data()
+        }
     } catch (e) {
         console.error('Error fetching user', e)
     }

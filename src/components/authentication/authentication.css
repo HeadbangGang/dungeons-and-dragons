@@ -1,0 +1,42 @@
+
+.authentication-page-container {
+    margin: 25px;
+}
+
+.authentication-box {
+    border: 1px solid grey;
+    border-radius: 25px;
+    max-width: 1000px;
+    background-color: white;
+    margin: 0 auto;
+    padding: 3% 0;
+}
+
+.authentication-header {
+    font-size: 30px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.authentication-form-container {
+    width: 75%;
+    margin: 15px auto;
+}
+
+.authentication-submit {
+    margin: 0 auto;
+    text-align: center;
+}
+
+.authentication-alt-option-container {
+    font-weight: 700;
+    text-align: center;
+}
+
+.authentication-or {
+    border-bottom: 1px solid black;
+}
+
+.authentication-alt-option {
+    margin: 20px 10px 10px;
+}

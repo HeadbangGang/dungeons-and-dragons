@@ -1,48 +1,50 @@
-import React, { useEffect, useState } from 'react'
+/* eslint-disable max-len */
+/* eslint-disable no-nested-ternary */
+/* eslint-disable react/jsx-key */
+import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { getDiceValues, resetDiceValues, updateDiceValues } from '../../store'
-import { Button, FormControl, InputGroup } from 'react-bootstrap'
-import { DEFAULT_DICE_SIDES } from '../../helpers/constants'
-import { numberValidation } from '../../helpers/helpers'
-import './dice-roller.scss'
-import I18N from '../I18N/i18n'
+import { updateDiceValues, getDiceValues, resetDiceValues, getIsSmallView } from '../../store/store'
+import { Row, Button, InputGroup, FormControl } from 'react-bootstrap'
 
-const DiceRoller = () => {
+export default function DiceRoller () {
     const dispatch = useDispatch()
+    const diceSides = [4, 6, 8, 10, 12, 20]
 
-    const [totalRollValue, setTotalRollValue] = useState('')
+    const [totalRollValue, setTotalRollValue] = useState()
     const [diceQuantities, setDiceQuantities] = useState([])
 
     const diceValues = useSelector(getDiceValues)
+    const isSmallView = useSelector(getIsSmallView)
 
     useEffect(() => {
         let total = 0
-        DEFAULT_DICE_SIDES.forEach(die => {
-            total = calculateTotalValue(diceValues[die], total)
+        diceSides.forEach(die => {
+            const stringDie = die.toString()
+            diceValues.get(stringDie) && diceValues.get(stringDie).forEach(val => {
+                total = total + val
+            })
         })
         setTotalRollValue(total)
         setDiceQuantities([])
     }, [diceValues])
 
-    const calculateTotalValue = (diceArr, totalVal) => {
-        let total = totalVal ?? 0
-        diceArr.forEach(die => {
-            total = total + die
-        })
-        return total
+    const numberValidation = (die, val) => {
+        let valid
+        if(!/^[0-9]+$/.test(val) && val !== ''){
+            valid = false
+            document.getElementById(die).value = ''
+        } else {
+            valid = true
+        }
+        return valid
     }
 
     const handleDiceQuantities = (die, quantity) => {
         const index = diceQuantities.findIndex(k => k[die])
-        if (numberValidation(quantity) && quantity !== '0') {
+        if (numberValidation(die, quantity)) {
             if (index > -1) {
-                const copyOfQuantities = [...diceQuantities]
-                if (!quantity) {
-                    const dieIndex = diceQuantities.findIndex(item => Object.keys(item)[0] === die)
-                    copyOfQuantities.splice(dieIndex, 1)
-                } else {
-                    copyOfQuantities[index][die] = quantity
-                }
+                let copyOfQuantities = [...diceQuantities]
+                copyOfQuantities[index][die] = quantity
                 setDiceQuantities(copyOfQuantities)
             } else {
                 setDiceQuantities([...diceQuantities, { [die]: quantity }])
@@ -52,8 +54,8 @@ const DiceRoller = () => {
 
     const roll = () => {
         diceQuantities.forEach(dice => {
-            const nums = []
-            const dieValue = Object.keys(dice)[0]
+            let nums = []
+            const dieValue = Object.keys(dice)
             const dieQuantity = dice[dieValue]
 
             for (let i = 0; i < dieQuantity; i++) {
@@ -69,115 +71,93 @@ const DiceRoller = () => {
         dispatch(resetDiceValues())
     }
 
-    const valueClassName = (value) => {
-        if (value === 20) return 'success'
-        if (value === 1) return 'failure'
-        return 'neutral'
-    }
-
-    const disableRollButton = () => {
-        let shouldDisable
-        shouldDisable = diceQuantities.length < 1
-        diceQuantities.forEach(item => {
-            const itemValue = item[Object.keys(item)[0]]
-            shouldDisable = itemValue < 1
-        })
-        return shouldDisable
-    }
-
     return (
-        <div className="dice-roller">
-            <h1><I18N name="diceRoller.header" /></h1>
+        <div style={{ padding: '10px' }}>
+            <h1 style={{ textAlign: 'center' }}>Dice Roller</h1>
             { totalRollValue > 0 &&
-                <h2>
-                    <I18N name="diceRoller.totalValue" />
+            <Row>
+                <h2 style={{ textAlign: 'center', margin: '15px 0' }}>
+                    Total value:
                     <div><strong>{ totalRollValue }</strong></div>
-                </h2> }
+                </h2>
+            </Row> }
             <form onSubmit={ (e) => {
                 e.preventDefault()
                 roll()
             } }
             >
-                <div className="dice-roller__dice-inputs">
-                    { DEFAULT_DICE_SIDES.map(dice => {
+                <Row>
+                    { diceSides.map(dice => {
                         const index = diceQuantities.findIndex(die => die[dice])
                         return (
-                            <InputGroup key={ dice }>
-                                <InputGroup.Text>{ dice }</InputGroup.Text>
-                                <FormControl
-                                    id={ dice }
-                                    inputMode="numeric"
-                                    maxLength="2"
-                                    onChange={ e => {
-                                        const { value, maxLength } = e.target
-                                        value.length > maxLength
-                                            ? value.slice(0, maxLength)
-                                            : handleDiceQuantities(dice, value)
-                                    } }
-                                    pattern="[0-9]*"
-                                    placeholder={ `Quantity of ${ dice }'s` }
-                                    type="number"
-                                    value={ (diceQuantities.length > 0 && index > -1 && diceQuantities[index] && diceQuantities[index][dice]) || '' }
-                                />
-                            </InputGroup>
+                            <div key={ dice }>
+                                <InputGroup style={{ width: '225px', margin: '5px' }}>
+                                    <InputGroup.Prepend>
+                                        <InputGroup.Text>{ dice }</InputGroup.Text>
+                                    </InputGroup.Prepend>
+                                    <FormControl
+                                        placeholder={ `Quantity of ${ dice }'s` }
+                                        id={ dice }
+                                        maxLength='2'
+                                        onChange={ e => {
+                                            handleDiceQuantities(dice, e.target.value)
+                                        } }
+                                        value={ (diceQuantities.length > 0 && index > -1 && diceQuantities[index] && diceQuantities[index][dice]) || '' }
+                                        type='tel'
+                                    />
+                                </InputGroup>
+                            </div>
                         )
-                    }) }
-                </div>
-                <div className="dice-roller__button-wrapper">
-                    <Button
-                        disabled={ disableRollButton() }
-                        onClick={ roll }
-                        type="submit"
-                    >
-                        <I18N name="diceRoller.roll" />
-                    </Button>
-                    <Button
-                        disabled={ !totalRollValue }
-                        onClick={ resetTable }
-                        tabIndex="-1"
-                        variant="danger"
-                    >
-                        <I18N name="diceRoller.resetTable" />
-                    </Button>
-                </div>
+                    })}
+                </Row>
+                <Row>
+                    <Button style={{ margin: '5px' }} type='submit' disabled={ diceQuantities.length < 1 } onClick={ roll } >Roll</Button>
+                    <Button tabIndex='-1' style={{ margin: '5px' }} disabled={ !totalRollValue } onClick={ resetTable } variant='danger'>Reset Table</Button>
+                </Row>
             </form>
-            <div>
+            <Row>
                 { totalRollValue > 0 &&
-                <table>
+                <table style={ isSmallView ? { marginTop: '16px' } : { width: '65%', marginTop: '16px' } }>
                     <tbody>
                         <tr>
-                            { DEFAULT_DICE_SIDES.map(die => (
-                                <th key={ die }>
-                                    <strong>{ `${ die }'s` }</strong>
-                                </th>
-                            )) }
+                            { diceSides.map((dice, index) => {
+                                return (
+                                    <th key={ index } style={{ width: '50px' }}>
+                                        <strong>{ `${ dice }'s` }</strong>
+                                    </th>
+                                )
+                            })}
                         </tr>
                         <tr>
-                            { DEFAULT_DICE_SIDES.map((die) => (
-                                <th key={ die }>
-                                    <div>
-                                        <em>{ calculateTotalValue(diceValues[die]) }</em>
-                                    </div>
-                                </th>
-                            )) }
-                        </tr>
-                        <tr>
-                            { Object.keys(diceValues).map((value, index) => (
-                                <td key={ index }>
-                                    { diceValues[value].map((die, idx) => (
-                                        <div className={ valueClassName(die) } key={ idx } >
-                                            <em>{ die }</em>
-                                            { idx + 1 !== diceValues[value].length && <hr /> }
+                            { diceSides.map((dice, index) => {
+                                return (
+                                    <th key={ index } style={{ width: '50px', padding: '0' }}>
+                                        <div>
+                                            <em>{ diceValues.get(dice.toString()) && diceValues.get(dice.toString()).reduce((a, b) => { return a + b }) } </em>
                                         </div>
-                                    )) }
-                                </td>
-                            )) }
+                                    </th>
+                                )
+                            })}
+                        </tr>
+                        <tr>
+                            { diceValues.keySeq().map((state, index) => {
+                                return (
+                                    <td key={ index } style={{ verticalAlign: 'top' }}>
+                                        { diceValues.get(state).map((die, index) => {
+                                            return (
+                                                <div key={ index } style={ die === 20 ? { backgroundColor: 'green' } : die === 1 ? { backgroundColor: 'red' } : { color: 'blue' } }>
+                                                    <em>{ die }</em>
+                                                    { diceValues.get(state).size > 1 && index !== diceValues.get(state).size - 1 && <hr style={{ margin: '0' }} /> }
+                                                </div>
+                                            )
+                                        })}
+                                    </td>
+                                )
+                            })}
                         </tr>
                     </tbody>
                 </table> }
-            </div>
+            </Row>
         </div>
     )
 }
-
-export default DiceRoller

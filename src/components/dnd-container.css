@@ -1,0 +1,22 @@
+.dnd-container {
+    overflow: hidden;
+}
+
+.dnd-main-content {
+    padding: 50px 0 75px;
+    min-height: 100vh;
+}
+
+.landscape-page-container {
+    display: none;
+}
+
+@media all and (orientation:landscape) and (max-device-width: 1200px) {
+    .dnd-container {
+        display: none;
+    }
+
+    .landscape-page-container {
+        display: unset;
+    }
+}
