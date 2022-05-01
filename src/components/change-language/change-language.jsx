@@ -1,6 +1,6 @@
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { getCurrentLanguage, getLocaleNames, getLocales, getShowChangeLanguage, setCurrentLanguage, setLocaleNames, setShowChangeLanguage } from '../../store'
+import { getCurrentLanguage, getLocaleNames, getShowChangeLanguage, setCurrentLanguage, setShowChangeLanguage } from '../../store'
 import { Button, Offcanvas } from 'react-bootstrap'
 import I18N, { changeCurrentLanguage } from '../I18N/i18n'
 import './change-language.scss'
@@ -9,7 +9,6 @@ const ChangeLanguage = () => {
     const dispatch = useDispatch()
 
     const showChangeLanguage = useSelector(getShowChangeLanguage)
-    const locales = useSelector(getLocales)
     const currentLanguage = useSelector(getCurrentLanguage)
     const localeNames = useSelector(getLocaleNames)
 
@@ -19,7 +18,6 @@ const ChangeLanguage = () => {
 
     const handleLanguageButton = async (language) => {
         await changeCurrentLanguage(language, () => dispatch(setCurrentLanguage(language)))
-        dispatch(setLocaleNames(locales))
     }
 
     const shouldDisableLanguageButton = (code) => code === currentLanguage || (code === 'en' && currentLanguage === 'en-US')

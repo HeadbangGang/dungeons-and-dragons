@@ -28,10 +28,9 @@ const dndState = (currentState = initialState, action) => {
                 errors: []
             }
         }
-        const updatedErrors = updateRemovedErrors(currentState)
         return currentState = {
             ...currentState,
-            errors: updatedErrors
+            errors: updateRemovedErrors(currentState)
         }
     }
     case SET_USER_ACCOUNT: {
@@ -101,10 +100,9 @@ const dndState = (currentState = initialState, action) => {
         }
     }
     case UPDATE_DICE_VALUES: {
-        const updatedDiceValues = updateCurrentDiceValues(action.die, action.values, currentState)
         return currentState = {
             ...currentState,
-            diceValues: updatedDiceValues
+            diceValues: updateCurrentDiceValues(action.die, action.values, currentState)
         }
     }
     case RESET_DICE_VALUES: {
@@ -154,7 +152,7 @@ const dndState = (currentState = initialState, action) => {
             ...currentState,
             localization: {
                 ...currentState.localization,
-                localeNames: action.localeNames
+                localeNames: mapLocaleNames(action.locales)
             }
         }
     }
@@ -215,8 +213,8 @@ export const SET_CURRENT_LANGUAGE = 'setCurrentLanguage'
 export const setShowChangeLanguage = shouldShowChangeLanguage => ({ type: SET_SHOW_CHANGE_LANGUAGE, shouldShowChangeLanguage })
 export const SET_SHOW_CHANGE_LANGUAGE = 'showChangeLanguage'
 
-export const setLocales = locales => ({ type: SET_LOCALES, locales })
-export const SET_LOCALES = 'setAvailableLocales'
+export const setLocaleNames = locales => ({ type: SET_LOCALE_NAMES, locales })
+export const SET_LOCALE_NAMES = 'setLocaleNames'
 
 // Thunks
 export const updateUserAccount = (gameId, characterName, currentGameData) => async (dispatch, getState) => {
@@ -265,18 +263,11 @@ export const setCurrentPageId = (pageId) => (dispatch, getState) => {
 }
 export const SET_CURRENT_PAGE_ID = 'setCurrentPageId'
 
-export const setLocaleNames = locales => (dispatch, getState) => {
-    const languageNames = new Intl.DisplayNames([getCurrentLanguage(getState()) || 'en'], {
-        type: 'language'
-    })
-
-    const localeNames = locales.sort().map(locale => ({
-        code: locale,
-        name: languageNames.of(locale)
-    }))
-    dispatch({ type: SET_LOCALE_NAMES, localeNames })
+export const setLocales = locales => (dispatch) => {
+    dispatch(setLocaleNames(locales))
+    dispatch({ type: SET_LOCALES, locales })
 }
-export const SET_LOCALE_NAMES = 'setLocaleNames'
+export const SET_LOCALES = 'setAvailableLocales'
 
 // Selectors
 export const getErrors = state => state.errors ?? []
@@ -315,6 +306,15 @@ const updateRemovedErrors = (state) => {
     const updatedErrors = getErrors(state)
     updatedErrors.shift()
     return updatedErrors
+}
+
+const mapLocaleNames = (locales) => {
+    const languageNames = (locale) => new Intl.DisplayNames([locale], { type: 'language' })
+
+    return locales.sort().map(locale => ({
+        code: locale,
+        name: languageNames(locale).of(locale)
+    }))
 }
 
 const updateCurrentUserAccount = async (gameId, characterName, currentGameData, state) => {

@@ -35,10 +35,9 @@ const PageTemplate = ({ children }) => {
 
     useEffect(() => {
         const preferredLanguage = window.localStorage.getItem('preferredLanguage')
-        const localeArr = Object.keys(allLocales)
 
-        dispatch(setLocales(localeArr))
-        dispatch(setLocaleNames(localeArr))
+        dispatch(setLocales(Object.keys(allLocales)))
+
         if (!preferredLanguage) {
             dispatch(setCurrentLanguage(window.navigator.language))
         }
