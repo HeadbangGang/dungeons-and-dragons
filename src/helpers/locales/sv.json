@@ -25,7 +25,10 @@
     "generic": "Det var ett problem. Var god försök igen.",
     "npcExists": "Denna karaktär finns redan. Använd ett annat NPC-namn.",
     "passwordsDoNotMatch": "Lösenorden matchar inte.",
-    "playerExists": "Du är redan en spelare i det här spelet."
+    "playerExists": "Du är redan en spelare i det här spelet.",
+    "testAccount": {
+      "joinCreateGame": "Tyvärr, du kan inte skapa eller gå med i ett spel medan du använder testkontot."
+    }
   },
   "firebaseErrors": {
     "emailAlreadyExists": "Den angivna e-postadressen används redan av ett annat konto. Använd en annan e-postadress och försök igen eller fortsätt till Logga in.",

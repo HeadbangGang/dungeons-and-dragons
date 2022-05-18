@@ -25,7 +25,10 @@
     "generic": "Bitte geben Sie einen Charakternamen ein.1",
     "npcExists": "Bitte geben Sie einen Charakternamen ein.2",
     "passwordsDoNotMatch": "Bitte geben Sie einen Charakternamen ein.3",
-    "playerExists": "Bitte geben Sie einen Charakternamen ein.4"
+    "playerExists": "Bitte geben Sie einen Charakternamen ein.4",
+    "testAccount": {
+      "joinCreateGame": "Tut mir leid, während Sie das Testkonto verwenden, können Sie kein Spiel erstellen oder einem Spiel beitreten."
+    }
   },
   "firebaseErrors": {
     "emailAlreadyExists": "Die eingegebene E-Mail-Adresse wird bereits von einem anderen Konto verwendet. Bitte verwenden Sie eine andere E-Mail-Adresse und versuchen Sie es erneut oder fahren Sie mit der Anmeldung fort.",

@@ -25,7 +25,10 @@
     "generic": "Il y avait un problème. Veuillez réessayer.",
     "npcExists": "Ce personnage existe déjà. Veuillez utiliser un autre nom de PNJ.",
     "passwordsDoNotMatch": "Les mots de passe ne correspondent pas.",
-    "playerExists": "Vous êtes déjà un joueur dans ce jeu."
+    "playerExists": "Vous êtes déjà un joueur dans ce jeu.",
+    "testAccount": {
+      "joinCreateGame": "Désolé, vous ne pouvez pas créer ou rejoindre une partie lorsque vous utilisez le compte de test."
+    }
   },
   "firebaseErrors": {
     "emailAlreadyExists": "L'adresse e-mail saisie est déjà utilisée par un autre compte. Veuillez utiliser une adresse e-mail différente et réessayer ou procéder à la connexion.",

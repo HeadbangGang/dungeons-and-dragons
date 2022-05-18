@@ -80,14 +80,16 @@ const PageTemplate = ({ children }) => {
     }, [setActiveGameData, userData])
 
     return (
-        <div className="dnd-container">
-            <Navbar />
-            <div className="dnd-main-content">
-                { children }
-                <ChangeLanguage />
+        <>
+            <div className="dnd-container">
+                <Navbar />
+                <div className="dnd-main-content">
+                    { children }
+                    <ChangeLanguage />
+                </div>
             </div>
             <Footer />
-        </div>
+        </>
     )
 }
 

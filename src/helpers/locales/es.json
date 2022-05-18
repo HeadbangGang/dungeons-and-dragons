@@ -25,7 +25,10 @@
     "generic": "Hubo un problema. Inténtalo de nuevo.",
     "npcExists": "Este personaje ya existe. Utilice un nombre NPC diferente.",
     "passwordsDoNotMatch": "Las contraseñas no coinciden.",
-    "playerExists": "Ya eres un jugador en este juego."
+    "playerExists": "Ya eres un jugador en este juego.",
+    "testAccount": {
+      "joinCreateGame": "Lo sentimos, no puedes crear o unirte a un juego mientras usas la cuenta de prueba."
+    }
   },
   "firebaseErrors": {
     "emailAlreadyExists": "La dirección de correo electrónico ingresada ya está en uso por otra cuenta. Utilice una dirección de correo electrónico diferente y vuelva a intentarlo o proceda a iniciar sesión.",

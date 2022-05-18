@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { PAGE_URL } from '../../helpers/constants'
+import { PAGE_URL, TEST_ACCOUNT_DATA } from '../../helpers/constants'
 import { sanitizedVariable, validateCharacterName, validateGameId } from '../../helpers/helpers'
-import { setErrors } from '../../store'
+import { getCurrentEmail, setErrors } from '../../store'
 import { db } from '../../database/firebase'
 import { Button } from 'react-bootstrap'
 import { getCurrentUser, updateActiveGameData, updateUserAccount } from '../../store'
@@ -15,6 +15,7 @@ const AddToGame =  () => {
     const dispatch = useDispatch()
 
     const userData = useSelector(getCurrentUser)
+    const isTestAccount = useSelector(getCurrentEmail) === TEST_ACCOUNT_DATA.EMAIL
 
     const [gameId, setGameId] = useState('')
     const [characterName, setCharacterName] = useState('')
@@ -40,6 +41,9 @@ const AddToGame =  () => {
     }
 
     const gameHandler = async (isNewGame) => {
+        if (isTestAccount) {
+            return dispatch(setErrors(language.errors.testAccount.joinCreateGame))
+        }
         if (validate()) {
             let gameExists = false
 

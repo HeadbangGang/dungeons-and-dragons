@@ -25,7 +25,10 @@
     "generic": "Oli ongelma. Yritä uudelleen.",
     "npcExists": "Tämä hahmo on jo olemassa. Käytä toista NPC-nimeä.",
     "passwordsDoNotMatch": "Salasanat eivät täsmää.",
-    "playerExists": "Olet jo tämän pelin pelaaja."
+    "playerExists": "Olet jo tämän pelin pelaaja.",
+    "testAccount": {
+      "joinCreateGame": "Valitettavasti et voi luoda peliä tai liittyä siihen, kun käytät testitiliä."
+    }
   },
   "firebaseErrors": {
     "emailAlreadyExists": "Annettu sähköpostiosoite on jo toisen tilin käytössä. Käytä toista sähköpostiosoitetta ja yritä uudelleen tai jatka kirjautumiseen.",
